@@ -23,7 +23,7 @@ export default function SettingsModal({ open, onClose }: SettingsModalProps) {
       <DialogTitle>
         <Box display='flex' alignItems='center' justifyContent='space-between'>
           <Typography variant='h6' component='div'>
-            Configurações
+            Settings
           </Typography>
           <IconButton aria-label='close' onClick={onClose} size='small'>
             <CloseIcon />
@@ -34,17 +34,17 @@ export default function SettingsModal({ open, onClose }: SettingsModalProps) {
       <DialogContent>
         <Box sx={{ py: 2 }}>
           <Typography variant='body1' color='text.secondary'>
-            Os parâmetros de configuração serão adicionados aqui.
+            Settings options will be added here.
           </Typography>
         </Box>
       </DialogContent>
       <Divider />
       <DialogActions sx={{ px: 3, py: 2 }}>
         <Button onClick={onClose} variant='outlined'>
-          Cancelar
+          Cancel
         </Button>
         <Button onClick={onClose} variant='contained'>
-          Salvar
+          Save
         </Button>
       </DialogActions>
     </Dialog>

@@ -1,59 +1,87 @@
-'use client';
-import { AppBar, Toolbar, Typography, Button, Box, Container, IconButton, Drawer, List, ListItem, ListItemIcon, ListItemText, ListItemButton, useTheme, useMediaQuery } from '@mui/material';
-import HomeIcon from '@mui/icons-material/Home';
-import TranslateIcon from '@mui/icons-material/Translate';
-import RecordVoiceOverIcon from '@mui/icons-material/RecordVoiceOver';
-import ScheduleIcon from '@mui/icons-material/Schedule';
-import MenuIcon from '@mui/icons-material/Menu';
-import SettingsIcon from '@mui/icons-material/Settings';
-import { useState } from 'react';
-import { useRouter, usePathname } from 'next/navigation';
-import SettingsModal from './SettingsModal';
+'use client'
+import {
+  AppBar,
+  Toolbar,
+  Typography,
+  Button,
+  Box,
+  Container,
+  IconButton,
+  Drawer,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  ListItemButton,
+  useTheme,
+  useMediaQuery,
+} from '@mui/material'
+import HomeIcon from '@mui/icons-material/Home'
+import TranslateIcon from '@mui/icons-material/Translate'
+import RecordVoiceOverIcon from '@mui/icons-material/RecordVoiceOver'
+import ScheduleIcon from '@mui/icons-material/Schedule'
+import MenuIcon from '@mui/icons-material/Menu'
+import { useState } from 'react'
+import { useRouter, usePathname } from 'next/navigation'
+import SettingsModal from './SettingsModal'
+import UserMenu from './UserMenu'
 
 const menuItems = [
   { text: 'Home', icon: <HomeIcon />, path: '/' },
-  { text: 'Words Translations', icon: <TranslateIcon />, path: '/words-translations' },
-  { text: 'Verbs Translations', icon: <RecordVoiceOverIcon />, path: '/verbs-translations' },
+  {
+    text: 'Words Translations',
+    icon: <TranslateIcon />,
+    path: '/words-translations',
+  },
+  {
+    text: 'Verbs Translations',
+    icon: <RecordVoiceOverIcon />,
+    path: '/verbs-translations',
+  },
   { text: 'Verb Tenses', icon: <ScheduleIcon />, path: '/verb-tenses' },
-];
+]
 
 export default function Navbar() {
-  const [mobileOpen, setMobileOpen] = useState(false);
-  const [settingsOpen, setSettingsOpen] = useState(false);
-  const router = useRouter();
-  const pathname = usePathname();
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const [mobileOpen, setMobileOpen] = useState(false)
+  const [settingsOpen, setSettingsOpen] = useState(false)
+  const router = useRouter()
+  const pathname = usePathname()
+  const theme = useTheme()
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'))
 
   const handleDrawerToggle = () => {
-    setMobileOpen(!mobileOpen);
-  };
+    setMobileOpen(!mobileOpen)
+  }
 
   const handleSettingsOpen = () => {
-    setSettingsOpen(true);
-  };
+    setSettingsOpen(true)
+  }
 
   const handleSettingsClose = () => {
-    setSettingsOpen(false);
-  };
+    setSettingsOpen(false)
+  }
 
   const handleNavigation = (path: string) => {
-    router.push(path);
+    router.push(path)
     if (isMobile) {
-      setMobileOpen(false);
+      setMobileOpen(false)
     }
-  };
+  }
 
   const drawer = (
-    <Box sx={{ width: 250 }} role="presentation">
+    <Box sx={{ width: 250 }} role='presentation'>
       <List>
         {menuItems.map((item) => (
           <ListItem key={item.text} disablePadding>
-            <ListItemButton 
+            <ListItemButton
               onClick={() => handleNavigation(item.path)}
               selected={pathname === item.path}
             >
-              <ListItemIcon sx={{ color: pathname === item.path ? 'primary.main' : 'inherit' }}>
+              <ListItemIcon
+                sx={{
+                  color: pathname === item.path ? 'primary.main' : 'inherit',
+                }}
+              >
                 {item.icon}
               </ListItemIcon>
               <ListItemText primary={item.text} />
@@ -62,29 +90,29 @@ export default function Navbar() {
         ))}
       </List>
     </Box>
-  );
+  )
 
   return (
     <>
-      <AppBar position="sticky" elevation={2}>
-        <Container maxWidth="xl">
+      <AppBar position='sticky' elevation={2}>
+        <Container maxWidth='xl'>
           <Toolbar disableGutters>
             {isMobile && (
               <IconButton
-                color="inherit"
-                aria-label="open drawer"
-                edge="start"
+                color='inherit'
+                aria-label='open drawer'
+                edge='start'
                 onClick={handleDrawerToggle}
                 sx={{ mr: 2 }}
               >
                 <MenuIcon />
               </IconButton>
             )}
-            
+
             <Typography
-              variant="h6"
+              variant='h6'
               noWrap
-              component="div"
+              component='div'
               sx={{
                 flexGrow: isMobile ? 1 : 0,
                 mr: 4,
@@ -104,7 +132,10 @@ export default function Navbar() {
                     startIcon={item.icon}
                     sx={{
                       color: 'white',
-                      backgroundColor: pathname === item.path ? 'rgba(255, 255, 255, 0.15)' : 'transparent',
+                      backgroundColor:
+                        pathname === item.path
+                          ? 'rgba(255, 255, 255, 0.15)'
+                          : 'transparent',
                       '&:hover': {
                         backgroundColor: 'rgba(255, 255, 255, 0.25)',
                       },
@@ -116,22 +147,13 @@ export default function Navbar() {
               </Box>
             )}
 
-            <IconButton
-              color="inherit"
-              aria-label="settings"
-              onClick={handleSettingsOpen}
-              sx={{
-                ml: isMobile ? 'auto' : 0,
-              }}
-            >
-              <SettingsIcon />
-            </IconButton>
+            <UserMenu onSettingsClick={handleSettingsOpen} />
           </Toolbar>
         </Container>
       </AppBar>
 
       <Drawer
-        variant="temporary"
+        variant='temporary'
         open={mobileOpen}
         onClose={handleDrawerToggle}
         ModalProps={{
@@ -147,6 +169,5 @@ export default function Navbar() {
 
       <SettingsModal open={settingsOpen} onClose={handleSettingsClose} />
     </>
-  );
+  )
 }
-
