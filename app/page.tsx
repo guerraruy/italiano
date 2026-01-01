@@ -1,24 +1,24 @@
 'use client';
-import { Container, Typography, Button, Box, Paper } from '@mui/material';
+import { Container, Typography, Button, Box, Paper, Grid, Card, CardContent } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import MenuBookIcon from '@mui/icons-material/MenuBook';
+import HomeIcon from '@mui/icons-material/Home';
+import TranslateIcon from '@mui/icons-material/Translate';
+import RecordVoiceOverIcon from '@mui/icons-material/RecordVoiceOver';
+import ScheduleIcon from '@mui/icons-material/Schedule';
+import { useRouter } from 'next/navigation';
 
-const StyledPaper = styled(Paper)(({ theme }) => ({
-  padding: theme.spacing(4),
-  marginTop: theme.spacing(4),
-  marginBottom: theme.spacing(4),
-  textAlign: 'center',
-  background: 'linear-gradient(145deg, #ffffff 0%, #f5f5f5 100%)',
-  boxShadow: '0 8px 32px rgba(0,0,0,0.1)',
+const PageContainer = styled(Container)(({ theme }) => ({
+  paddingTop: theme.spacing(4),
+  paddingBottom: theme.spacing(4),
 }));
 
-const HeroBox = styled(Box)(({ theme }) => ({
+const HeroSection = styled(Box)(({ theme }) => ({
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
   gap: theme.spacing(3),
-  minHeight: '60vh',
-  justifyContent: 'center',
+  marginBottom: theme.spacing(6),
+  textAlign: 'center',
 }));
 
 const IconWrapper = styled(Box)(({ theme }) => ({
@@ -27,12 +27,53 @@ const IconWrapper = styled(Box)(({ theme }) => ({
   marginBottom: theme.spacing(2),
 }));
 
+const FeatureCard = styled(Card)(({ theme }) => ({
+  height: '100%',
+  display: 'flex',
+  flexDirection: 'column',
+  transition: 'transform 0.2s, box-shadow 0.2s',
+  cursor: 'pointer',
+  '&:hover': {
+    transform: 'translateY(-8px)',
+    boxShadow: theme.shadows[8],
+  },
+}));
+
+const FeatureIcon = styled(Box)(({ theme }) => ({
+  color: theme.palette.primary.main,
+  fontSize: '3rem',
+  marginBottom: theme.spacing(2),
+}));
+
 export default function Home() {
+  const router = useRouter();
+
+  const features = [
+    {
+      title: 'Words Translations',
+      description: 'Learn and practice Italian vocabulary with interactive translations',
+      icon: <TranslateIcon fontSize="inherit" />,
+      path: '/words-translations',
+    },
+    {
+      title: 'Verbs Translations',
+      description: 'Master Italian verbs with comprehensive translation exercises',
+      icon: <RecordVoiceOverIcon fontSize="inherit" />,
+      path: '/verbs-translations',
+    },
+    {
+      title: 'Verb Tenses',
+      description: 'Practice verb conjugations across different tenses',
+      icon: <ScheduleIcon fontSize="inherit" />,
+      path: '/verb-tenses',
+    },
+  ];
+
   return (
-    <Container maxWidth="md">
-      <HeroBox>
+    <PageContainer maxWidth="lg">
+      <HeroSection>
         <IconWrapper>
-          <MenuBookIcon fontSize="inherit" />
+          <HomeIcon fontSize="inherit" />
         </IconWrapper>
         <Typography variant="h2" component="h1" gutterBottom fontWeight="bold">
           Welcome to Italiano
@@ -40,32 +81,56 @@ export default function Home() {
         <Typography variant="h5" color="text.secondary" paragraph>
           Your journey to learning Italian starts here
         </Typography>
-        <StyledPaper elevation={3}>
-          <Typography variant="body1" paragraph>
-            This is a modern Next.js application built with:
-          </Typography>
-          <Typography variant="body2" color="text.secondary" component="div">
-            ✓ Next.js 15 (App Router)
-            <br />
-            ✓ TypeScript
-            <br />
-            ✓ Material-UI (MUI)
-            <br />
-            ✓ @emotion/styled for styled components
-            <br />
-            ✓ PostgreSQL with Prisma ORM
-          </Typography>
-        </StyledPaper>
-        <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', justifyContent: 'center' }}>
-          <Button variant="contained" size="large" color="primary">
+        <Typography variant="body1" color="text.secondary" maxWidth="md">
+          Choose a learning path below to begin mastering the Italian language with interactive exercises and comprehensive lessons.
+        </Typography>
+      </HeroSection>
+
+      <Grid container spacing={4}>
+        {features.map((feature) => (
+          <Grid item xs={12} md={4} key={feature.title}>
+            <FeatureCard 
+              elevation={3}
+              onClick={() => router.push(feature.path)}
+            >
+              <CardContent sx={{ textAlign: 'center', flexGrow: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', p: 4 }}>
+                <FeatureIcon>
+                  {feature.icon}
+                </FeatureIcon>
+                <Typography variant="h5" component="h2" gutterBottom fontWeight="bold">
+                  {feature.title}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  {feature.description}
+                </Typography>
+              </CardContent>
+            </FeatureCard>
+          </Grid>
+        ))}
+      </Grid>
+
+      <Paper 
+        elevation={2} 
+        sx={{ 
+          mt: 6, 
+          p: 4, 
+          textAlign: 'center',
+          background: 'linear-gradient(145deg, #ffffff 0%, #f5f5f5 100%)',
+        }}
+      >
+        <Typography variant="h6" gutterBottom>
+          Ready to start learning?
+        </Typography>
+        <Typography variant="body2" color="text.secondary" paragraph>
+          Click on any of the cards above to begin your Italian learning journey
+        </Typography>
+        <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', justifyContent: 'center', mt: 3 }}>
+          <Button variant="contained" size="large" color="primary" onClick={() => router.push('/words-translations')}>
             Get Started
           </Button>
-          <Button variant="outlined" size="large" color="primary">
-            Learn More
-          </Button>
         </Box>
-      </HeroBox>
-    </Container>
+      </Paper>
+    </PageContainer>
   );
 }
 
