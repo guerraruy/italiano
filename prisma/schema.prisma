@@ -16,8 +16,11 @@ datasource db {
 // User model for authentication
 model User {
   id        String   @id @default(cuid())
+  username  String   @unique
   email     String   @unique
+  password  String   // Hashed password
   name      String?
+  admin     Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   lessons   UserLesson[]

@@ -21,10 +21,12 @@ import TranslateIcon from '@mui/icons-material/Translate'
 import RecordVoiceOverIcon from '@mui/icons-material/RecordVoiceOver'
 import ScheduleIcon from '@mui/icons-material/Schedule'
 import MenuIcon from '@mui/icons-material/Menu'
+import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings'
 import { useState } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import SettingsModal from './SettingsModal'
 import UserMenu from './UserMenu'
+import { useAuth } from '../contexts/AuthContext'
 
 const menuItems = [
   { text: 'Home', icon: <HomeIcon />, path: '/' },
@@ -48,6 +50,7 @@ export default function Navbar() {
   const pathname = usePathname()
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
+  const { user } = useAuth()
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen)
@@ -88,13 +91,36 @@ export default function Navbar() {
             </ListItemButton>
           </ListItem>
         ))}
+        {user?.admin && (
+          <ListItem disablePadding>
+            <ListItemButton
+              onClick={() => handleNavigation('/admin')}
+              selected={pathname === '/admin'}
+            >
+              <ListItemIcon
+                sx={{
+                  color: pathname === '/admin' ? 'primary.main' : 'inherit',
+                }}
+              >
+                <AdminPanelSettingsIcon />
+              </ListItemIcon>
+              <ListItemText primary='Admin Panel' />
+            </ListItemButton>
+          </ListItem>
+        )}
       </List>
     </Box>
   )
 
   return (
     <>
-      <AppBar position='sticky' elevation={2}>
+      <AppBar
+        position='sticky'
+        elevation={2}
+        sx={{
+          zIndex: (theme) => theme.zIndex.modal + 1,
+        }}
+      >
         <Container maxWidth='xl'>
           <Toolbar disableGutters>
             {isMobile && (
@@ -144,6 +170,24 @@ export default function Navbar() {
                     {item.text}
                   </Button>
                 ))}
+                {user?.admin && (
+                  <Button
+                    onClick={() => handleNavigation('/admin')}
+                    startIcon={<AdminPanelSettingsIcon />}
+                    sx={{
+                      color: 'white',
+                      backgroundColor:
+                        pathname === '/admin'
+                          ? 'rgba(255, 255, 255, 0.15)'
+                          : 'transparent',
+                      '&:hover': {
+                        backgroundColor: 'rgba(255, 255, 255, 0.25)',
+                      },
+                    }}
+                  >
+                    Admin Panel
+                  </Button>
+                )}
               </Box>
             )}
 
