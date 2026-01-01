@@ -45,7 +45,10 @@ export default function AdminPanel() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
-  const [deleteDialog, setDeleteDialog] = useState<{ open: boolean; user: UserData | null }>({
+  const [deleteDialog, setDeleteDialog] = useState<{
+    open: boolean
+    user: UserData | null
+  }>({
     open: false,
     user: null,
   })
@@ -63,10 +66,10 @@ export default function AdminPanel() {
       setLoading(true)
       setError(null)
       const token = localStorage.getItem('italiano_token')
-      
+
       const response = await fetch('/api/admin/users', {
         headers: {
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
       })
 
@@ -84,14 +87,17 @@ export default function AdminPanel() {
     }
   }
 
-  const handleToggleAdmin = async (userId: string, currentAdminStatus: boolean) => {
+  const handleToggleAdmin = async (
+    userId: string,
+    currentAdminStatus: boolean
+  ) => {
     try {
       const token = localStorage.getItem('italiano_token')
       const response = await fetch(`/api/admin/users/${userId}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ admin: !currentAdminStatus }),
       })
@@ -108,8 +114,8 @@ export default function AdminPanel() {
       )
       setTimeout(() => setSuccessMessage(null), 3000)
       fetchUsers()
-    } catch (err: any) {
-      setError(err.message || 'Error updating user')
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Error updating user')
       setTimeout(() => setError(null), 3000)
     }
   }
@@ -122,7 +128,7 @@ export default function AdminPanel() {
       const response = await fetch(`/api/admin/users/${deleteDialog.user.id}`, {
         method: 'DELETE',
         headers: {
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
       })
 
@@ -135,8 +141,8 @@ export default function AdminPanel() {
       setTimeout(() => setSuccessMessage(null), 3000)
       setDeleteDialog({ open: false, user: null })
       fetchUsers()
-    } catch (err: any) {
-      setError(err.message || 'Error deleting user')
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Error deleting user')
       setTimeout(() => setError(null), 3000)
     }
   }
@@ -147,7 +153,12 @@ export default function AdminPanel() {
 
   if (loading) {
     return (
-      <Box display="flex" justifyContent="center" alignItems="center" minHeight="400px">
+      <Box
+        display='flex'
+        justifyContent='center'
+        alignItems='center'
+        minHeight='400px'
+      >
         <CircularProgress />
       </Box>
     )
@@ -155,25 +166,29 @@ export default function AdminPanel() {
 
   return (
     <Box sx={{ maxWidth: 1200, mx: 'auto', p: 3 }}>
-      <Typography variant="h4" gutterBottom sx={{ mb: 3 }}>
+      <Typography variant='h4' gutterBottom sx={{ mb: 3 }}>
         Administration Panel
       </Typography>
 
       {error && (
-        <Alert severity="error" sx={{ mb: 2 }} onClose={() => setError(null)}>
+        <Alert severity='error' sx={{ mb: 2 }} onClose={() => setError(null)}>
           {error}
         </Alert>
       )}
 
       {successMessage && (
-        <Alert severity="success" sx={{ mb: 2 }} onClose={() => setSuccessMessage(null)}>
+        <Alert
+          severity='success'
+          sx={{ mb: 2 }}
+          onClose={() => setSuccessMessage(null)}
+        >
           {successMessage}
         </Alert>
       )}
 
       <Card>
         <CardContent>
-          <Typography variant="h6" gutterBottom>
+          <Typography variant='h6' gutterBottom>
             Manage Users ({users.length})
           </Typography>
 
@@ -184,10 +199,10 @@ export default function AdminPanel() {
                   <TableCell>Username</TableCell>
                   <TableCell>Email</TableCell>
                   <TableCell>Name</TableCell>
-                  <TableCell align="center">Admin</TableCell>
-                  <TableCell align="center">Lessons</TableCell>
-                  <TableCell align="center">Registered</TableCell>
-                  <TableCell align="center">Actions</TableCell>
+                  <TableCell align='center'>Admin</TableCell>
+                  <TableCell align='center'>Lessons</TableCell>
+                  <TableCell align='center'>Registered</TableCell>
+                  <TableCell align='center'>Actions</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -196,24 +211,32 @@ export default function AdminPanel() {
                     <TableCell>{userData.username}</TableCell>
                     <TableCell>{userData.email}</TableCell>
                     <TableCell>{userData.name || '-'}</TableCell>
-                    <TableCell align="center">
+                    <TableCell align='center'>
                       {userData.admin ? (
                         <Chip
-                          label="Admin"
-                          color="primary"
-                          size="small"
+                          label='Admin'
+                          color='primary'
+                          size='small'
                           icon={<AdminPanelSettings />}
                         />
                       ) : (
-                        <Chip label="User" size="small" />
+                        <Chip label='User' size='small' />
                       )}
                     </TableCell>
-                    <TableCell align="center">{userData._count.lessons}</TableCell>
-                    <TableCell align="center">
+                    <TableCell align='center'>
+                      {userData._count.lessons}
+                    </TableCell>
+                    <TableCell align='center'>
                       {new Date(userData.createdAt).toLocaleDateString('en-US')}
                     </TableCell>
-                    <TableCell align="center">
-                      <Box sx={{ display: 'flex', gap: 1, justifyContent: 'center' }}>
+                    <TableCell align='center'>
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          gap: 1,
+                          justifyContent: 'center',
+                        }}
+                      >
                         <Tooltip
                           title={
                             userData.admin
@@ -224,21 +247,29 @@ export default function AdminPanel() {
                           <span>
                             <IconButton
                               color={userData.admin ? 'warning' : 'primary'}
-                              size="small"
-                              onClick={() => handleToggleAdmin(userData.id, userData.admin)}
+                              size='small'
+                              onClick={() =>
+                                handleToggleAdmin(userData.id, userData.admin)
+                              }
                               disabled={userData.id === user.id}
                             >
-                              {userData.admin ? <PersonRemove /> : <AdminPanelSettings />}
+                              {userData.admin ? (
+                                <PersonRemove />
+                              ) : (
+                                <AdminPanelSettings />
+                              )}
                             </IconButton>
                           </span>
                         </Tooltip>
 
-                        <Tooltip title="Delete user">
+                        <Tooltip title='Delete user'>
                           <span>
                             <IconButton
-                              color="error"
-                              size="small"
-                              onClick={() => setDeleteDialog({ open: true, user: userData })}
+                              color='error'
+                              size='small'
+                              onClick={() =>
+                                setDeleteDialog({ open: true, user: userData })
+                              }
                               disabled={userData.id === user.id}
                             >
                               <Delete />
@@ -266,16 +297,16 @@ export default function AdminPanel() {
             Are you sure you want to delete the user{' '}
             <strong>{deleteDialog.user?.username}</strong>?
           </Typography>
-          <Typography color="error" sx={{ mt: 2 }}>
-            This action cannot be undone. All user data will be
-            permanently removed.
+          <Typography color='error' sx={{ mt: 2 }}>
+            This action cannot be undone. All user data will be permanently
+            removed.
           </Typography>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setDeleteDialog({ open: false, user: null })}>
             Cancel
           </Button>
-          <Button onClick={handleDeleteUser} color="error" variant="contained">
+          <Button onClick={handleDeleteUser} color='error' variant='contained'>
             Delete
           </Button>
         </DialogActions>
@@ -283,4 +314,3 @@ export default function AdminPanel() {
     </Box>
   )
 }
-
