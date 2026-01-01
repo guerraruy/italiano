@@ -5,8 +5,10 @@ import TranslateIcon from '@mui/icons-material/Translate';
 import RecordVoiceOverIcon from '@mui/icons-material/RecordVoiceOver';
 import ScheduleIcon from '@mui/icons-material/Schedule';
 import MenuIcon from '@mui/icons-material/Menu';
+import SettingsIcon from '@mui/icons-material/Settings';
 import { useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
+import SettingsModal from './SettingsModal';
 
 const menuItems = [
   { text: 'Home', icon: <HomeIcon />, path: '/' },
@@ -17,6 +19,7 @@ const menuItems = [
 
 export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
   const theme = useTheme();
@@ -24,6 +27,14 @@ export default function Navbar() {
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
+  };
+
+  const handleSettingsOpen = () => {
+    setSettingsOpen(true);
+  };
+
+  const handleSettingsClose = () => {
+    setSettingsOpen(false);
   };
 
   const handleNavigation = (path: string) => {
@@ -104,6 +115,17 @@ export default function Navbar() {
                 ))}
               </Box>
             )}
+
+            <IconButton
+              color="inherit"
+              aria-label="settings"
+              onClick={handleSettingsOpen}
+              sx={{
+                ml: isMobile ? 'auto' : 0,
+              }}
+            >
+              <SettingsIcon />
+            </IconButton>
           </Toolbar>
         </Container>
       </AppBar>
@@ -122,6 +144,8 @@ export default function Navbar() {
       >
         {drawer}
       </Drawer>
+
+      <SettingsModal open={settingsOpen} onClose={handleSettingsClose} />
     </>
   );
 }
