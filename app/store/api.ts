@@ -66,6 +66,14 @@ export interface ImportVerbsResponse {
   conflicts?: ConflictVerb[]
 }
 
+export interface VerbForPractice {
+  id: string
+  italian: string
+  translation: string
+  regular: boolean
+  reflexive: boolean
+}
+
 // Base query with authentication
 const baseQuery = fetchBaseQuery({
   baseUrl: '/api',
@@ -82,7 +90,7 @@ const baseQuery = fetchBaseQuery({
 export const api = createApi({
   reducerPath: 'api',
   baseQuery,
-  tagTypes: ['Users', 'Verbs', 'Auth', 'Profile'],
+  tagTypes: ['Users', 'Verbs', 'Auth', 'Profile', 'VerbsPractice'],
   endpoints: (builder) => ({
     // Auth endpoints
     login: builder.mutation<
@@ -178,6 +186,12 @@ export const api = createApi({
       }),
       invalidatesTags: ['Verbs'],
     }),
+
+    // Verb practice endpoints
+    getVerbsForPractice: builder.query<{ verbs: VerbForPractice[] }, void>({
+      query: () => '/verbs',
+      providesTags: ['VerbsPractice'],
+    }),
   }),
 })
 
@@ -193,4 +207,5 @@ export const {
   useDeleteUserMutation,
   useGetVerbsQuery,
   useImportVerbsMutation,
+  useGetVerbsForPracticeQuery,
 } = api
