@@ -13,6 +13,14 @@ export interface User {
   }
 }
 
+export interface UserProfile {
+  id: string
+  userId: string
+  nativeLanguage: 'pt-BR' | 'en'
+  createdAt: string
+  updatedAt: string
+}
+
 export interface UserData extends User {
   _count: {
     lessons: number
@@ -74,7 +82,7 @@ const baseQuery = fetchBaseQuery({
 export const api = createApi({
   reducerPath: 'api',
   baseQuery,
-  tagTypes: ['Users', 'Verbs', 'Auth'],
+  tagTypes: ['Users', 'Verbs', 'Auth', 'Profile'],
   endpoints: (builder) => ({
     // Auth endpoints
     login: builder.mutation<
@@ -108,6 +116,23 @@ export const api = createApi({
         method: 'POST',
         body: passwords,
       }),
+    }),
+
+    // Profile endpoints
+    getProfile: builder.query<{ profile: UserProfile }, void>({
+      query: () => '/profile',
+      providesTags: ['Profile'],
+    }),
+    updateProfile: builder.mutation<
+      { message: string; profile: UserProfile },
+      { nativeLanguage: 'pt-BR' | 'en' }
+    >({
+      query: (data) => ({
+        url: '/profile',
+        method: 'PATCH',
+        body: data,
+      }),
+      invalidatesTags: ['Profile'],
     }),
 
     // Admin User endpoints
@@ -161,6 +186,8 @@ export const {
   useLoginMutation,
   useRegisterMutation,
   useChangePasswordMutation,
+  useGetProfileQuery,
+  useUpdateProfileMutation,
   useGetUsersQuery,
   useUpdateUserMutation,
   useDeleteUserMutation,
