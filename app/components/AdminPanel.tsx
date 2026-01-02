@@ -22,7 +22,12 @@ import {
   Button,
   Tooltip,
 } from '@mui/material'
-import { Delete, AdminPanelSettings, PersonRemove } from '@mui/icons-material'
+import {
+  Delete,
+  AdminPanelSettings,
+  PersonRemove,
+  Translate,
+} from '@mui/icons-material'
 import { useAuth } from '../contexts/AuthContext'
 import { useRouter } from 'next/navigation'
 
@@ -166,9 +171,28 @@ export default function AdminPanel() {
 
   return (
     <Box sx={{ maxWidth: 1200, mx: 'auto', p: 3 }}>
-      <Typography variant='h4' gutterBottom sx={{ mb: 3 }}>
-        Administration Panel
-      </Typography>
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          mb: 3,
+        }}
+      >
+        <Typography variant='h4'>Administration Panel</Typography>
+        <Box>
+          <Button
+            variant='outlined'
+            startIcon={<Translate />}
+            onClick={() => {
+              console.log('Button clicked!')
+              router.push('/admin/verbs')
+            }}
+          >
+            Manage Verbs
+          </Button>
+        </Box>
+      </Box>
 
       {error && (
         <Alert severity='error' sx={{ mb: 2 }} onClose={() => setError(null)}>

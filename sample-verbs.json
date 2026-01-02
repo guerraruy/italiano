@@ -1,0 +1,93 @@
+{
+  "accendere": {
+    "regular": false,
+    "reflexive": false,
+    "tr_ptBR": "acender",
+    "tr_en": "to light"
+  },
+  "accettare": {
+    "regular": true,
+    "reflexive": false,
+    "tr_ptBR": "aceitar",
+    "tr_en": "to accept"
+  },
+  "accompagnare": {
+    "regular": true,
+    "reflexive": false,
+    "tr_ptBR": "acompanhar",
+    "tr_en": "to accompany"
+  },
+  "accorgersi": {
+    "regular": false,
+    "reflexive": true,
+    "tr_ptBR": "perceber-se",
+    "tr_en": "to realize"
+  },
+  "addormentarsi": {
+    "regular": true,
+    "reflexive": true,
+    "tr_ptBR": "adormecer",
+    "tr_en": "to fall asleep"
+  },
+  "aiutare": {
+    "regular": true,
+    "reflexive": false,
+    "tr_ptBR": "ajudar",
+    "tr_en": "to help"
+  },
+  "alzarsi": {
+    "regular": true,
+    "reflexive": true,
+    "tr_ptBR": "levantar-se",
+    "tr_en": "to get up"
+  },
+  "amare": {
+    "regular": true,
+    "reflexive": false,
+    "tr_ptBR": "amar",
+    "tr_en": "to love"
+  },
+  "andare": {
+    "regular": false,
+    "reflexive": false,
+    "tr_ptBR": "ir",
+    "tr_en": "to go"
+  },
+  "aprire": {
+    "regular": false,
+    "reflexive": false,
+    "tr_ptBR": "abrir",
+    "tr_en": "to open"
+  },
+  "arrivare": {
+    "regular": true,
+    "reflexive": false,
+    "tr_ptBR": "chegar",
+    "tr_en": "to arrive"
+  },
+  "ascoltare": {
+    "regular": true,
+    "reflexive": false,
+    "tr_ptBR": "ouvir",
+    "tr_en": "to listen"
+  },
+  "aspettare": {
+    "regular": true,
+    "reflexive": false,
+    "tr_ptBR": "esperar",
+    "tr_en": "to wait"
+  },
+  "avere": {
+    "regular": false,
+    "reflexive": false,
+    "tr_ptBR": "ter",
+    "tr_en": "to have"
+  },
+  "essere": {
+    "regular": false,
+    "reflexive": false,
+    "tr_ptBR": "ser/estar",
+    "tr_en": "to be"
+  }
+}
+
