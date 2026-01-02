@@ -1,5 +1,5 @@
 'use client'
-import { useState, useRef } from 'react'
+import React, { useState, useRef, useCallback, useMemo } from 'react'
 import {
   Container,
   Typography,
@@ -10,14 +10,32 @@ import {
   ListItem,
   CircularProgress,
   Alert,
-  Chip,
+  IconButton,
+  Tooltip,
+  InputAdornment,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
+  Button,
 } from '@mui/material'
 import { styled } from '@mui/material/styles'
 import RecordVoiceOverIcon from '@mui/icons-material/RecordVoiceOver'
-import CheckCircleIcon from '@mui/icons-material/CheckCircle'
-import CancelIcon from '@mui/icons-material/Cancel'
+import RadioButtonCheckedIcon from '@mui/icons-material/RadioButtonChecked'
+import ShowChartIcon from '@mui/icons-material/ShowChart'
 import AutorenewIcon from '@mui/icons-material/Autorenew'
-import { useGetVerbsForPracticeQuery } from '../store/api'
+import ClearIcon from '@mui/icons-material/Clear'
+import LightbulbIcon from '@mui/icons-material/Lightbulb'
+import CheckIcon from '@mui/icons-material/Check'
+import CloseIcon from '@mui/icons-material/Close'
+import RestartAltIcon from '@mui/icons-material/RestartAlt'
+import {
+  useGetVerbsForPracticeQuery,
+  useGetVerbStatisticsQuery,
+  useUpdateVerbStatisticMutation,
+  useResetVerbStatisticMutation,
+} from '../store/api'
 
 const PageContainer = styled(Container)(({ theme }) => ({
   paddingTop: theme.spacing(4),
@@ -51,14 +69,29 @@ const VerbInfo = styled(Box)(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
   gap: theme.spacing(2),
-  minWidth: '300px',
+  minWidth: '250px',
 }))
 
 const IconBox = styled(Box)(() => ({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  minWidth: '40px',
+  minWidth: '32px',
+}))
+
+const InputActionsBox = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  alignItems: 'center',
+  gap: theme.spacing(1),
+  flexGrow: 1,
+  maxWidth: '500px',
+}))
+
+const StatisticsBox = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: theme.spacing(0.5),
+  minWidth: '50px',
 }))
 
 interface ValidationState {
@@ -69,76 +102,50 @@ interface InputValues {
   [key: string]: string
 }
 
-export default function VerbsTranslationsPage() {
-  const { data, isLoading, error } = useGetVerbsForPracticeQuery()
-  const [inputValues, setInputValues] = useState<InputValues>({})
-  const [validationState, setValidationState] = useState<ValidationState>({})
-  const inputRefs = useRef<{ [key: string]: HTMLInputElement | null }>({})
-
-  // Normalize strings for comparison (remove accents, lowercase, trim)
-  const normalizeString = (str: string): string => {
-    return str
-      .toLowerCase()
-      .trim()
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
+interface VerbItemProps {
+  verb: {
+    id: string
+    italian: string
+    translation: string
+    regular: boolean
+    reflexive: boolean
   }
-
-  const validateAnswer = (
-    verbId: string,
-    userInput: string,
-    correctAnswer: string
-  ) => {
-    const normalizedInput = normalizeString(userInput)
-    const normalizedAnswer = normalizeString(correctAnswer)
-
-    return normalizedInput === normalizedAnswer
-  }
-
-  const handleInputChange = (verbId: string, value: string) => {
-    setInputValues((prev) => ({ ...prev, [verbId]: value }))
-    // Clear validation state when user starts typing
-    if (validationState[verbId]) {
-      setValidationState((prev) => ({ ...prev, [verbId]: null }))
-    }
-  }
-
-  const handleValidation = (verbId: string, correctAnswer: string) => {
-    const userInput = inputValues[verbId] || ''
-    if (!userInput.trim()) return
-
-    const isCorrect = validateAnswer(verbId, userInput, correctAnswer)
-    setValidationState((prev) => ({
-      ...prev,
-      [verbId]: isCorrect ? 'correct' : 'incorrect',
-    }))
-  }
-
-  const handleKeyDown = (
+  index: number
+  inputValue: string
+  validationState: 'correct' | 'incorrect' | null
+  statistics: { correct: number; wrong: number }
+  onInputChange: (verbId: string, value: string) => void
+  onValidation: (verbId: string, correctAnswer: string) => void
+  onClearInput: (verbId: string) => void
+  onShowAnswer: (verbId: string, correctAnswer: string) => void
+  onResetStatistics: (verbId: string) => void
+  onKeyDown: (
     e: React.KeyboardEvent,
     verbId: string,
     correctAnswer: string,
-    currentIndex: number
-  ) => {
-    if (e.key === 'Enter') {
-      e.preventDefault()
-      handleValidation(verbId, correctAnswer)
+    index: number
+  ) => void
+  inputRef: (el: HTMLInputElement | null) => void
+  getVerbIcon: (regular: boolean, reflexive: boolean) => React.ReactNode
+}
 
-      // Move to next input
-      const verbs = data?.verbs || []
-      if (currentIndex < verbs.length - 1) {
-        const nextVerb = verbs[currentIndex + 1]
-        const nextInput = inputRefs.current[nextVerb.id]
-        if (nextInput) {
-          nextInput.focus()
-        }
-      }
-    }
-  }
-
-  const getInputStyle = (verbId: string) => {
-    const state = validationState[verbId]
-    if (state === 'correct') {
+const VerbItem = ({
+  verb,
+  index,
+  inputValue,
+  validationState,
+  statistics,
+  onInputChange,
+  onValidation,
+  onClearInput,
+  onShowAnswer,
+  onResetStatistics,
+  onKeyDown,
+  inputRef,
+  getVerbIcon,
+}: VerbItemProps) => {
+  const inputStyle = useMemo(() => {
+    if (validationState === 'correct') {
       return {
         backgroundColor: '#c8e6c9',
         '& .MuiOutlinedInput-root': {
@@ -146,7 +153,7 @@ export default function VerbsTranslationsPage() {
         },
       }
     }
-    if (state === 'incorrect') {
+    if (validationState === 'incorrect') {
       return {
         backgroundColor: '#ffcdd2',
         '& .MuiOutlinedInput-root': {
@@ -155,41 +162,313 @@ export default function VerbsTranslationsPage() {
       }
     }
     return {}
-  }
+  }, [validationState])
 
-  const getVerbIcon = (regular: boolean, reflexive: boolean) => {
-    if (reflexive) {
-      return (
-        <Chip
-          icon={<AutorenewIcon />}
-          label='Reflexive'
+  return (
+    <VerbListItem>
+      <IconBox>{getVerbIcon(verb.regular, verb.reflexive)}</IconBox>
+
+      <VerbInfo>
+        <Typography
+          variant='body1'
+          fontWeight='bold'
+          sx={{ minWidth: '180px' }}
+        >
+          {verb.translation}
+        </Typography>
+      </VerbInfo>
+
+      <InputActionsBox>
+        <TextField
+          fullWidth
           size='small'
-          color='secondary'
-          variant='outlined'
+          placeholder='Type the Italian translation...'
+          value={inputValue}
+          onChange={(e) => onInputChange(verb.id, e.target.value)}
+          onBlur={() => onValidation(verb.id, verb.italian)}
+          onKeyDown={(e) => onKeyDown(e, verb.id, verb.italian, index)}
+          sx={inputStyle}
+          autoComplete='off'
+          inputRef={inputRef}
+          slotProps={{
+            input: {
+              endAdornment: (
+                <InputAdornment position='end'>
+                  <Tooltip title='Clear field'>
+                    <IconButton
+                      size='small'
+                      onClick={() => onClearInput(verb.id)}
+                      edge='end'
+                      sx={{ mr: 0.5 }}
+                    >
+                      <ClearIcon fontSize='small' />
+                    </IconButton>
+                  </Tooltip>
+                </InputAdornment>
+              ),
+            },
+          }}
         />
-      )
-    }
-    if (regular) {
-      return (
-        <Chip
-          icon={<CheckCircleIcon />}
-          label='Regular'
+        <Tooltip title='Show answer'>
+          <IconButton
+            size='small'
+            onClick={() => onShowAnswer(verb.id, verb.italian)}
+            color='primary'
+          >
+            <LightbulbIcon />
+          </IconButton>
+        </Tooltip>
+      </InputActionsBox>
+
+      <StatisticsBox>
+        <Tooltip title='Correct attempts'>
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 0.5,
+              color: 'success.main',
+            }}
+          >
+            <CheckIcon sx={{ fontSize: 16 }} />
+            <Typography variant='caption' fontWeight='bold'>
+              {statistics.correct}
+            </Typography>
+          </Box>
+        </Tooltip>
+        <Tooltip title='Wrong attempts'>
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 0.5,
+              color: 'error.main',
+            }}
+          >
+            <CloseIcon sx={{ fontSize: 16 }} />
+            <Typography variant='caption' fontWeight='bold'>
+              {statistics.wrong}
+            </Typography>
+          </Box>
+        </Tooltip>
+      </StatisticsBox>
+
+      <Tooltip title='Reset statistics'>
+        <IconButton
           size='small'
-          color='success'
-          variant='outlined'
-        />
-      )
+          onClick={() => onResetStatistics(verb.id)}
+          color='default'
+          disabled={statistics.correct === 0 && statistics.wrong === 0}
+        >
+          <RestartAltIcon fontSize='small' />
+        </IconButton>
+      </Tooltip>
+    </VerbListItem>
+  )
+}
+
+const MemoizedVerbItem = React.memo(VerbItem)
+
+interface ResetDialogState {
+  open: boolean
+  verbId: string | null
+  verbTranslation: string | null
+}
+
+// Normalize strings for comparison (remove accents, lowercase, trim)
+const normalizeString = (str: string): string => {
+  return str
+    .toLowerCase()
+    .trim()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+}
+
+const validateAnswer = (
+  verbId: string,
+  userInput: string,
+  correctAnswer: string
+) => {
+  const normalizedInput = normalizeString(userInput)
+  const normalizedAnswer = normalizeString(correctAnswer)
+
+  return normalizedInput === normalizedAnswer
+}
+
+export default function VerbsTranslationsPage() {
+  const { data, isLoading, error } = useGetVerbsForPracticeQuery()
+  const { data: statisticsData } = useGetVerbStatisticsQuery(undefined, {
+    refetchOnMountOrArgChange: false,
+    refetchOnFocus: false,
+  })
+  const [updateVerbStatistic] = useUpdateVerbStatisticMutation()
+  const [resetVerbStatistic, { isLoading: isResetting }] =
+    useResetVerbStatisticMutation()
+  const [inputValues, setInputValues] = useState<InputValues>({})
+  const [validationState, setValidationState] = useState<ValidationState>({})
+  const [resetDialog, setResetDialog] = useState<ResetDialogState>({
+    open: false,
+    verbId: null,
+    verbTranslation: null,
+  })
+  const inputRefs = useRef<{ [key: string]: HTMLInputElement | null }>({})
+  const lastValidatedRef = useRef<{ [key: string]: number }>({})
+
+  const handleInputChange = useCallback((verbId: string, value: string) => {
+    setInputValues((prev) => ({ ...prev, [verbId]: value }))
+    // Clear validation visual feedback when user starts typing again
+    setValidationState((prev) => {
+      if (!prev[verbId]) return prev // No change needed
+      return { ...prev, [verbId]: null }
+    })
+  }, [])
+
+  const handleValidation = useCallback(
+    (verbId: string, correctAnswer: string) => {
+      const userInput = inputValues[verbId] || ''
+      if (!userInput.trim()) return
+
+      // Prevent duplicate validation within 100ms
+      const now = Date.now()
+      const lastValidated = lastValidatedRef.current[verbId] || 0
+      if (now - lastValidated < 100) {
+        return
+      }
+      lastValidatedRef.current[verbId] = now
+
+      const isCorrect = validateAnswer(verbId, userInput, correctAnswer)
+
+      setValidationState((prev) => ({
+        ...prev,
+        [verbId]: isCorrect ? 'correct' : 'incorrect',
+      }))
+
+      // Save statistics to backend asynchronously (fire and forget)
+      updateVerbStatistic({ verbId, correct: isCorrect }).catch((error) => {
+        console.error('Failed to update statistics:', error)
+      })
+    },
+    [inputValues, updateVerbStatistic]
+  )
+
+  const handleClearInput = useCallback((verbId: string) => {
+    setInputValues((prev) => ({ ...prev, [verbId]: '' }))
+    setValidationState((prev) => ({ ...prev, [verbId]: null }))
+    // Focus the input
+    setTimeout(() => {
+      const input = inputRefs.current[verbId]
+      if (input) {
+        input.focus()
+      }
+    }, 0)
+  }, [])
+
+  const handleShowAnswer = useCallback(
+    (verbId: string, correctAnswer: string) => {
+      setInputValues((prev) => ({ ...prev, [verbId]: correctAnswer }))
+      setValidationState((prev) => ({ ...prev, [verbId]: 'correct' }))
+    },
+    []
+  )
+
+  const handleOpenResetDialog = useCallback(
+    (verbId: string) => {
+      const verb = data?.verbs.find((v) => v.id === verbId)
+      if (verb) {
+        setResetDialog({
+          open: true,
+          verbId,
+          verbTranslation: verb.translation,
+        })
+      }
+    },
+    [data?.verbs]
+  )
+
+  const handleCloseResetDialog = useCallback(() => {
+    setResetDialog({
+      open: false,
+      verbId: null,
+      verbTranslation: null,
+    })
+  }, [])
+
+  const handleConfirmReset = useCallback(async () => {
+    if (!resetDialog.verbId) return
+
+    try {
+      await resetVerbStatistic(resetDialog.verbId).unwrap()
+      handleCloseResetDialog()
+    } catch (error) {
+      console.error('Failed to reset statistics:', error)
     }
-    return (
-      <Chip
-        icon={<CancelIcon />}
-        label='Irregular'
-        size='small'
-        color='warning'
-        variant='outlined'
-      />
-    )
-  }
+  }, [resetDialog.verbId, resetVerbStatistic, handleCloseResetDialog])
+
+  const handleKeyDown = useCallback(
+    (
+      e: React.KeyboardEvent,
+      verbId: string,
+      correctAnswer: string,
+      currentIndex: number
+    ) => {
+      if (e.key === 'Enter') {
+        e.preventDefault()
+        handleValidation(verbId, correctAnswer)
+
+        // Move to next input
+        const verbs = data?.verbs || []
+        if (currentIndex < verbs.length - 1) {
+          const nextVerb = verbs[currentIndex + 1]
+          const nextInput = inputRefs.current[nextVerb.id]
+          if (nextInput) {
+            nextInput.focus()
+          }
+        }
+      }
+    },
+    [data?.verbs, handleValidation]
+  )
+
+  const verbIcons = useMemo(
+    () => ({
+      reflexive: (
+        <Tooltip title='Reflexive'>
+          <AutorenewIcon color='secondary' />
+        </Tooltip>
+      ),
+      regular: (
+        <Tooltip title='Regular'>
+          <RadioButtonCheckedIcon color='info' />
+        </Tooltip>
+      ),
+      irregular: (
+        <Tooltip title='Irregular'>
+          <ShowChartIcon color='warning' />
+        </Tooltip>
+      ),
+    }),
+    []
+  )
+
+  const getVerbIcon = useCallback(
+    (regular: boolean, reflexive: boolean) => {
+      if (reflexive) return verbIcons.reflexive
+      if (regular) return verbIcons.regular
+      return verbIcons.irregular
+    },
+    [verbIcons]
+  )
+
+  const getStatistics = useCallback(
+    (verbId: string) => {
+      const stats = statisticsData?.statistics[verbId]
+      return {
+        correct: stats?.correctAttempts || 0,
+        wrong: stats?.wrongAttempts || 0,
+      }
+    },
+    [statisticsData?.statistics]
+  )
 
   if (isLoading) {
     return (
@@ -260,40 +539,56 @@ export default function VerbsTranslationsPage() {
         ) : (
           <List>
             {verbs.map((verb, index) => (
-              <VerbListItem key={verb.id}>
-                <IconBox>{getVerbIcon(verb.regular, verb.reflexive)}</IconBox>
-
-                <VerbInfo>
-                  <Typography
-                    variant='body1'
-                    fontWeight='bold'
-                    sx={{ minWidth: '200px' }}
-                  >
-                    {verb.translation}
-                  </Typography>
-                </VerbInfo>
-
-                <Box sx={{ flexGrow: 1, maxWidth: '400px' }}>
-                  <TextField
-                    fullWidth
-                    size='small'
-                    placeholder='Type the Italian translation...'
-                    value={inputValues[verb.id] || ''}
-                    onChange={(e) => handleInputChange(verb.id, e.target.value)}
-                    onBlur={() => handleValidation(verb.id, verb.italian)}
-                    onKeyDown={(e) =>
-                      handleKeyDown(e, verb.id, verb.italian, index)
-                    }
-                    sx={getInputStyle(verb.id)}
-                    autoComplete='off'
-                    inputRef={(el) => (inputRefs.current[verb.id] = el)}
-                  />
-                </Box>
-              </VerbListItem>
+              <MemoizedVerbItem
+                key={verb.id}
+                verb={verb}
+                index={index}
+                inputValue={inputValues[verb.id] || ''}
+                validationState={validationState[verb.id] || null}
+                statistics={getStatistics(verb.id)}
+                onInputChange={handleInputChange}
+                onValidation={handleValidation}
+                onClearInput={handleClearInput}
+                onShowAnswer={handleShowAnswer}
+                onResetStatistics={handleOpenResetDialog}
+                onKeyDown={handleKeyDown}
+                inputRef={(el) => (inputRefs.current[verb.id] = el)}
+                getVerbIcon={getVerbIcon}
+              />
             ))}
           </List>
         )}
       </ContentPaper>
+
+      {/* Reset Statistics Confirmation Dialog */}
+      <Dialog
+        open={resetDialog.open}
+        onClose={handleCloseResetDialog}
+        aria-labelledby='reset-dialog-title'
+        aria-describedby='reset-dialog-description'
+      >
+        <DialogTitle id='reset-dialog-title'>Reset Statistics</DialogTitle>
+        <DialogContent>
+          <DialogContentText id='reset-dialog-description'>
+            Are you sure you want to reset all statistics for the verb &quot;
+            {resetDialog.verbTranslation}&quot;? This action cannot be undone.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseResetDialog} disabled={isResetting}>
+            Cancel
+          </Button>
+          <Button
+            onClick={handleConfirmReset}
+            color='error'
+            variant='contained'
+            disabled={isResetting}
+            autoFocus
+          >
+            {isResetting ? 'Resetting...' : 'Reset'}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </PageContainer>
   )
 }

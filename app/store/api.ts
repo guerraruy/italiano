@@ -74,6 +74,16 @@ export interface VerbForPractice {
   reflexive: boolean
 }
 
+export interface VerbStatistic {
+  correctAttempts: number
+  wrongAttempts: number
+  lastPracticed: Date
+}
+
+export interface VerbStatisticsMap {
+  [verbId: string]: VerbStatistic
+}
+
 // Base query with authentication
 const baseQuery = fetchBaseQuery({
   baseUrl: '/api',
@@ -90,7 +100,7 @@ const baseQuery = fetchBaseQuery({
 export const api = createApi({
   reducerPath: 'api',
   baseQuery,
-  tagTypes: ['Users', 'Verbs', 'Auth', 'Profile', 'VerbsPractice'],
+  tagTypes: ['Users', 'Verbs', 'Auth', 'Profile', 'VerbsPractice', 'VerbStatistics'],
   endpoints: (builder) => ({
     // Auth endpoints
     login: builder.mutation<
@@ -192,6 +202,33 @@ export const api = createApi({
       query: () => '/verbs',
       providesTags: ['VerbsPractice'],
     }),
+
+    // Verb statistics endpoints
+    getVerbStatistics: builder.query<{ statistics: VerbStatisticsMap }, void>({
+      query: () => '/verbs/statistics',
+      providesTags: ['VerbStatistics'],
+    }),
+    updateVerbStatistic: builder.mutation<
+      { message: string; statistic: VerbStatistic & { id: string; verbId: string } },
+      { verbId: string; correct: boolean }
+    >({
+      query: (data) => ({
+        url: '/verbs/statistics',
+        method: 'POST',
+        body: data,
+      }),
+      invalidatesTags: ['VerbStatistics'],
+    }),
+    resetVerbStatistic: builder.mutation<
+      { message: string },
+      string
+    >({
+      query: (verbId) => ({
+        url: `/verbs/statistics/${verbId}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: ['VerbStatistics'],
+    }),
   }),
 })
 
@@ -208,4 +245,7 @@ export const {
   useGetVerbsQuery,
   useImportVerbsMutation,
   useGetVerbsForPracticeQuery,
+  useGetVerbStatisticsQuery,
+  useUpdateVerbStatisticMutation,
+  useResetVerbStatisticMutation,
 } = api

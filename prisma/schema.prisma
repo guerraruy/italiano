@@ -15,16 +15,17 @@ datasource db {
 
 // User model for authentication
 model User {
-  id        String       @id @default(cuid())
-  username  String       @unique
-  email     String       @unique
-  password  String       // Hashed password
-  name      String?
-  admin     Boolean      @default(false)
-  createdAt DateTime     @default(now())
-  updatedAt DateTime     @updatedAt
-  lessons   UserLesson[]
-  profile   UserProfile?
+  id             String          @id @default(cuid())
+  username       String          @unique
+  email          String          @unique
+  password       String          // Hashed password
+  name           String?
+  admin          Boolean         @default(false)
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  lessons        UserLesson[]
+  profile        UserProfile?
+  verbStatistics VerbStatistic[]
 }
 
 // User profile with preferences and settings
@@ -80,12 +81,31 @@ model UserLesson {
 
 // Italian verbs with translations
 model Verb {
-  id          String   @id @default(cuid())
-  italian     String   @unique // The verb infinitive in Italian
-  regular     Boolean  @default(true) // Regular or irregular verb
-  reflexive   Boolean  @default(false) // Reflexive verb
-  tr_ptBR     String   // Portuguese (Brazil) translation
-  tr_en       String?  // English translation
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id          String          @id @default(cuid())
+  italian     String          @unique // The verb infinitive in Italian
+  regular     Boolean         @default(true) // Regular or irregular verb
+  reflexive   Boolean         @default(false) // Reflexive verb
+  tr_ptBR     String          // Portuguese (Brazil) translation
+  tr_en       String?         // English translation
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  statistics  VerbStatistic[]
+}
+
+// Statistics for verb practice per user
+model VerbStatistic {
+  id              String   @id @default(cuid())
+  userId          String
+  verbId          String
+  correctAttempts Int      @default(0)
+  wrongAttempts   Int      @default(0)
+  lastPracticed   DateTime @default(now())
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  verb            Verb     @relation(fields: [verbId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, verbId])
+  @@index([userId])
+  @@index([verbId])
 }
