@@ -30,24 +30,26 @@ import {
 } from '@mui/icons-material'
 import { useAuth } from '../contexts/AuthContext'
 import { useRouter } from 'next/navigation'
-
-interface UserData {
-  id: string
-  username: string
-  email: string
-  name: string | null
-  admin: boolean
-  createdAt: string
-  _count: {
-    lessons: number
-  }
-}
+import {
+  useGetUsersQuery,
+  useUpdateUserMutation,
+  useDeleteUserMutation,
+  type UserData,
+} from '../store/api'
 
 export default function AdminPanel() {
   const { user, isAuthenticated } = useAuth()
   const router = useRouter()
-  const [users, setUsers] = useState<UserData[]>([])
-  const [loading, setLoading] = useState(true)
+  const {
+    data,
+    isLoading,
+    error: queryError,
+  } = useGetUsersQuery(undefined, {
+    skip: !isAuthenticated || !user?.admin,
+  })
+  const [updateUser] = useUpdateUserMutation()
+  const [deleteUser] = useDeleteUserMutation()
+
   const [error, setError] = useState<string | null>(null)
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
   const [deleteDialog, setDeleteDialog] = useState<{
@@ -63,54 +65,17 @@ export default function AdminPanel() {
       router.push('/')
       return
     }
-    fetchUsers()
   }, [isAuthenticated, user, router])
-
-  const fetchUsers = async () => {
-    try {
-      setLoading(true)
-      setError(null)
-      const token = localStorage.getItem('italiano_token')
-
-      const response = await fetch('/api/admin/users', {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch users')
-      }
-
-      const data = await response.json()
-      setUsers(data.users)
-    } catch (err) {
-      setError('Error loading users')
-      console.error(err)
-    } finally {
-      setLoading(false)
-    }
-  }
 
   const handleToggleAdmin = async (
     userId: string,
     currentAdminStatus: boolean
   ) => {
     try {
-      const token = localStorage.getItem('italiano_token')
-      const response = await fetch(`/api/admin/users/${userId}`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ admin: !currentAdminStatus }),
-      })
-
-      if (!response.ok) {
-        const data = await response.json()
-        throw new Error(data.error || 'Failed to update user')
-      }
+      await updateUser({
+        userId,
+        admin: !currentAdminStatus,
+      }).unwrap()
 
       setSuccessMessage(
         currentAdminStatus
@@ -118,9 +83,9 @@ export default function AdminPanel() {
           : 'User promoted to admin successfully'
       )
       setTimeout(() => setSuccessMessage(null), 3000)
-      fetchUsers()
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error updating user')
+      const error = err as { data?: { error?: string } }
+      setError(error?.data?.error || 'Error updating user')
       setTimeout(() => setError(null), 3000)
     }
   }
@@ -129,25 +94,14 @@ export default function AdminPanel() {
     if (!deleteDialog.user) return
 
     try {
-      const token = localStorage.getItem('italiano_token')
-      const response = await fetch(`/api/admin/users/${deleteDialog.user.id}`, {
-        method: 'DELETE',
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-
-      if (!response.ok) {
-        const data = await response.json()
-        throw new Error(data.error || 'Failed to delete user')
-      }
+      await deleteUser(deleteDialog.user.id).unwrap()
 
       setSuccessMessage('User deleted successfully')
       setTimeout(() => setSuccessMessage(null), 3000)
       setDeleteDialog({ open: false, user: null })
-      fetchUsers()
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error deleting user')
+      const error = err as { data?: { error?: string } }
+      setError(error?.data?.error || 'Error deleting user')
       setTimeout(() => setError(null), 3000)
     }
   }
@@ -156,7 +110,7 @@ export default function AdminPanel() {
     return null
   }
 
-  if (loading) {
+  if (isLoading) {
     return (
       <Box
         display='flex'
@@ -169,6 +123,8 @@ export default function AdminPanel() {
     )
   }
 
+  const users = data?.users || []
+
   return (
     <Box sx={{ maxWidth: 1200, mx: 'auto', p: 3 }}>
       <Box
@@ -180,23 +136,18 @@ export default function AdminPanel() {
         }}
       >
         <Typography variant='h4'>Administration Panel</Typography>
-        <Box>
-          <Button
-            variant='outlined'
-            startIcon={<Translate />}
-            onClick={() => {
-              console.log('Button clicked!')
-              router.push('/admin/verbs')
-            }}
-          >
-            Manage Verbs
-          </Button>
-        </Box>
+        <Button
+          variant='outlined'
+          startIcon={<Translate />}
+          onClick={() => router.push('/admin/verbs')}
+        >
+          Manage Verbs
+        </Button>
       </Box>
 
-      {error && (
+      {(error || queryError) && (
         <Alert severity='error' sx={{ mb: 2 }} onClose={() => setError(null)}>
-          {error}
+          {error || 'Error loading users'}
         </Alert>
       )}
 
@@ -251,7 +202,11 @@ export default function AdminPanel() {
                       {userData._count.lessons}
                     </TableCell>
                     <TableCell align='center'>
-                      {new Date(userData.createdAt).toLocaleDateString('en-US')}
+                      {userData.createdAt
+                        ? new Date(userData.createdAt).toLocaleDateString(
+                            'en-US'
+                          )
+                        : '-'}
                     </TableCell>
                     <TableCell align='center'>
                       <Box

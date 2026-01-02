@@ -1,1 +1,2 @@
 - All text, comments and filenames in the application must be written in English.
+- use RTK Query for API state management and data fetching

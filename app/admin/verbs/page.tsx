@@ -31,39 +31,22 @@ import {
 } from '@mui/icons-material'
 import { useAuth } from '../../contexts/AuthContext'
 import { useRouter } from 'next/navigation'
-
-interface VerbData {
-  regular: boolean
-  reflexive: boolean
-  tr_ptBR: string
-  tr_en?: string
-}
-
-interface ConflictVerb {
-  italian: string
-  existing: {
-    regular: boolean
-    reflexive: boolean
-    tr_ptBR: string
-    tr_en: string | null
-  }
-  new: VerbData
-}
-
-interface ImportedVerb {
-  italian: string
-  regular: boolean
-  reflexive: boolean
-  tr_ptBR: string
-  tr_en: string | null
-  createdAt: string
-  updatedAt: string
-}
+import { 
+  useGetVerbsQuery, 
+  useImportVerbsMutation,
+  type VerbData,
+  type ConflictVerb,
+  type ImportedVerb 
+} from '../../store/api'
 
 export default function AdminVerbsPage() {
   const { user, isAuthenticated } = useAuth()
   const router = useRouter()
-  const [loading, setLoading] = useState(false)
+  const { data, isLoading: loadingVerbs } = useGetVerbsQuery(undefined, {
+    skip: !isAuthenticated || !user?.admin,
+  })
+  const [importVerbs, { isLoading: importing }] = useImportVerbsMutation()
+  
   const [error, setError] = useState<string | null>(null)
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
   const [jsonContent, setJsonContent] = useState<string>('')
@@ -72,40 +55,13 @@ export default function AdminVerbsPage() {
     [italian: string]: 'keep' | 'replace'
   }>({})
   const [showConflictDialog, setShowConflictDialog] = useState(false)
-  const [verbs, setVerbs] = useState<ImportedVerb[]>([])
-  const [loadingVerbs, setLoadingVerbs] = useState(true)
 
   useEffect(() => {
     if (!isAuthenticated || !user?.admin) {
       router.push('/')
       return
     }
-    fetchVerbs()
   }, [isAuthenticated, user, router])
-
-  const fetchVerbs = async () => {
-    try {
-      setLoadingVerbs(true)
-      const token = localStorage.getItem('italiano_token')
-
-      const response = await fetch('/api/admin/verbs/import', {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch verbs')
-      }
-
-      const data = await response.json()
-      setVerbs(data.verbs)
-    } catch (err) {
-      console.error('Error loading verbs:', err)
-    } finally {
-      setLoadingVerbs(false)
-    }
-  }
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
@@ -135,46 +91,30 @@ export default function AdminVerbsPage() {
     }
 
     try {
-      setLoading(true)
       setError(null)
-      const token = localStorage.getItem('italiano_token')
 
-      const verbs = JSON.parse(jsonContent)
+      const verbsData = JSON.parse(jsonContent)
 
-      const response = await fetch('/api/admin/verbs/import', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          verbs,
-          resolveConflicts: Object.keys(conflictResolutions).length > 0
-            ? conflictResolutions
-            : undefined,
-        }),
-      })
+      const result = await importVerbs({
+        verbs: verbsData,
+        resolveConflicts: Object.keys(conflictResolutions).length > 0
+          ? conflictResolutions
+          : undefined,
+      }).unwrap()
 
-      const data = await response.json()
-
-      if (response.status === 409) {
-        // Conflicts detected
-        setConflicts(data.conflicts)
+      setSuccessMessage(result.message)
+      setJsonContent('')
+      setConflicts([])
+      setConflictResolutions({})
+    } catch (err: any) {
+      // Handle conflict response (409)
+      if (err?.status === 409 && err?.data?.conflicts) {
+        setConflicts(err.data.conflicts)
         setShowConflictDialog(true)
         setError(null)
-      } else if (!response.ok) {
-        throw new Error(data.error || 'Failed to import verbs')
       } else {
-        setSuccessMessage(data.message)
-        setJsonContent('')
-        setConflicts([])
-        setConflictResolutions({})
-        fetchVerbs()
+        setError(err?.data?.error || 'Error importing verbs')
       }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error importing verbs')
-    } finally {
-      setLoading(false)
     }
   }
 
@@ -193,6 +133,8 @@ export default function AdminVerbsPage() {
   if (!user?.admin) {
     return null
   }
+
+  const verbs = data?.verbs || []
 
   return (
     <Box sx={{ maxWidth: 1400, mx: 'auto', p: 3 }}>
@@ -249,7 +191,7 @@ export default function AdminVerbsPage() {
               component='label'
               variant='outlined'
               startIcon={<CloudUpload />}
-              disabled={loading}
+              disabled={importing}
             >
               Choose JSON File
               <input
@@ -277,10 +219,10 @@ export default function AdminVerbsPage() {
               <Button
                 variant='contained'
                 onClick={handleImportVerbs}
-                disabled={loading}
-                startIcon={loading ? <CircularProgress size={20} /> : <CloudUpload />}
+                disabled={importing}
+                startIcon={importing ? <CircularProgress size={20} /> : <CloudUpload />}
               >
-                {loading ? 'Importing...' : 'Import Verbs'}
+                {importing ? 'Importing...' : 'Import Verbs'}
               </Button>
             </Box>
           )}

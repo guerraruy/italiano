@@ -84,9 +84,14 @@ export default function LoginModal() {
     setName('');
   };
 
+  // Don't render the dialog at all if authenticated
+  if (isAuthenticated) {
+    return null
+  }
+
   return (
     <Dialog 
-      open={!isAuthenticated} 
+      open={true} 
       maxWidth="sm" 
       fullWidth
       disableEscapeKeyDown

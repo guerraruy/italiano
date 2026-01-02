@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { PrismaClient } from '@prisma/client'
+import { prisma } from '@/lib/prisma'
+import { Verb } from '@prisma/client'
 import jwt from 'jsonwebtoken'
 
-const prisma = new PrismaClient()
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-this'
 
 interface VerbData {
@@ -75,8 +75,8 @@ export async function POST(request: NextRequest) {
       },
     })
 
-    const existingVerbMap = new Map(
-      existingVerbs.map((v) => [v.italian, v])
+    const existingVerbMap = new Map<string, Verb>(
+      existingVerbs.map((v: Verb) => [v.italian, v])
     )
 
     // Find conflicts
@@ -190,9 +190,9 @@ export async function GET(request: NextRequest) {
     }
 
     const token = authHeader.substring(7)
-    let decoded: any
+    let decoded: { userId: string }
     try {
-      decoded = jwt.verify(token, JWT_SECRET)
+      decoded = jwt.verify(token, JWT_SECRET) as { userId: string }
     } catch (err) {
       return NextResponse.json({ error: 'Invalid token' }, { status: 401 })
     }

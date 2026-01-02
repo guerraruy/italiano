@@ -1,5 +1,5 @@
 'use client';
-import { Container, Typography, Button, Box, Paper, Grid, Card, CardContent } from '@mui/material';
+import { Container, Typography, Button, Box, Paper, Card, CardContent } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import HomeIcon from '@mui/icons-material/Home';
 import TranslateIcon from '@mui/icons-material/Translate';
@@ -86,9 +86,9 @@ export default function Home() {
         </Typography>
       </HeroSection>
 
-      <Grid container spacing={4}>
+      <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(3, 1fr)' }, gap: 4 }}>
         {features.map((feature) => (
-          <Grid item xs={12} md={4} key={feature.title}>
+          <Box key={feature.title}>
             <FeatureCard 
               elevation={3}
               onClick={() => router.push(feature.path)}
@@ -105,9 +105,9 @@ export default function Home() {
                 </Typography>
               </CardContent>
             </FeatureCard>
-          </Grid>
+          </Box>
         ))}
-      </Grid>
+      </Box>
 
       <Paper 
         elevation={2} 

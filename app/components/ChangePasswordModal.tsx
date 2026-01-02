@@ -15,6 +15,7 @@ import {
 } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
 import { useState } from 'react'
+import { useChangePasswordMutation } from '../store/api'
 
 interface ChangePasswordModalProps {
   open: boolean
@@ -28,7 +29,7 @@ export default function ChangePasswordModal({
   const [currentPassword, setCurrentPassword] = useState('')
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
+  const [changePassword, { isLoading }] = useChangePasswordMutation()
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
 
@@ -74,35 +75,11 @@ export default function ChangePasswordModal({
       return
     }
 
-    setIsLoading(true)
-
     try {
-      const token = localStorage.getItem('italiano_token')
-      
-      if (!token) {
-        setError('Authentication required. Please login again.')
-        setIsLoading(false)
-        return
-      }
-
-      const response = await fetch('/api/auth/change-password', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          currentPassword,
-          newPassword,
-        }),
-      })
-
-      const data = await response.json()
-
-      if (!response.ok) {
-        setError(data.error || 'Failed to change password')
-        return
-      }
+      await changePassword({
+        currentPassword,
+        newPassword,
+      }).unwrap()
 
       setSuccess(true)
       setCurrentPassword('')
@@ -113,11 +90,9 @@ export default function ChangePasswordModal({
       setTimeout(() => {
         handleClose()
       }, 2000)
-    } catch (error) {
-      console.error('Change password error:', error)
-      setError('Network error. Please try again.')
-    } finally {
-      setIsLoading(false)
+    } catch (err: any) {
+      console.error('Change password error:', err)
+      setError(err?.data?.error || 'Failed to change password. Please try again.')
     }
   }
 

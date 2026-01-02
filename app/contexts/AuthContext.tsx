@@ -2,10 +2,10 @@
 import {
   createContext,
   useContext,
-  useState,
-  useEffect,
+  useSyncExternalStore,
   ReactNode,
 } from 'react'
+import { useLoginMutation, useRegisterMutation } from '../store/api'
 
 interface User {
   id: string
@@ -34,48 +34,97 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
-export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null)
-  const [isLoading, setIsLoading] = useState(false)
+// Cache for localStorage user to avoid infinite loops in useSyncExternalStore
+let cachedUser: User | null = null
+let cachedUserString: string | null = null
+let listeners: Array<() => void> = []
 
-  // Load user from localStorage after mount to avoid hydration mismatch
-  useEffect(() => {
-    const savedUser = localStorage.getItem('italiano_user')
-    if (savedUser) {
-      try {
-        setUser(JSON.parse(savedUser))
-      } catch {
-        localStorage.removeItem('italiano_user')
-      }
+// Helper to get initial user from localStorage (client-side only)
+function getStoredUser(): User | null {
+  if (typeof window === 'undefined') return null
+
+  const savedUser = localStorage.getItem('italiano_user')
+
+  // Return cached value if localStorage hasn't changed
+  if (savedUser === cachedUserString) {
+    return cachedUser
+  }
+
+  // Update cache
+  cachedUserString = savedUser
+
+  if (savedUser) {
+    try {
+      cachedUser = JSON.parse(savedUser)
+      return cachedUser
+    } catch {
+      localStorage.removeItem('italiano_user')
+      cachedUser = null
+      return null
     }
-  }, [])
+  }
+
+  cachedUser = null
+  return null
+}
+
+// Subscribe to localStorage changes
+function subscribe(listener: () => void) {
+  listeners.push(listener)
+  return () => {
+    listeners = listeners.filter((l) => l !== listener)
+  }
+}
+
+// Notify all listeners when localStorage changes
+function emitChange() {
+  for (const listener of listeners) {
+    listener()
+  }
+}
+
+export function AuthProvider({ children }: { children: ReactNode }) {
+  // Use useSyncExternalStore to safely access localStorage without hydration mismatch
+  const user = useSyncExternalStore(
+    subscribe, // subscribe to changes
+    getStoredUser, // getSnapshot (client-side)
+    () => null // getServerSnapshot (server-side: always null)
+  )
+
+  const [loginMutation, { isLoading: isLoginLoading }] = useLoginMutation()
+  const [registerMutation, { isLoading: isRegisterLoading }] =
+    useRegisterMutation()
+
+  const isLoading = isLoginLoading || isRegisterLoading
 
   const login = async (username: string, password: string) => {
-    setIsLoading(true)
     try {
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ username, password }),
-      })
+      const result = await loginMutation({ username, password }).unwrap()
 
-      const data = await response.json()
-
-      if (!response.ok) {
-        return { success: false, error: data.error || 'Login failed' }
-      }
-
-      setUser(data.user)
-      localStorage.setItem('italiano_user', JSON.stringify(data.user))
-      localStorage.setItem('italiano_token', data.token)
+      const userString = JSON.stringify(result.user)
+      localStorage.setItem('italiano_user', userString)
+      localStorage.setItem('italiano_token', result.token)
+      // Update cache and notify listeners
+      cachedUser = result.user
+      cachedUserString = userString
+      emitChange()
       return { success: true }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Login error:', error)
-      return { success: false, error: 'Network error. Please try again.' }
-    } finally {
-      setIsLoading(false)
+      const errorMessage =
+        error &&
+        typeof error === 'object' &&
+        'data' in error &&
+        error.data &&
+        typeof error.data === 'object' &&
+        'error' in error.data &&
+        typeof error.data.error === 'string'
+          ? error.data.error
+          : 'Login failed. Please try again.'
+      return {
+        success: false,
+        error: errorMessage,
+      }
     }
   }
 
@@ -85,38 +134,48 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     password: string,
     name?: string
   ) => {
-    setIsLoading(true)
     try {
-      const response = await fetch('/api/auth/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ username, email, password, name }),
-      })
+      const result = await registerMutation({
+        username,
+        email,
+        password,
+        name,
+      }).unwrap()
 
-      const data = await response.json()
-
-      if (!response.ok) {
-        return { success: false, error: data.error || 'Registration failed' }
-      }
-
-      setUser(data.user)
-      localStorage.setItem('italiano_user', JSON.stringify(data.user))
-      localStorage.setItem('italiano_token', data.token)
+      const userString = JSON.stringify(result.user)
+      localStorage.setItem('italiano_user', userString)
+      localStorage.setItem('italiano_token', result.token)
+      // Update cache and notify listeners
+      cachedUser = result.user
+      cachedUserString = userString
+      emitChange()
       return { success: true }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Registration error:', error)
-      return { success: false, error: 'Network error. Please try again.' }
-    } finally {
-      setIsLoading(false)
+      const errorMessage =
+        error &&
+        typeof error === 'object' &&
+        'data' in error &&
+        error.data &&
+        typeof error.data === 'object' &&
+        'error' in error.data &&
+        typeof error.data.error === 'string'
+          ? error.data.error
+          : 'Registration failed. Please try again.'
+      return {
+        success: false,
+        error: errorMessage,
+      }
     }
   }
 
   const logout = () => {
-    setUser(null)
     localStorage.removeItem('italiano_user')
     localStorage.removeItem('italiano_token')
+    // Clear cache and notify listeners
+    cachedUser = null
+    cachedUserString = null
+    emitChange()
   }
 
   const isAuthenticated = user !== null

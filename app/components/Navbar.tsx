@@ -22,7 +22,7 @@ import RecordVoiceOverIcon from '@mui/icons-material/RecordVoiceOver'
 import ScheduleIcon from '@mui/icons-material/Schedule'
 import MenuIcon from '@mui/icons-material/Menu'
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings'
-import { useState } from 'react'
+import { useState, useSyncExternalStore } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import SettingsModal from './SettingsModal'
 import UserMenu from './UserMenu'
@@ -51,6 +51,13 @@ export default function Navbar() {
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
   const { user } = useAuth()
+
+  // Prevent hydration mismatch by only using dynamic values after mount
+  const mounted = useSyncExternalStore(
+    () => () => {}, // subscribe (no-op, value never changes after mount)
+    () => true, // getSnapshot (client-side: always true)
+    () => false // getServerSnapshot (server-side: always false)
+  )
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen)
@@ -91,7 +98,7 @@ export default function Navbar() {
             </ListItemButton>
           </ListItem>
         ))}
-        {user?.admin && (
+        {mounted && user?.admin && (
           <ListItem disablePadding>
             <ListItemButton
               onClick={() => handleNavigation('/admin')}
@@ -112,6 +119,10 @@ export default function Navbar() {
     </Box>
   )
 
+  // Use mounted state to prevent hydration mismatch
+  const showMobileMenu = mounted && isMobile
+  const showDesktopMenu = mounted && !isMobile
+
   return (
     <>
       <AppBar
@@ -123,7 +134,7 @@ export default function Navbar() {
       >
         <Container maxWidth='xl'>
           <Toolbar disableGutters>
-            {isMobile && (
+            {showMobileMenu && (
               <IconButton
                 color='inherit'
                 aria-label='open drawer'
@@ -140,7 +151,7 @@ export default function Navbar() {
               noWrap
               component='div'
               sx={{
-                flexGrow: isMobile ? 1 : 0,
+                flexGrow: showMobileMenu ? 1 : 0,
                 mr: 4,
                 fontWeight: 700,
                 letterSpacing: '.1rem',
@@ -149,7 +160,7 @@ export default function Navbar() {
               ITALIANO
             </Typography>
 
-            {!isMobile && (
+            {showDesktopMenu && (
               <Box sx={{ flexGrow: 1, display: 'flex', gap: 1 }}>
                 {menuItems.map((item) => (
                   <Button
@@ -170,7 +181,7 @@ export default function Navbar() {
                     {item.text}
                   </Button>
                 ))}
-                {user?.admin && (
+                {mounted && user?.admin && (
                   <Button
                     onClick={() => handleNavigation('/admin')}
                     startIcon={<AdminPanelSettingsIcon />}
