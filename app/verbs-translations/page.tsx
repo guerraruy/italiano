@@ -19,6 +19,10 @@ import {
   DialogContentText,
   DialogActions,
   Button,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
 } from '@mui/material'
 import { styled } from '@mui/material/styles'
 import RecordVoiceOverIcon from '@mui/icons-material/RecordVoiceOver'
@@ -29,7 +33,8 @@ import ClearIcon from '@mui/icons-material/Clear'
 import LightbulbIcon from '@mui/icons-material/Lightbulb'
 import CheckIcon from '@mui/icons-material/Check'
 import CloseIcon from '@mui/icons-material/Close'
-import RestartAltIcon from '@mui/icons-material/RestartAlt'
+import DeleteSweepIcon from '@mui/icons-material/DeleteSweep'
+import RefreshIcon from '@mui/icons-material/Refresh'
 import {
   useGetVerbsForPracticeQuery,
   useGetVerbStatisticsQuery,
@@ -93,6 +98,23 @@ const StatisticsBox = styled(Box)(({ theme }) => ({
   gap: theme.spacing(0.5),
   minWidth: '50px',
 }))
+
+const FilterBox = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  gap: theme.spacing(2),
+  marginBottom: theme.spacing(3),
+  flexWrap: 'wrap',
+  alignItems: 'center',
+}))
+
+type VerbTypeFilter = 'all' | 'regular' | 'irregular' | 'reflexive'
+type SortOption =
+  | 'none'
+  | 'alphabetical'
+  | 'random'
+  | 'most-errors'
+  | 'worst-performance'
+type DisplayCount = 10 | 20 | 30 | 'all'
 
 interface ValidationState {
   [key: string]: 'correct' | 'incorrect' | null
@@ -260,7 +282,7 @@ const VerbItem = ({
           color='default'
           disabled={statistics.correct === 0 && statistics.wrong === 0}
         >
-          <RestartAltIcon fontSize='small' />
+          <DeleteSweepIcon fontSize='small' />
         </IconButton>
       </Tooltip>
     </VerbListItem>
@@ -297,10 +319,11 @@ const validateAnswer = (
 
 export default function VerbsTranslationsPage() {
   const { data, isLoading, error } = useGetVerbsForPracticeQuery()
-  const { data: statisticsData } = useGetVerbStatisticsQuery(undefined, {
-    refetchOnMountOrArgChange: false,
-    refetchOnFocus: false,
-  })
+  const { data: statisticsData, refetch: refetchStatistics } =
+    useGetVerbStatisticsQuery(undefined, {
+      refetchOnMountOrArgChange: false,
+      refetchOnFocus: false,
+    })
   const [updateVerbStatistic] = useUpdateVerbStatisticMutation()
   const [resetVerbStatistic, { isLoading: isResetting }] =
     useResetVerbStatisticMutation()
@@ -311,6 +334,10 @@ export default function VerbsTranslationsPage() {
     verbId: null,
     verbTranslation: null,
   })
+  const [verbTypeFilter, setVerbTypeFilter] = useState<VerbTypeFilter>('all')
+  const [sortOption, setSortOption] = useState<SortOption>('none')
+  const [displayCount, setDisplayCount] = useState<DisplayCount>('all')
+  const [randomSeed, setRandomSeed] = useState(0)
   const inputRefs = useRef<{ [key: string]: HTMLInputElement | null }>({})
   const lastValidatedRef = useRef<{ [key: string]: number }>({})
 
@@ -404,31 +431,6 @@ export default function VerbsTranslationsPage() {
     }
   }, [resetDialog.verbId, resetVerbStatistic, handleCloseResetDialog])
 
-  const handleKeyDown = useCallback(
-    (
-      e: React.KeyboardEvent,
-      verbId: string,
-      correctAnswer: string,
-      currentIndex: number
-    ) => {
-      if (e.key === 'Enter') {
-        e.preventDefault()
-        handleValidation(verbId, correctAnswer)
-
-        // Move to next input
-        const verbs = data?.verbs || []
-        if (currentIndex < verbs.length - 1) {
-          const nextVerb = verbs[currentIndex + 1]
-          const nextInput = inputRefs.current[nextVerb.id]
-          if (nextInput) {
-            nextInput.focus()
-          }
-        }
-      }
-    },
-    [data?.verbs, handleValidation]
-  )
-
   const verbIcons = useMemo(
     () => ({
       reflexive: (
@@ -469,6 +471,116 @@ export default function VerbsTranslationsPage() {
     },
     [statisticsData?.statistics]
   )
+
+  // Memoize verbs array to prevent unnecessary re-renders
+  const verbs = useMemo(() => data?.verbs || [], [data?.verbs])
+
+  // Apply filters, sorting, and limit
+  const filteredAndSortedVerbs = useMemo(() => {
+    let result = [...verbs]
+
+    // Apply verb type filter
+    if (verbTypeFilter !== 'all') {
+      result = result.filter((verb) => {
+        if (verbTypeFilter === 'reflexive') return verb.reflexive
+        if (verbTypeFilter === 'regular') return verb.regular && !verb.reflexive
+        if (verbTypeFilter === 'irregular')
+          return !verb.regular && !verb.reflexive
+        return true
+      })
+    }
+
+    // Apply sorting
+    if (sortOption === 'alphabetical') {
+      result.sort((a, b) => a.translation.localeCompare(b.translation))
+    } else if (sortOption === 'random') {
+      // Use Fisher-Yates shuffle with a seeded random
+      const shuffled = [...result]
+      let seed = randomSeed
+      const seededRandom = () => {
+        seed = (seed * 9301 + 49297) % 233280
+        return seed / 233280
+      }
+      for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(seededRandom() * (i + 1))
+        ;[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
+      }
+      result = shuffled
+    } else if (
+      sortOption === 'most-errors' ||
+      sortOption === 'worst-performance'
+    ) {
+      result.sort((a, b) => {
+        const statsA = getStatistics(a.id)
+        const statsB = getStatistics(b.id)
+
+        if (sortOption === 'most-errors') {
+          return statsB.wrong - statsA.wrong
+        } else {
+          // worst-performance: highest (errors - correct) first
+          const performanceA = statsA.wrong - statsA.correct
+          const performanceB = statsB.wrong - statsB.correct
+          return performanceB - performanceA
+        }
+      })
+    }
+
+    // Apply display count limit
+    if (displayCount !== 'all') {
+      result = result.slice(0, displayCount)
+    }
+
+    return result
+  }, [
+    verbs,
+    verbTypeFilter,
+    sortOption,
+    displayCount,
+    getStatistics,
+    randomSeed,
+  ])
+
+  const handleKeyDown = useCallback(
+    (
+      e: React.KeyboardEvent,
+      verbId: string,
+      correctAnswer: string,
+      currentIndex: number
+    ) => {
+      if (e.key === 'Enter') {
+        e.preventDefault()
+        handleValidation(verbId, correctAnswer)
+
+        // Move to next input in the filtered list
+        if (currentIndex < filteredAndSortedVerbs.length - 1) {
+          const nextVerb = filteredAndSortedVerbs[currentIndex + 1]
+          const nextInput = inputRefs.current[nextVerb.id]
+          if (nextInput) {
+            nextInput.focus()
+          }
+        }
+      }
+    },
+    [filteredAndSortedVerbs, handleValidation]
+  )
+
+  const handleRefresh = useCallback(() => {
+    if (sortOption === 'random') {
+      // Update random seed to reshuffle
+      setRandomSeed(Date.now())
+    } else if (
+      sortOption === 'most-errors' ||
+      sortOption === 'worst-performance'
+    ) {
+      // Refetch statistics to get latest data
+      refetchStatistics()
+    }
+  }, [sortOption, refetchStatistics])
+
+  const shouldShowRefreshButton =
+    sortOption === 'random' ||
+    sortOption === 'most-errors' ||
+    sortOption === 'worst-performance'
 
   if (isLoading) {
     return (
@@ -511,8 +623,6 @@ export default function VerbsTranslationsPage() {
     )
   }
 
-  const verbs = data?.verbs || []
-
   return (
     <PageContainer maxWidth='lg'>
       <HeaderBox>
@@ -532,13 +642,89 @@ export default function VerbsTranslationsPage() {
           Translate each verb from your native language to Italian
         </Typography>
 
+        <FilterBox>
+          <FormControl size='small' sx={{ minWidth: 150 }}>
+            <InputLabel id='verb-type-filter-label'>Verb Type</InputLabel>
+            <Select
+              labelId='verb-type-filter-label'
+              id='verb-type-filter'
+              value={verbTypeFilter}
+              label='Verb Type'
+              onChange={(e) =>
+                setVerbTypeFilter(e.target.value as VerbTypeFilter)
+              }
+            >
+              <MenuItem value='all'>All</MenuItem>
+              <MenuItem value='regular'>Regular</MenuItem>
+              <MenuItem value='irregular'>Irregular</MenuItem>
+              <MenuItem value='reflexive'>Reflexive</MenuItem>
+            </Select>
+          </FormControl>
+
+          <FormControl size='small' sx={{ minWidth: 180 }}>
+            <InputLabel id='sort-option-label'>Sort By</InputLabel>
+            <Select
+              labelId='sort-option-label'
+              id='sort-option'
+              value={sortOption}
+              label='Sort By'
+              onChange={(e) => {
+                const newSort = e.target.value as SortOption
+                setSortOption(newSort)
+                if (newSort === 'random') {
+                  setRandomSeed(Date.now())
+                }
+              }}
+            >
+              <MenuItem value='none'>None</MenuItem>
+              <MenuItem value='alphabetical'>Alphabetical</MenuItem>
+              <MenuItem value='random'>Random</MenuItem>
+              <MenuItem value='most-errors'>Most Errors</MenuItem>
+              <MenuItem value='worst-performance'>Worst Performance</MenuItem>
+            </Select>
+          </FormControl>
+
+          <FormControl size='small' sx={{ minWidth: 120 }}>
+            <InputLabel id='display-count-label'>Display</InputLabel>
+            <Select
+              labelId='display-count-label'
+              id='display-count'
+              value={displayCount}
+              label='Display'
+              onChange={(e) => setDisplayCount(e.target.value as DisplayCount)}
+            >
+              <MenuItem value={10}>10 verbs</MenuItem>
+              <MenuItem value={20}>20 verbs</MenuItem>
+              <MenuItem value={30}>30 verbs</MenuItem>
+              <MenuItem value='all'>All verbs</MenuItem>
+            </Select>
+          </FormControl>
+
+          {shouldShowRefreshButton && (
+            <Tooltip title='Refresh list'>
+              <IconButton
+                onClick={handleRefresh}
+                color='primary'
+                size='small'
+                sx={{ ml: 1 }}
+              >
+                <RefreshIcon />
+              </IconButton>
+            </Tooltip>
+          )}
+
+          <Typography variant='body2' color='text.secondary' sx={{ ml: 1 }}>
+            Showing {filteredAndSortedVerbs.length} of {verbs.length} verbs
+          </Typography>
+        </FilterBox>
+
         {verbs.length === 0 ? (
           <Alert severity='info'>
             No verbs available. Please ask your administrator to import verbs.
           </Alert>
         ) : (
           <List>
-            {verbs.map((verb, index) => (
+            {filteredAndSortedVerbs.map((verb, index) => (
               <MemoizedVerbItem
                 key={verb.id}
                 verb={verb}
