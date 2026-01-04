@@ -184,20 +184,14 @@ export default function ManageConjugations({
   }
 
   const renderConjugationPreview = (conjugation: ConjugationData) => {
-    const moods = Object.keys(conjugation)
+    const totalTenses = Object.values(conjugation).reduce(
+      (total, tenses) => total + Object.keys(tenses).length,
+      0
+    )
     return (
-      <Box sx={{ fontSize: '0.85rem' }}>
-        {moods.slice(0, 2).map((mood) => (
-          <Typography key={mood} variant='caption' display='block'>
-            {mood}: {Object.keys(conjugation[mood]).length} tense(s)
-          </Typography>
-        ))}
-        {moods.length > 2 && (
-          <Typography variant='caption' color='text.secondary'>
-            +{moods.length - 2} more mood(s)
-          </Typography>
-        )}
-      </Box>
+      <Typography variant='body2'>
+        {totalTenses} tense{totalTenses !== 1 ? 's' : ''}
+      </Typography>
     )
   }
 
@@ -255,12 +249,7 @@ export default function ManageConjugations({
             </IconButton>
           </Box>
 
-          <Stack
-            direction='row'
-            spacing={2}
-            alignItems='center'
-            sx={{ mt: 2 }}
-          >
+          <Stack direction='row' spacing={2} alignItems='center' sx={{ mt: 2 }}>
             <Button
               component='label'
               variant='outlined'
@@ -324,9 +313,7 @@ export default function ManageConjugations({
                   )
                 }
               >
-                {importingConjugations
-                  ? 'Importing...'
-                  : 'Import Conjugations'}
+                {importingConjugations ? 'Importing...' : 'Import Conjugations'}
               </Button>
             </Box>
           )}
@@ -346,8 +333,8 @@ export default function ManageConjugations({
             </Box>
           ) : conjugations.length === 0 ? (
             <Alert severity='info' icon={<Info />}>
-              No conjugations in the database yet. Import some using the
-              form above.
+              No conjugations in the database yet. Import some using the form
+              above.
             </Alert>
           ) : (
             <TableContainer>
@@ -397,9 +384,7 @@ export default function ManageConjugations({
                           )}
                         </TableCell>
                         <TableCell>
-                          {new Date(conj.updatedAt).toLocaleDateString(
-                            'en-US'
-                          )}
+                          {new Date(conj.updatedAt).toLocaleDateString('en-US')}
                         </TableCell>
                         <TableCell align='center'>
                           <IconButton
@@ -553,8 +538,9 @@ export default function ManageConjugations({
         </DialogTitle>
         <DialogContent>
           <Typography variant='body2' color='text.secondary' sx={{ mb: 2 }}>
-            Upload one or multiple JSON files with Italian verb conjugations. 
-            The filename (without .json extension) will be used as the verb name.
+            Upload one or multiple JSON files with Italian verb conjugations.
+            The filename (without .json extension) will be used as the verb
+            name.
           </Typography>
           <Typography variant='body2' color='text.secondary' sx={{ mb: 2 }}>
             Expected format (example for &quot;aiutare.json&quot;):
@@ -584,12 +570,9 @@ export default function ManageConjugations({
           </Paper>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setShowFormatInfoDialog(false)}>
-            Close
-          </Button>
+          <Button onClick={() => setShowFormatInfoDialog(false)}>Close</Button>
         </DialogActions>
       </Dialog>
     </>
   )
 }
-
