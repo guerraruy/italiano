@@ -50,7 +50,7 @@ export default function Home() {
 
   const features = [
     {
-      title: 'Words Translations',
+      title: 'Nouns Translations',
       description: 'Learn and practice Italian vocabulary with interactive translations',
       icon: <TranslateIcon fontSize="inherit" />,
       path: '/words-translations',

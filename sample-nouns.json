@@ -1,0 +1,63 @@
+{
+  "orologio": {
+    "singolare": {
+      "it": "l'orologio",
+      "pt": "o relógio",
+      "en": "the watch"
+    },
+    "plurale": {
+      "it": "gli orologi",
+      "pt": "os relógios",
+      "en": "the clocks"
+    }
+  },
+  "libro": {
+    "singolare": {
+      "it": "il libro",
+      "pt": "o livro",
+      "en": "the book"
+    },
+    "plurale": {
+      "it": "i libri",
+      "pt": "os livros",
+      "en": "the books"
+    }
+  },
+  "casa": {
+    "singolare": {
+      "it": "la casa",
+      "pt": "a casa",
+      "en": "the house"
+    },
+    "plurale": {
+      "it": "le case",
+      "pt": "as casas",
+      "en": "the houses"
+    }
+  },
+  "tavolo": {
+    "singolare": {
+      "it": "il tavolo",
+      "pt": "a mesa",
+      "en": "the table"
+    },
+    "plurale": {
+      "it": "i tavoli",
+      "pt": "as mesas",
+      "en": "the tables"
+    }
+  },
+  "finestra": {
+    "singolare": {
+      "it": "la finestra",
+      "pt": "a janela",
+      "en": "the window"
+    },
+    "plurale": {
+      "it": "le finestre",
+      "pt": "as janelas",
+      "en": "the windows"
+    }
+  }
+}
+

@@ -120,6 +120,42 @@ export interface ImportConjugationsResponse {
   conflicts?: ConflictConjugation[]
 }
 
+export interface NounTranslations {
+  it: string
+  pt: string
+  en: string
+}
+
+export interface NounData {
+  singolare: NounTranslations
+  plurale: NounTranslations
+}
+
+export interface ImportedNoun {
+  id: string
+  italian: string
+  singolare: NounTranslations
+  plurale: NounTranslations
+  createdAt: string
+  updatedAt: string
+}
+
+export interface ConflictNoun {
+  italian: string
+  existing: {
+    singolare: NounTranslations
+    plurale: NounTranslations
+  }
+  new: NounData
+}
+
+export interface ImportNounsResponse {
+  message: string
+  created?: number
+  updated?: number
+  conflicts?: ConflictNoun[]
+}
+
 // Base query with authentication
 const baseQuery = fetchBaseQuery({
   baseUrl: '/api',
@@ -136,7 +172,7 @@ const baseQuery = fetchBaseQuery({
 export const api = createApi({
   reducerPath: 'api',
   baseQuery,
-  tagTypes: ['Users', 'Verbs', 'Auth', 'Profile', 'VerbsPractice', 'VerbStatistics', 'Conjugations'],
+  tagTypes: ['Users', 'Verbs', 'Auth', 'Profile', 'VerbsPractice', 'VerbStatistics', 'Conjugations', 'Nouns'],
   endpoints: (builder) => ({
     // Auth endpoints
     login: builder.mutation<
@@ -285,6 +321,26 @@ export const api = createApi({
       }),
       invalidatesTags: ['Conjugations'],
     }),
+
+    // Noun endpoints
+    getNouns: builder.query<{ nouns: ImportedNoun[] }, void>({
+      query: () => '/admin/nouns/import',
+      providesTags: ['Nouns'],
+    }),
+    importNouns: builder.mutation<
+      ImportNounsResponse,
+      {
+        nouns: Record<string, NounData>
+        resolveConflicts?: Record<string, 'keep' | 'replace'>
+      }
+    >({
+      query: (data) => ({
+        url: '/admin/nouns/import',
+        method: 'POST',
+        body: data,
+      }),
+      invalidatesTags: ['Nouns'],
+    }),
   }),
 })
 
@@ -306,4 +362,6 @@ export const {
   useResetVerbStatisticMutation,
   useGetConjugationsQuery,
   useImportConjugationsMutation,
+  useGetNounsQuery,
+  useImportNounsMutation,
 } = api

@@ -31,7 +31,7 @@ import { useAuth } from '../contexts/AuthContext'
 const menuItems = [
   { text: 'Home', icon: <HomeIcon />, path: '/' },
   {
-    text: 'Words Translations',
+    text: 'Nouns Translations',
     icon: <TranslateIcon />,
     path: '/words-translations',
   },

@@ -123,3 +123,13 @@ model VerbStatistic {
   @@index([userId])
   @@index([verbId])
 }
+
+// Italian nouns with translations
+model Noun {
+  id          String   @id @default(cuid())
+  italian     String   @unique // The noun in Italian (base form without article)
+  singolare   Json     // Singular form with translations { it: "l'orologio", pt: "o relógio", en: "the watch" }
+  plurale     Json     // Plural form with translations { it: "gli orologi", pt: "os relógios", en: "the clocks" }
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
