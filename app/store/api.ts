@@ -84,6 +84,42 @@ export interface VerbStatisticsMap {
   [verbId: string]: VerbStatistic
 }
 
+export interface ConjugationData {
+  [mood: string]: {
+    [tense: string]:
+      | {
+          [person: string]: string
+        }
+      | string // For simple forms like Participio Presente/Passato
+  }
+}
+
+export interface VerbConjugation {
+  id: string
+  verbId: string
+  conjugation: ConjugationData
+  createdAt: string
+  updatedAt: string
+  verb: {
+    italian: string
+    regular: boolean
+    reflexive: boolean
+  }
+}
+
+export interface ConflictConjugation {
+  verbName: string
+  existing: ConjugationData
+  new: ConjugationData
+}
+
+export interface ImportConjugationsResponse {
+  message: string
+  created?: number
+  updated?: number
+  conflicts?: ConflictConjugation[]
+}
+
 // Base query with authentication
 const baseQuery = fetchBaseQuery({
   baseUrl: '/api',
@@ -100,7 +136,7 @@ const baseQuery = fetchBaseQuery({
 export const api = createApi({
   reducerPath: 'api',
   baseQuery,
-  tagTypes: ['Users', 'Verbs', 'Auth', 'Profile', 'VerbsPractice', 'VerbStatistics'],
+  tagTypes: ['Users', 'Verbs', 'Auth', 'Profile', 'VerbsPractice', 'VerbStatistics', 'Conjugations'],
   endpoints: (builder) => ({
     // Auth endpoints
     login: builder.mutation<
@@ -229,6 +265,26 @@ export const api = createApi({
       }),
       invalidatesTags: ['VerbStatistics'],
     }),
+
+    // Conjugation endpoints
+    getConjugations: builder.query<{ conjugations: VerbConjugation[] }, void>({
+      query: () => '/admin/verbs/conjugations/import',
+      providesTags: ['Conjugations'],
+    }),
+    importConjugations: builder.mutation<
+      ImportConjugationsResponse,
+      {
+        conjugations: Record<string, ConjugationData>
+        resolveConflicts?: Record<string, 'keep' | 'replace'>
+      }
+    >({
+      query: (data) => ({
+        url: '/admin/verbs/conjugations/import',
+        method: 'POST',
+        body: data,
+      }),
+      invalidatesTags: ['Conjugations'],
+    }),
   }),
 })
 
@@ -248,4 +304,6 @@ export const {
   useGetVerbStatisticsQuery,
   useUpdateVerbStatisticMutation,
   useResetVerbStatisticMutation,
+  useGetConjugationsQuery,
+  useImportConjugationsMutation,
 } = api

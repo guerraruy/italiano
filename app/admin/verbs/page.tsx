@@ -42,6 +42,7 @@ import {
 export default function AdminVerbsPage() {
   const { user, isAuthenticated } = useAuth()
   const router = useRouter()
+  const [isMounted, setIsMounted] = useState(false)
   const { data, isLoading: loadingVerbs } = useGetVerbsQuery(undefined, {
     skip: !isAuthenticated || !user?.admin,
   })
@@ -56,12 +57,22 @@ export default function AdminVerbsPage() {
   }>({})
   const [showConflictDialog, setShowConflictDialog] = useState(false)
 
+  // Track when component is mounted (client-side only)
   useEffect(() => {
+    // Use setTimeout to avoid setState in effect warning
+    const timer = setTimeout(() => setIsMounted(true), 0)
+    return () => clearTimeout(timer)
+  }, [])
+
+  useEffect(() => {
+    // Wait for component to mount before checking auth
+    if (!isMounted) return
+
     if (!isAuthenticated || !user?.admin) {
       router.push('/')
       return
     }
-  }, [isAuthenticated, user, router])
+  }, [isAuthenticated, user, router, isMounted])
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
@@ -128,6 +139,22 @@ export default function AdminVerbsPage() {
       ...prev,
       [italian]: action,
     }))
+  }
+
+  // Show loading while checking authentication
+  if (!isMounted) {
+    return (
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          minHeight: '60vh',
+        }}
+      >
+        <CircularProgress />
+      </Box>
+    )
   }
 
   if (!user?.admin) {

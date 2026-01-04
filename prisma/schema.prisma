@@ -81,15 +81,29 @@ model UserLesson {
 
 // Italian verbs with translations
 model Verb {
-  id          String          @id @default(cuid())
-  italian     String          @unique // The verb infinitive in Italian
-  regular     Boolean         @default(true) // Regular or irregular verb
-  reflexive   Boolean         @default(false) // Reflexive verb
-  tr_ptBR     String          // Portuguese (Brazil) translation
-  tr_en       String?         // English translation
-  createdAt   DateTime        @default(now())
-  updatedAt   DateTime        @updatedAt
-  statistics  VerbStatistic[]
+  id           String            @id @default(cuid())
+  italian      String            @unique // The verb infinitive in Italian
+  regular      Boolean           @default(true) // Regular or irregular verb
+  reflexive    Boolean           @default(false) // Reflexive verb
+  tr_ptBR      String            // Portuguese (Brazil) translation
+  tr_en        String?           // English translation
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+  statistics   VerbStatistic[]
+  conjugations VerbConjugation[]
+}
+
+// Verb conjugations for all tenses
+model VerbConjugation {
+  id          String   @id @default(cuid())
+  verbId      String
+  verb        Verb     @relation(fields: [verbId], references: [id], onDelete: Cascade)
+  conjugation Json     // Complete conjugation data in JSON format
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([verbId])
+  @@index([verbId])
 }
 
 // Statistics for verb practice per user

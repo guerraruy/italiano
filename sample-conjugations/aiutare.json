@@ -1,0 +1,133 @@
+{
+  "Indicativo": {
+    "Presente": {
+      "io": "aiuto",
+      "tu": "aiuti",
+      "lui/lei": "aiuta",
+      "noi": "aiutiamo",
+      "voi": "aiutate",
+      "loro": "aiutano"
+    },
+    "Passato Prossimo": {
+      "io": "ho aiutato",
+      "tu": "hai aiutato",
+      "lui/lei": "ha aiutato",
+      "noi": "abbiamo aiutato",
+      "voi": "avete aiutato",
+      "loro": "hanno aiutato"
+    },
+    "Imperfetto": {
+      "io": "aiutavo",
+      "tu": "aiutavi",
+      "lui/lei": "aiutava",
+      "noi": "aiutavamo",
+      "voi": "aiutavate",
+      "loro": "aiutavano"
+    },
+    "Trapassato Prossimo": {
+      "io": "avevo aiutato",
+      "tu": "avevi aiutato",
+      "lui/lei": "aveva aiutato",
+      "noi": "avevamo aiutato",
+      "voi": "avevate aiutato",
+      "loro": "avevano aiutato"
+    },
+    "Futuro Semplice": {
+      "io": "aiuterò",
+      "tu": "aiuterai",
+      "lui/lei": "aiuterà",
+      "noi": "aiuteremo",
+      "voi": "aiuterete",
+      "loro": "aiuteranno"
+    },
+    "Passato Remoto": {
+      "io": "aiutai",
+      "tu": "aiutasti",
+      "lui/lei": "aiutò",
+      "noi": "aiutammo",
+      "voi": "aiutaste",
+      "loro": "aiutarono"
+    }
+  },
+  "Congiuntivo": {
+    "Presente": {
+      "io": "aiuti",
+      "tu": "aiuti",
+      "lui/lei": "aiuti",
+      "noi": "aiutiamo",
+      "voi": "aiutiate",
+      "loro": "aiutino"
+    },
+    "Passato": {
+      "io": "abbia aiutato",
+      "tu": "abbia aiutato",
+      "lui/lei": "abbia aiutato",
+      "noi": "abbiamo aiutato",
+      "voi": "abbiate aiutato",
+      "loro": "abbiano aiutato"
+    },
+    "Imperfetto": {
+      "io": "aiutassi",
+      "tu": "aiutassi",
+      "lui/lei": "aiutasse",
+      "noi": "aiutassimo",
+      "voi": "aiutaste",
+      "loro": "aiutassero"
+    },
+    "Trapassato": {
+      "io": "avessi aiutato",
+      "tu": "avessi aiutato",
+      "lui/lei": "avesse aiutato",
+      "noi": "avessimo aiutato",
+      "voi": "aveste aiutato",
+      "loro": "avessero aiutato"
+    }
+  },
+  "Condizionale": {
+    "Presente": {
+      "io": "aiuterei",
+      "tu": "aiuteresti",
+      "lui/lei": "aiuterebbe",
+      "noi": "aiuteremmo",
+      "voi": "aiutereste",
+      "loro": "aiuterebbero"
+    },
+    "Passato": {
+      "io": "avrei aiutato",
+      "tu": "avresti aiutato",
+      "lui/lei": "avrebbe aiutato",
+      "noi": "avremmo aiutato",
+      "voi": "avreste aiutato",
+      "loro": "avrebbero aiutato"
+    }
+  },
+  "Imperativo": {
+    "Affirmativo": {
+      "tu": "aiuta",
+      "lui/lei": "aiuti",
+      "noi": "aiutiamo",
+      "voi": "aiutate",
+      "loro": "aiutino"
+    },
+    "Negativo": {
+      "tu": "non aiutare",
+      "lui/lei": "non aiuti",
+      "noi": "non aiutiamo",
+      "voi": "non aiutate",
+      "loro": "non aiutino"
+    }
+  },
+  "Participio": {
+    "Presente": "aiutante",
+    "Passato": "aiutato"
+  },
+  "Gerundio": {
+    "Presente": "aiutando",
+    "Passato": "avendo aiutato"
+  },
+  "Infinito": {
+    "Presente": "aiutare",
+    "Passato": "aver aiutato"
+  }
+}
+

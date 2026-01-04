@@ -27,6 +27,7 @@ import {
   AdminPanelSettings,
   PersonRemove,
   Translate,
+  MenuBook,
 } from '@mui/icons-material'
 import { useAuth } from '../contexts/AuthContext'
 import { useRouter } from 'next/navigation'
@@ -136,13 +137,22 @@ export default function AdminPanel() {
         }}
       >
         <Typography variant='h4'>Administration Panel</Typography>
-        <Button
-          variant='outlined'
-          startIcon={<Translate />}
-          onClick={() => router.push('/admin/verbs')}
-        >
-          Manage Verbs
-        </Button>
+        <Box sx={{ display: 'flex', gap: 2 }}>
+          <Button
+            variant='outlined'
+            startIcon={<Translate />}
+            onClick={() => router.push('/admin/verbs')}
+          >
+            Manage Verbs
+          </Button>
+          <Button
+            variant='outlined'
+            startIcon={<MenuBook />}
+            onClick={() => router.push('/admin/verbs/conjugations')}
+          >
+            Manage Conjugations
+          </Button>
+        </Box>
       </Box>
 
       {(error || queryError) && (
