@@ -341,6 +341,29 @@ export const api = createApi({
       }),
       invalidatesTags: ['Nouns'],
     }),
+    updateNoun: builder.mutation<
+      { message: string; noun: ImportedNoun },
+      {
+        nounId: string
+        italian: string
+        singolare: NounTranslations
+        plurale: NounTranslations
+      }
+    >({
+      query: ({ nounId, italian, singolare, plurale }) => ({
+        url: `/admin/nouns/${nounId}`,
+        method: 'PATCH',
+        body: { italian, singolare, plurale },
+      }),
+      invalidatesTags: ['Nouns'],
+    }),
+    deleteNoun: builder.mutation<{ message: string }, string>({
+      query: (nounId) => ({
+        url: `/admin/nouns/${nounId}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: ['Nouns'],
+    }),
   }),
 })
 
@@ -364,4 +387,6 @@ export const {
   useImportConjugationsMutation,
   useGetNounsQuery,
   useImportNounsMutation,
+  useUpdateNounMutation,
+  useDeleteNounMutation,
 } = api

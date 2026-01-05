@@ -5,15 +5,6 @@ import {
   Card,
   CardContent,
   Typography,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Chip,
-  Alert,
-  CircularProgress,
   Dialog,
   DialogTitle,
   DialogContent,
@@ -22,6 +13,8 @@ import {
   Paper,
   Stack,
   IconButton,
+  Chip,
+  CircularProgress,
 } from '@mui/material'
 import {
   CloudUpload,
@@ -31,19 +24,16 @@ import {
   InfoOutlined,
 } from '@mui/icons-material'
 import {
-  useGetNounsQuery,
   useImportNounsMutation,
   type ConflictNoun,
-  type NounTranslations,
-} from '../../../store/api'
+} from '../../../../../store/api'
 
-interface ManageNounsProps {
+interface ImportNounsProps {
   onError: (message: string) => void
   onSuccess: (message: string) => void
 }
 
-export default function ManageNouns({ onError, onSuccess }: ManageNounsProps) {
-  const { data: nounsData, isLoading: loadingNouns } = useGetNounsQuery()
+export default function ImportNouns({ onError, onSuccess }: ImportNounsProps) {
   const [importNouns, { isLoading: importingNouns }] = useImportNounsMutation()
 
   const [nounJsonContent, setNounJsonContent] = useState<string>('')
@@ -127,8 +117,6 @@ export default function ManageNouns({ onError, onSuccess }: ManageNounsProps) {
     }))
   }
 
-  const nouns = nounsData?.nouns || []
-
   return (
     <>
       {/* Import Section */}
@@ -191,64 +179,6 @@ export default function ManageNouns({ onError, onSuccess }: ManageNounsProps) {
                 {importingNouns ? 'Importing...' : 'Import Nouns'}
               </Button>
             </Box>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Existing Nouns Table */}
-      <Card>
-        <CardContent>
-          <Typography variant='h6' gutterBottom>
-            Current Nouns in Database ({nouns.length})
-          </Typography>
-
-          {loadingNouns ? (
-            <Box display='flex' justifyContent='center' p={3}>
-              <CircularProgress />
-            </Box>
-          ) : nouns.length === 0 ? (
-            <Alert severity='info' icon={<Info />}>
-              No nouns in the database yet. Import some using the form above.
-            </Alert>
-          ) : (
-            <TableContainer>
-              <Table size='small'>
-                <TableHead>
-                  <TableRow>
-                    <TableCell>Italian</TableCell>
-                    <TableCell>Singular (IT)</TableCell>
-                    <TableCell>Singular (PT)</TableCell>
-                    <TableCell>Singular (EN)</TableCell>
-                    <TableCell>Plural (IT)</TableCell>
-                    <TableCell>Plural (PT)</TableCell>
-                    <TableCell>Plural (EN)</TableCell>
-                    <TableCell>Last Updated</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {nouns.map((noun) => {
-                    const singolare = noun.singolare as NounTranslations
-                    const plurale = noun.plurale as NounTranslations
-                    return (
-                      <TableRow key={noun.italian}>
-                        <TableCell>
-                          <strong>{noun.italian}</strong>
-                        </TableCell>
-                        <TableCell>{singolare.it}</TableCell>
-                        <TableCell>{singolare.pt}</TableCell>
-                        <TableCell>{singolare.en}</TableCell>
-                        <TableCell>{plurale.it}</TableCell>
-                        <TableCell>{plurale.pt}</TableCell>
-                        <TableCell>{plurale.en}</TableCell>
-                        <TableCell>
-                          {new Date(noun.updatedAt).toLocaleDateString('en-US')}
-                        </TableCell>
-                      </TableRow>
-                    )
-                  })}
-                </TableBody>
-              </Table>
-            </TableContainer>
           )}
         </CardContent>
       </Card>
