@@ -1,27 +1,20 @@
 'use client'
-import { useState, Fragment } from 'react'
+import { useState } from 'react'
 import {
   Box,
   Card,
   CardContent,
   Typography,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  IconButton,
+  Button,
+  Stack,
   Chip,
-  Alert,
   CircularProgress,
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
-  Button,
   Paper,
-  Stack,
+  IconButton,
   List,
   ListItem,
   ListItemText,
@@ -32,17 +25,13 @@ import {
   Warning,
   Info,
   Delete as DeleteIcon,
-  ExpandMore,
-  ExpandLess,
   InfoOutlined,
 } from '@mui/icons-material'
 import {
-  useGetConjugationsQuery,
   useImportConjugationsMutation,
   type ConjugationData,
   type ConflictConjugation,
-  type VerbConjugation,
-} from '../../../store/api'
+} from '../../../../../store/api'
 
 interface FileWithContent {
   file: File
@@ -50,17 +39,15 @@ interface FileWithContent {
   content: ConjugationData
 }
 
-interface ManageConjugationsProps {
+interface ImportConjugationsProps {
   onError: (message: string) => void
   onSuccess: (message: string) => void
 }
 
-export default function ManageConjugations({
+export default function ImportConjugations({
   onError,
   onSuccess,
-}: ManageConjugationsProps) {
-  const { data: conjugationsData, isLoading: loadingConjugations } =
-    useGetConjugationsQuery()
+}: ImportConjugationsProps) {
   const [importConjugations, { isLoading: importingConjugations }] =
     useImportConjugationsMutation()
 
@@ -74,9 +61,6 @@ export default function ManageConjugations({
     }>({})
   const [showConjugationConflictDialog, setShowConjugationConflictDialog] =
     useState(false)
-  const [expandedConjugations, setExpandedConjugations] = useState<Set<string>>(
-    new Set()
-  )
   const [showFormatInfoDialog, setShowFormatInfoDialog] = useState(false)
 
   const handleConjugationFileUpload = async (
@@ -171,30 +155,6 @@ export default function ManageConjugations({
     }))
   }
 
-  const toggleExpanded = (verbId: string) => {
-    setExpandedConjugations((prev) => {
-      const newSet = new Set(prev)
-      if (newSet.has(verbId)) {
-        newSet.delete(verbId)
-      } else {
-        newSet.add(verbId)
-      }
-      return newSet
-    })
-  }
-
-  const renderConjugationPreview = (conjugation: ConjugationData) => {
-    const totalTenses = Object.values(conjugation).reduce(
-      (total, tenses) => total + Object.keys(tenses).length,
-      0
-    )
-    return (
-      <Typography variant='body2'>
-        {totalTenses} tense{totalTenses !== 1 ? 's' : ''}
-      </Typography>
-    )
-  }
-
   const renderFullConjugation = (conjugation: ConjugationData) => {
     return (
       <Box sx={{ mt: 2, p: 2, backgroundColor: 'grey.50', borderRadius: 1 }}>
@@ -228,8 +188,6 @@ export default function ManageConjugations({
       </Box>
     )
   }
-
-  const conjugations = conjugationsData?.conjugations || []
 
   return (
     <>
@@ -316,103 +274,6 @@ export default function ManageConjugations({
                 {importingConjugations ? 'Importing...' : 'Import Conjugations'}
               </Button>
             </Box>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Existing Conjugations Table */}
-      <Card>
-        <CardContent>
-          <Typography variant='h6' gutterBottom>
-            Current Conjugations in Database ({conjugations.length})
-          </Typography>
-
-          {loadingConjugations ? (
-            <Box display='flex' justifyContent='center' p={3}>
-              <CircularProgress />
-            </Box>
-          ) : conjugations.length === 0 ? (
-            <Alert severity='info' icon={<Info />}>
-              No conjugations in the database yet. Import some using the form
-              above.
-            </Alert>
-          ) : (
-            <TableContainer>
-              <Table size='small'>
-                <TableHead>
-                  <TableRow>
-                    <TableCell>Italian Verb</TableCell>
-                    <TableCell>Regular</TableCell>
-                    <TableCell>Reflexive</TableCell>
-                    <TableCell>Conjugation Summary</TableCell>
-                    <TableCell>Last Updated</TableCell>
-                    <TableCell align='center'>Actions</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {conjugations.map((conj: VerbConjugation) => (
-                    <Fragment key={conj.id}>
-                      <TableRow>
-                        <TableCell>
-                          <strong>{conj.verb.italian}</strong>
-                        </TableCell>
-                        <TableCell>
-                          {conj.verb.regular ? (
-                            <Chip
-                              label='Regular'
-                              size='small'
-                              color='success'
-                            />
-                          ) : (
-                            <Chip
-                              label='Irregular'
-                              size='small'
-                              color='warning'
-                            />
-                          )}
-                        </TableCell>
-                        <TableCell>
-                          {conj.verb.reflexive ? (
-                            <Chip label='Yes' size='small' color='info' />
-                          ) : (
-                            <Chip label='No' size='small' />
-                          )}
-                        </TableCell>
-                        <TableCell>
-                          {renderConjugationPreview(
-                            conj.conjugation as ConjugationData
-                          )}
-                        </TableCell>
-                        <TableCell>
-                          {new Date(conj.updatedAt).toLocaleDateString('en-US')}
-                        </TableCell>
-                        <TableCell align='center'>
-                          <IconButton
-                            size='small'
-                            onClick={() => toggleExpanded(conj.id)}
-                          >
-                            {expandedConjugations.has(conj.id) ? (
-                              <ExpandLess />
-                            ) : (
-                              <ExpandMore />
-                            )}
-                          </IconButton>
-                        </TableCell>
-                      </TableRow>
-                      {expandedConjugations.has(conj.id) && (
-                        <TableRow>
-                          <TableCell colSpan={6}>
-                            {renderFullConjugation(
-                              conj.conjugation as ConjugationData
-                            )}
-                          </TableCell>
-                        </TableRow>
-                      )}
-                    </Fragment>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
           )}
         </CardContent>
       </Card>
@@ -576,3 +437,4 @@ export default function ManageConjugations({
     </>
   )
 }
+

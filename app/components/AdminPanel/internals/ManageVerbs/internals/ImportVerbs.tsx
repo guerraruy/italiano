@@ -5,23 +5,16 @@ import {
   Card,
   CardContent,
   Typography,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  IconButton,
+  Button,
+  Stack,
   Chip,
-  Alert,
   CircularProgress,
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
-  Button,
   Paper,
-  Stack,
+  IconButton,
 } from '@mui/material'
 import {
   CloudUpload,
@@ -31,18 +24,16 @@ import {
   InfoOutlined,
 } from '@mui/icons-material'
 import {
-  useGetVerbsQuery,
   useImportVerbsMutation,
   type ConflictVerb,
-} from '../../../store/api'
+} from '../../../../../store/api'
 
-interface ManageVerbsProps {
+interface ImportVerbsProps {
   onError: (message: string) => void
   onSuccess: (message: string) => void
 }
 
-export default function ManageVerbs({ onError, onSuccess }: ManageVerbsProps) {
-  const { data: verbsData, isLoading: loadingVerbs } = useGetVerbsQuery()
+export default function ImportVerbs({ onError, onSuccess }: ImportVerbsProps) {
   const [importVerbs, { isLoading: importingVerbs }] = useImportVerbsMutation()
 
   const [verbJsonContent, setVerbJsonContent] = useState<string>('')
@@ -126,8 +117,6 @@ export default function ManageVerbs({ onError, onSuccess }: ManageVerbsProps) {
     }))
   }
 
-  const verbs = verbsData?.verbs || []
-
   return (
     <>
       {/* Import Section */}
@@ -190,72 +179,6 @@ export default function ManageVerbs({ onError, onSuccess }: ManageVerbsProps) {
                 {importingVerbs ? 'Importing...' : 'Import Verbs'}
               </Button>
             </Box>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Existing Verbs Table */}
-      <Card>
-        <CardContent>
-          <Typography variant='h6' gutterBottom>
-            Current Verbs in Database ({verbs.length})
-          </Typography>
-
-          {loadingVerbs ? (
-            <Box display='flex' justifyContent='center' p={3}>
-              <CircularProgress />
-            </Box>
-          ) : verbs.length === 0 ? (
-            <Alert severity='info' icon={<Info />}>
-              No verbs in the database yet. Import some using the form above.
-            </Alert>
-          ) : (
-            <TableContainer>
-              <Table size='small'>
-                <TableHead>
-                  <TableRow>
-                    <TableCell>Italian</TableCell>
-                    <TableCell>Portuguese (BR)</TableCell>
-                    <TableCell>English</TableCell>
-                    <TableCell align='center'>Regular</TableCell>
-                    <TableCell align='center'>Reflexive</TableCell>
-                    <TableCell>Last Updated</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {verbs.map((verb) => (
-                    <TableRow key={verb.italian}>
-                      <TableCell>
-                        <strong>{verb.italian}</strong>
-                      </TableCell>
-                      <TableCell>{verb.tr_ptBR}</TableCell>
-                      <TableCell>{verb.tr_en || '-'}</TableCell>
-                      <TableCell align='center'>
-                        {verb.regular ? (
-                          <Chip label='Regular' size='small' color='success' />
-                        ) : (
-                          <Chip
-                            label='Irregular'
-                            size='small'
-                            color='warning'
-                          />
-                        )}
-                      </TableCell>
-                      <TableCell align='center'>
-                        {verb.reflexive ? (
-                          <Chip label='Yes' size='small' color='info' />
-                        ) : (
-                          <Chip label='No' size='small' />
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        {new Date(verb.updatedAt).toLocaleDateString('en-US')}
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
           )}
         </CardContent>
       </Card>
@@ -424,3 +347,4 @@ export default function ManageVerbs({ onError, onSuccess }: ManageVerbsProps) {
     </>
   )
 }
+

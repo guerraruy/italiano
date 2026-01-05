@@ -40,6 +40,7 @@ export interface VerbData {
 }
 
 export interface ImportedVerb {
+  id: string
   italian: string
   regular: boolean
   reflexive: boolean
@@ -286,6 +287,31 @@ export const api = createApi({
       }),
       invalidatesTags: ['Verbs'],
     }),
+    updateVerb: builder.mutation<
+      { message: string; verb: ImportedVerb },
+      {
+        verbId: string
+        italian: string
+        regular: boolean
+        reflexive: boolean
+        tr_ptBR: string
+        tr_en?: string
+      }
+    >({
+      query: ({ verbId, italian, regular, reflexive, tr_ptBR, tr_en }) => ({
+        url: `/admin/verbs/${verbId}`,
+        method: 'PATCH',
+        body: { italian, regular, reflexive, tr_ptBR, tr_en },
+      }),
+      invalidatesTags: ['Verbs'],
+    }),
+    deleteVerb: builder.mutation<{ message: string }, string>({
+      query: (verbId) => ({
+        url: `/admin/verbs/${verbId}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: ['Verbs'],
+    }),
 
     // Verb practice endpoints
     getVerbsForPractice: builder.query<{ verbs: VerbForPractice[] }, void>({
@@ -336,6 +362,27 @@ export const api = createApi({
         url: '/admin/verbs/conjugations/import',
         method: 'POST',
         body: data,
+      }),
+      invalidatesTags: ['Conjugations'],
+    }),
+    updateConjugation: builder.mutation<
+      { message: string; conjugation: VerbConjugation },
+      {
+        conjugationId: string
+        conjugation: ConjugationData
+      }
+    >({
+      query: ({ conjugationId, conjugation }) => ({
+        url: `/admin/verbs/conjugations/${conjugationId}`,
+        method: 'PATCH',
+        body: { conjugation },
+      }),
+      invalidatesTags: ['Conjugations'],
+    }),
+    deleteConjugation: builder.mutation<{ message: string }, string>({
+      query: (conjugationId) => ({
+        url: `/admin/verbs/conjugations/${conjugationId}`,
+        method: 'DELETE',
       }),
       invalidatesTags: ['Conjugations'],
     }),
@@ -430,12 +477,16 @@ export const {
   useDeleteUserMutation,
   useGetVerbsQuery,
   useImportVerbsMutation,
+  useUpdateVerbMutation,
+  useDeleteVerbMutation,
   useGetVerbsForPracticeQuery,
   useGetVerbStatisticsQuery,
   useUpdateVerbStatisticMutation,
   useResetVerbStatisticMutation,
   useGetConjugationsQuery,
   useImportConjugationsMutation,
+  useUpdateConjugationMutation,
+  useDeleteConjugationMutation,
   useGetNounsQuery,
   useImportNounsMutation,
   useUpdateNounMutation,
