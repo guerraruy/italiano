@@ -33,7 +33,7 @@ const menuItems = [
   {
     text: 'Nouns Translations',
     icon: <TranslateIcon />,
-    path: '/words-translations',
+    path: '/nouns-translations',
   },
   {
     text: 'Verbs Translations',

@@ -8,6 +8,7 @@ interface NounTranslations {
   it: string
   pt: string
   en: string
+  [key: string]: string
 }
 
 interface NounData {
@@ -71,7 +72,6 @@ export async function POST(request: NextRequest) {
 
     // Check for existing nouns (conflicts)
     const nounNames = Object.keys(nouns)
-    // @ts-expect-error - Noun model exists but TS server needs restart
     const existingNouns = await prisma.noun.findMany({
       where: {
         italian: {
@@ -154,7 +154,6 @@ export async function POST(request: NextRequest) {
 
     // Create new nouns
     if (nounsToCreate.length > 0) {
-      // @ts-expect-error - Noun model exists but TS server needs restart
       const result = await prisma.noun.createMany({
         data: nounsToCreate,
       })
@@ -163,7 +162,6 @@ export async function POST(request: NextRequest) {
 
     // Update existing nouns
     for (const { italian, data } of nounsToUpdate) {
-      // @ts-expect-error - Noun model exists but TS server needs restart
       await prisma.noun.update({
         where: { italian },
         data: {
@@ -217,7 +215,6 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    // @ts-expect-error - Noun model exists but TS server needs restart
     const nouns = await prisma.noun.findMany({
       orderBy: {
         italian: 'asc',
