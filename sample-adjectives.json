@@ -1,0 +1,263 @@
+{
+  "basso": {
+    "maschile": {
+      "singolare": {
+        "it": "basso",
+        "pt": "baixo",
+        "en": "short"
+      },
+      "plurale": {
+        "it": "bassi",
+        "pt": "baixos",
+        "en": "short"
+      }
+    },
+    "femminile": {
+      "singolare": {
+        "it": "bassa",
+        "pt": "baixa",
+        "en": "short"
+      },
+      "plurale": {
+        "it": "basse",
+        "pt": "baixas",
+        "en": "short"
+      }
+    }
+  },
+  "alto": {
+    "maschile": {
+      "singolare": {
+        "it": "alto",
+        "pt": "alto",
+        "en": "tall"
+      },
+      "plurale": {
+        "it": "alti",
+        "pt": "altos",
+        "en": "tall"
+      }
+    },
+    "femminile": {
+      "singolare": {
+        "it": "alta",
+        "pt": "alta",
+        "en": "tall"
+      },
+      "plurale": {
+        "it": "alte",
+        "pt": "altas",
+        "en": "tall"
+      }
+    }
+  },
+  "bello": {
+    "maschile": {
+      "singolare": {
+        "it": "bello",
+        "pt": "bonito",
+        "en": "beautiful"
+      },
+      "plurale": {
+        "it": "belli",
+        "pt": "bonitos",
+        "en": "beautiful"
+      }
+    },
+    "femminile": {
+      "singolare": {
+        "it": "bella",
+        "pt": "bonita",
+        "en": "beautiful"
+      },
+      "plurale": {
+        "it": "belle",
+        "pt": "bonitas",
+        "en": "beautiful"
+      }
+    }
+  },
+  "buono": {
+    "maschile": {
+      "singolare": {
+        "it": "buono",
+        "pt": "bom",
+        "en": "good"
+      },
+      "plurale": {
+        "it": "buoni",
+        "pt": "bons",
+        "en": "good"
+      }
+    },
+    "femminile": {
+      "singolare": {
+        "it": "buona",
+        "pt": "boa",
+        "en": "good"
+      },
+      "plurale": {
+        "it": "buone",
+        "pt": "boas",
+        "en": "good"
+      }
+    }
+  },
+  "cattivo": {
+    "maschile": {
+      "singolare": {
+        "it": "cattivo",
+        "pt": "mau",
+        "en": "bad"
+      },
+      "plurale": {
+        "it": "cattivi",
+        "pt": "maus",
+        "en": "bad"
+      }
+    },
+    "femminile": {
+      "singolare": {
+        "it": "cattiva",
+        "pt": "má",
+        "en": "bad"
+      },
+      "plurale": {
+        "it": "cattive",
+        "pt": "más",
+        "en": "bad"
+      }
+    }
+  },
+  "grande": {
+    "maschile": {
+      "singolare": {
+        "it": "grande",
+        "pt": "grande",
+        "en": "big"
+      },
+      "plurale": {
+        "it": "grandi",
+        "pt": "grandes",
+        "en": "big"
+      }
+    },
+    "femminile": {
+      "singolare": {
+        "it": "grande",
+        "pt": "grande",
+        "en": "big"
+      },
+      "plurale": {
+        "it": "grandi",
+        "pt": "grandes",
+        "en": "big"
+      }
+    }
+  },
+  "piccolo": {
+    "maschile": {
+      "singolare": {
+        "it": "piccolo",
+        "pt": "pequeno",
+        "en": "small"
+      },
+      "plurale": {
+        "it": "piccoli",
+        "pt": "pequenos",
+        "en": "small"
+      }
+    },
+    "femminile": {
+      "singolare": {
+        "it": "piccola",
+        "pt": "pequena",
+        "en": "small"
+      },
+      "plurale": {
+        "it": "piccole",
+        "pt": "pequenas",
+        "en": "small"
+      }
+    }
+  },
+  "nuovo": {
+    "maschile": {
+      "singolare": {
+        "it": "nuovo",
+        "pt": "novo",
+        "en": "new"
+      },
+      "plurale": {
+        "it": "nuovi",
+        "pt": "novos",
+        "en": "new"
+      }
+    },
+    "femminile": {
+      "singolare": {
+        "it": "nuova",
+        "pt": "nova",
+        "en": "new"
+      },
+      "plurale": {
+        "it": "nuove",
+        "pt": "novas",
+        "en": "new"
+      }
+    }
+  },
+  "vecchio": {
+    "maschile": {
+      "singolare": {
+        "it": "vecchio",
+        "pt": "velho",
+        "en": "old"
+      },
+      "plurale": {
+        "it": "vecchi",
+        "pt": "velhos",
+        "en": "old"
+      }
+    },
+    "femminile": {
+      "singolare": {
+        "it": "vecchia",
+        "pt": "velha",
+        "en": "old"
+      },
+      "plurale": {
+        "it": "vecchie",
+        "pt": "velhas",
+        "en": "old"
+      }
+    }
+  },
+  "giovane": {
+    "maschile": {
+      "singolare": {
+        "it": "giovane",
+        "pt": "jovem",
+        "en": "young"
+      },
+      "plurale": {
+        "it": "giovani",
+        "pt": "jovens",
+        "en": "young"
+      }
+    },
+    "femminile": {
+      "singolare": {
+        "it": "giovane",
+        "pt": "jovem",
+        "en": "young"
+      },
+      "plurale": {
+        "it": "giovani",
+        "pt": "jovens",
+        "en": "young"
+      }
+    }
+  }
+}
+

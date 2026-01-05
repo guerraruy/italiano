@@ -15,18 +15,19 @@ datasource db {
 
 // User model for authentication
 model User {
-  id             String          @id @default(cuid())
-  username       String          @unique
-  email          String          @unique
-  password       String          // Hashed password
-  name           String?
-  admin          Boolean         @default(false)
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
-  lessons        UserLesson[]
-  profile        UserProfile?
-  verbStatistics VerbStatistic[]
-  nounStatistics NounStatistic[]
+  id                   String               @id @default(cuid())
+  username             String               @unique
+  email                String               @unique
+  password             String               // Hashed password
+  name                 String?
+  admin                Boolean              @default(false)
+  createdAt            DateTime             @default(now())
+  updatedAt            DateTime             @updatedAt
+  lessons              UserLesson[]
+  profile              UserProfile?
+  verbStatistics       VerbStatistic[]
+  nounStatistics       NounStatistic[]
+  adjectiveStatistics  AdjectiveStatistic[]
 }
 
 // User profile with preferences and settings
@@ -152,4 +153,33 @@ model NounStatistic {
   @@unique([userId, nounId])
   @@index([userId])
   @@index([nounId])
+}
+
+// Italian adjectives with translations
+model Adjective {
+  id          String               @id @default(cuid())
+  italian     String               @unique // The adjective in Italian (masculine singular base form)
+  maschile    Json                 // Masculine forms with translations { singolare: { it, pt, en }, plurale: { it, pt, en } }
+  femminile   Json                 // Feminine forms with translations { singolare: { it, pt, en }, plurale: { it, pt, en } }
+  createdAt   DateTime             @default(now())
+  updatedAt   DateTime             @updatedAt
+  statistics  AdjectiveStatistic[]
+}
+
+// Statistics for adjective practice per user
+model AdjectiveStatistic {
+  id              String     @id @default(cuid())
+  userId          String
+  adjectiveId     String
+  correctAttempts Int        @default(0)
+  wrongAttempts   Int        @default(0)
+  lastPracticed   DateTime   @default(now())
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+  user            User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  adjective       Adjective  @relation(fields: [adjectiveId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, adjectiveId])
+  @@index([userId])
+  @@index([adjectiveId])
 }

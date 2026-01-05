@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react'
 import { Box, Typography, Alert, Tabs, Tab } from '@mui/material'
 import { useAuth } from '../../contexts/AuthContext'
 import { useRouter } from 'next/navigation'
-import { ManageUsers, ManageVerbs, ManageConjugations, ManageNouns } from './internals'
+import { ManageUsers, ManageVerbs, ManageConjugations, ManageNouns, ManageAdjectives } from './internals'
 
 export default function AdminPanel() {
   const { user, isAuthenticated } = useAuth()
@@ -64,6 +64,7 @@ export default function AdminPanel() {
           <Tab label='Manage Verbs' />
           <Tab label='Manage Conjugations' />
           <Tab label='Manage Nouns' />
+          <Tab label='Manage Adjectives' />
         </Tabs>
       </Box>
 
@@ -81,6 +82,10 @@ export default function AdminPanel() {
 
       {currentTab === 3 && (
         <ManageNouns onError={handleError} onSuccess={handleSuccess} />
+      )}
+
+      {currentTab === 4 && (
+        <ManageAdjectives onError={handleError} onSuccess={handleSuccess} />
       )}
     </Box>
   )
