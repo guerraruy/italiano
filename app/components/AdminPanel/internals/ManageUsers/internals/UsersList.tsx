@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useState, useMemo, useDeferredValue, useTransition } from 'react'
 import {
   Box,
   Card,
@@ -13,40 +13,47 @@ import {
   TableRow,
   IconButton,
   Chip,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
   Tooltip,
   CircularProgress,
+  TextField,
+  InputAdornment,
+  TablePagination,
 } from '@mui/material'
 import {
-  Delete,
+  DeleteOutlined,
   AdminPanelSettings,
   PersonRemove,
+  Search,
+  Clear,
 } from '@mui/icons-material'
 import {
   useGetUsersQuery,
   useUpdateUserMutation,
-  useDeleteUserMutation,
   type UserData,
-} from '../../../store/api'
-import { useAuth } from '../../../contexts/AuthContext'
+} from '../../../../../store/api'
+import { useAuth } from '../../../../../contexts/AuthContext'
+import { DeleteUserDialog } from './'
 
-interface ManageUsersProps {
+interface UsersListProps {
   onError: (message: string) => void
   onSuccess: (message: string) => void
 }
 
-export default function ManageUsers({ onError, onSuccess }: ManageUsersProps) {
+export default function UsersList({ onError, onSuccess }: UsersListProps) {
   const { user } = useAuth()
-  const {
-    data: usersData,
-    isLoading: loadingUsers,
-  } = useGetUsersQuery()
+  const { data: usersData, isLoading: loadingUsers } = useGetUsersQuery()
   const [updateUser] = useUpdateUserMutation()
-  const [deleteUser] = useDeleteUserMutation()
+
+  // Filter state with transition
+  const [filterText, setFilterText] = useState('')
+  const [isPending, startTransition] = useTransition()
+
+  // Pagination state
+  const [page, setPage] = useState(0)
+  const [rowsPerPage, setRowsPerPage] = useState(25)
+
+  // Defer the filter text to keep input responsive
+  const deferredFilterText = useDeferredValue(filterText)
 
   const [deleteDialog, setDeleteDialog] = useState<{
     open: boolean
@@ -77,19 +84,32 @@ export default function ManageUsers({ onError, onSuccess }: ManageUsersProps) {
     }
   }
 
-  const handleDeleteUser = async () => {
-    if (!deleteDialog.user) return
-
-    try {
-      await deleteUser(deleteDialog.user.id).unwrap()
-
-      onSuccess('User deleted successfully')
-      setDeleteDialog({ open: false, user: null })
-    } catch (err) {
-      const error = err as { data?: { error?: string } }
-      onError(error?.data?.error || 'Error deleting user')
-    }
+  const handleOpenDeleteDialog = (userData: UserData) => {
+    setDeleteDialog({ open: true, user: userData })
   }
+
+  const handleCloseDeleteDialog = () => {
+    setDeleteDialog({ open: false, user: null })
+  }
+
+  // Filter users based on deferred search text (memoized for performance)
+  const filteredUsers = useMemo(() => {
+    const users = usersData?.users || []
+    if (!deferredFilterText) return users
+    const searchTerm = deferredFilterText.toLowerCase()
+    return users.filter(
+      (userData) =>
+        userData.username.toLowerCase().includes(searchTerm) ||
+        userData.email.toLowerCase().includes(searchTerm) ||
+        (userData.name && userData.name.toLowerCase().includes(searchTerm))
+    )
+  }, [usersData?.users, deferredFilterText])
+
+  // Paginated users
+  const paginatedUsers = useMemo(() => {
+    const startIndex = page * rowsPerPage
+    return filteredUsers.slice(startIndex, startIndex + rowsPerPage)
+  }, [filteredUsers, page, rowsPerPage])
 
   if (loadingUsers) {
     return (
@@ -104,17 +124,60 @@ export default function ManageUsers({ onError, onSuccess }: ManageUsersProps) {
     )
   }
 
-  const users = usersData?.users || []
-
   return (
     <>
       <Card>
         <CardContent>
-          <Typography variant='h6' gutterBottom>
-            Manage Users ({users.length})
-          </Typography>
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              mb: 2,
+            }}
+          >
+            <Typography variant='h6'>
+              Manage Users ({filteredUsers.length}
+              {deferredFilterText && ` of ${usersData?.users?.length || 0}`})
+            </Typography>
+            <TextField
+              size='small'
+              placeholder='Filter by username, email, or name...'
+              value={filterText}
+              onChange={(e) => {
+                const value = e.target.value
+                setFilterText(value)
+                startTransition(() => {
+                  setPage(0) // Reset to first page on filter change
+                })
+              }}
+              sx={{ minWidth: 300 }}
+              disabled={loadingUsers}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position='start'>
+                    <Search fontSize='small' />
+                  </InputAdornment>
+                ),
+                endAdornment: filterText && (
+                  <InputAdornment position='end'>
+                    <IconButton
+                      size='small'
+                      onClick={() => setFilterText('')}
+                      edge='end'
+                      aria-label='clear filter'
+                    >
+                      <Clear fontSize='small' />
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
+            />
+          </Box>
 
-          <TableContainer>
+          <TableContainer
+            sx={{ opacity: isPending ? 0.5 : 1, transition: 'opacity 0.2s' }}
+          >
             <Table>
               <TableHead>
                 <TableRow>
@@ -128,7 +191,7 @@ export default function ManageUsers({ onError, onSuccess }: ManageUsersProps) {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {users.map((userData) => (
+                {paginatedUsers.map((userData) => (
                   <TableRow key={userData.id}>
                     <TableCell>{userData.username}</TableCell>
                     <TableCell>{userData.email}</TableCell>
@@ -193,15 +256,10 @@ export default function ManageUsers({ onError, onSuccess }: ManageUsersProps) {
                             <IconButton
                               color='error'
                               size='small'
-                              onClick={() =>
-                                setDeleteDialog({
-                                  open: true,
-                                  user: userData,
-                                })
-                              }
+                              onClick={() => handleOpenDeleteDialog(userData)}
                               disabled={userData.id === user?.id}
                             >
-                              <Delete />
+                              <DeleteOutlined />
                             </IconButton>
                           </span>
                         </Tooltip>
@@ -212,35 +270,39 @@ export default function ManageUsers({ onError, onSuccess }: ManageUsersProps) {
               </TableBody>
             </Table>
           </TableContainer>
+
+          {/* Pagination */}
+          {filteredUsers.length > 0 && (
+            <TablePagination
+              component='div'
+              count={filteredUsers.length}
+              page={page}
+              onPageChange={(_, newPage) => {
+                startTransition(() => {
+                  setPage(newPage)
+                })
+              }}
+              rowsPerPage={rowsPerPage}
+              onRowsPerPageChange={(e) => {
+                startTransition(() => {
+                  setRowsPerPage(parseInt(e.target.value, 10))
+                  setPage(0)
+                })
+              }}
+              rowsPerPageOptions={[10, 25, 50, 100]}
+            />
+          )}
         </CardContent>
       </Card>
 
       {/* Delete Confirmation Dialog */}
-      <Dialog
+      <DeleteUserDialog
         open={deleteDialog.open}
-        onClose={() => setDeleteDialog({ open: false, user: null })}
-      >
-        <DialogTitle>Confirm Deletion</DialogTitle>
-        <DialogContent>
-          <Typography>
-            Are you sure you want to delete the user{' '}
-            <strong>{deleteDialog.user?.username}</strong>?
-          </Typography>
-          <Typography color='error' sx={{ mt: 2 }}>
-            This action cannot be undone. All user data will be permanently
-            removed.
-          </Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setDeleteDialog({ open: false, user: null })}>
-            Cancel
-          </Button>
-          <Button onClick={handleDeleteUser} color='error' variant='contained'>
-            Delete
-          </Button>
-        </DialogActions>
-      </Dialog>
+        user={deleteDialog.user}
+        onClose={handleCloseDeleteDialog}
+        onSuccess={onSuccess}
+        onError={onError}
+      />
     </>
   )
 }
-
