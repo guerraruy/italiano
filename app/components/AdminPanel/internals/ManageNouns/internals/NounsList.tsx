@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useState, useMemo, useDeferredValue, useTransition } from 'react'
 import {
   Box,
   Card,
@@ -14,8 +14,17 @@ import {
   Alert,
   CircularProgress,
   IconButton,
+  TextField,
+  InputAdornment,
+  TablePagination,
 } from '@mui/material'
-import { Info, EditOutlined, DeleteOutlined } from '@mui/icons-material'
+import {
+  Info,
+  EditOutlined,
+  DeleteOutlined,
+  Search,
+  Clear,
+} from '@mui/icons-material'
 import {
   useGetNounsQuery,
   type NounTranslations,
@@ -30,6 +39,17 @@ interface NounsListProps {
 
 export default function NounsList({ onError, onSuccess }: NounsListProps) {
   const { data: nounsData, isLoading: loadingNouns } = useGetNounsQuery()
+
+  // Filter state with transition
+  const [filterText, setFilterText] = useState('')
+  const [isPending, startTransition] = useTransition()
+
+  // Pagination state
+  const [page, setPage] = useState(0)
+  const [rowsPerPage, setRowsPerPage] = useState(25)
+
+  // Defer the filter text to keep input responsive
+  const deferredFilterText = useDeferredValue(filterText)
 
   // Edit and Delete modal states
   const [showEditDialog, setShowEditDialog] = useState(false)
@@ -59,27 +79,90 @@ export default function NounsList({ onError, onSuccess }: NounsListProps) {
     setNounToDelete(null)
   }
 
-  const nouns = nounsData?.nouns || []
+  // Filter nouns based on deferred search text (memoized for performance)
+  const filteredNouns = useMemo(() => {
+    const nouns = nounsData?.nouns || []
+    if (!deferredFilterText) return nouns
+    const searchTerm = deferredFilterText.toLowerCase()
+    return nouns.filter((noun) =>
+      noun.italian.toLowerCase().includes(searchTerm)
+    )
+  }, [nounsData?.nouns, deferredFilterText])
+
+  // Paginated nouns
+  const paginatedNouns = useMemo(() => {
+    const startIndex = page * rowsPerPage
+    return filteredNouns.slice(startIndex, startIndex + rowsPerPage)
+  }, [filteredNouns, page, rowsPerPage])
 
   return (
     <>
       {/* Existing Nouns Table */}
       <Card>
         <CardContent>
-          <Typography variant='h6' gutterBottom>
-            Current Nouns in Database ({nouns.length})
-          </Typography>
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              mb: 2,
+            }}
+          >
+            <Typography variant='h6'>
+              Current Nouns in Database ({filteredNouns.length}
+              {deferredFilterText && ` of ${nounsData?.nouns?.length || 0}`})
+            </Typography>
+            <TextField
+              size='small'
+              placeholder='Filter by Italian name...'
+              value={filterText}
+              onChange={(e) => {
+                const value = e.target.value
+                setFilterText(value)
+                startTransition(() => {
+                  setPage(0) // Reset to first page on filter change
+                })
+              }}
+              sx={{ minWidth: 250 }}
+              disabled={loadingNouns}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position='start'>
+                    <Search fontSize='small' />
+                  </InputAdornment>
+                ),
+                endAdornment: filterText && (
+                  <InputAdornment position='end'>
+                    <IconButton
+                      size='small'
+                      onClick={() => setFilterText('')}
+                      edge='end'
+                      aria-label='clear filter'
+                    >
+                      <Clear fontSize='small' />
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
+            />
+          </Box>
 
           {loadingNouns ? (
             <Box display='flex' justifyContent='center' p={3}>
               <CircularProgress />
             </Box>
-          ) : nouns.length === 0 ? (
+          ) : (nounsData?.nouns?.length || 0) === 0 ? (
             <Alert severity='info' icon={<Info />}>
               No nouns in the database yet. Import some using the form above.
             </Alert>
+          ) : filteredNouns.length === 0 ? (
+            <Alert severity='info' icon={<Info />}>
+              No nouns found matching &quot;{deferredFilterText}&quot;
+            </Alert>
           ) : (
-            <TableContainer>
+            <TableContainer
+              sx={{ opacity: isPending ? 0.5 : 1, transition: 'opacity 0.2s' }}
+            >
               <Table size='small'>
                 <TableHead>
                   <TableRow>
@@ -94,7 +177,7 @@ export default function NounsList({ onError, onSuccess }: NounsListProps) {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {nouns.map((noun) => {
+                  {paginatedNouns.map((noun) => {
                     const singolare = noun.singolare as NounTranslations
                     const plurale = noun.plurale as NounTranslations
                     return (
@@ -166,6 +249,28 @@ export default function NounsList({ onError, onSuccess }: NounsListProps) {
               </Table>
             </TableContainer>
           )}
+
+          {/* Pagination */}
+          {filteredNouns.length > 0 && (
+            <TablePagination
+              component='div'
+              count={filteredNouns.length}
+              page={page}
+              onPageChange={(_, newPage) => {
+                startTransition(() => {
+                  setPage(newPage)
+                })
+              }}
+              rowsPerPage={rowsPerPage}
+              onRowsPerPageChange={(e) => {
+                startTransition(() => {
+                  setRowsPerPage(parseInt(e.target.value, 10))
+                  setPage(0)
+                })
+              }}
+              rowsPerPageOptions={[10, 25, 50, 100]}
+            />
+          )}
         </CardContent>
       </Card>
 
@@ -189,4 +294,3 @@ export default function NounsList({ onError, onSuccess }: NounsListProps) {
     </>
   )
 }
-

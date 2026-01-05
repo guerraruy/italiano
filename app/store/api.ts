@@ -156,6 +156,24 @@ export interface ImportNounsResponse {
   conflicts?: ConflictNoun[]
 }
 
+export interface NounForPractice {
+  id: string
+  italian: string
+  italianPlural: string
+  translation: string
+  translationPlural: string
+}
+
+export interface NounStatistic {
+  correctAttempts: number
+  wrongAttempts: number
+  lastPracticed: Date
+}
+
+export interface NounStatisticsMap {
+  [nounId: string]: NounStatistic
+}
+
 // Base query with authentication
 const baseQuery = fetchBaseQuery({
   baseUrl: '/api',
@@ -172,7 +190,7 @@ const baseQuery = fetchBaseQuery({
 export const api = createApi({
   reducerPath: 'api',
   baseQuery,
-  tagTypes: ['Users', 'Verbs', 'Auth', 'Profile', 'VerbsPractice', 'VerbStatistics', 'Conjugations', 'Nouns'],
+  tagTypes: ['Users', 'Verbs', 'Auth', 'Profile', 'VerbsPractice', 'VerbStatistics', 'Conjugations', 'Nouns', 'NounsPractice', 'NounStatistics'],
   endpoints: (builder) => ({
     // Auth endpoints
     login: builder.mutation<
@@ -364,6 +382,39 @@ export const api = createApi({
       }),
       invalidatesTags: ['Nouns'],
     }),
+
+    // Noun practice endpoints
+    getNounsForPractice: builder.query<{ nouns: NounForPractice[] }, void>({
+      query: () => '/nouns',
+      providesTags: ['NounsPractice'],
+    }),
+
+    // Noun statistics endpoints
+    getNounStatistics: builder.query<{ statistics: NounStatisticsMap }, void>({
+      query: () => '/nouns/statistics',
+      providesTags: ['NounStatistics'],
+    }),
+    updateNounStatistic: builder.mutation<
+      { message: string; statistic: NounStatistic & { id: string; nounId: string } },
+      { nounId: string; correct: boolean }
+    >({
+      query: (data) => ({
+        url: '/nouns/statistics',
+        method: 'POST',
+        body: data,
+      }),
+      invalidatesTags: ['NounStatistics'],
+    }),
+    resetNounStatistic: builder.mutation<
+      { message: string },
+      string
+    >({
+      query: (nounId) => ({
+        url: `/nouns/statistics/${nounId}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: ['NounStatistics'],
+    }),
   }),
 })
 
@@ -389,4 +440,8 @@ export const {
   useImportNounsMutation,
   useUpdateNounMutation,
   useDeleteNounMutation,
+  useGetNounsForPracticeQuery,
+  useGetNounStatisticsQuery,
+  useUpdateNounStatisticMutation,
+  useResetNounStatisticMutation,
 } = api
