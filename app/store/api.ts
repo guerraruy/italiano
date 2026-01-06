@@ -237,6 +237,25 @@ export interface AdjectiveStatisticsMap {
   [adjectiveId: string]: AdjectiveStatistic
 }
 
+export interface VerbForConjugationPractice {
+  id: string
+  italian: string
+  translation: string
+  regular: boolean
+  reflexive: boolean
+  conjugation: ConjugationData
+}
+
+export interface ConjugationStatistic {
+  correctAttempts: number
+  wrongAttempts: number
+  lastPracticed: Date
+}
+
+export interface ConjugationStatisticsMap {
+  [key: string]: ConjugationStatistic // key format: "verbId:mood:tense:person"
+}
+
 // Base query with authentication
 const baseQuery = fetchBaseQuery({
   baseUrl: '/api',
@@ -253,7 +272,7 @@ const baseQuery = fetchBaseQuery({
 export const api = createApi({
   reducerPath: 'api',
   baseQuery,
-  tagTypes: ['Users', 'Verbs', 'Auth', 'Profile', 'VerbsPractice', 'VerbStatistics', 'Conjugations', 'Nouns', 'NounsPractice', 'NounStatistics', 'Adjectives', 'AdjectivesPractice', 'AdjectiveStatistics'],
+  tagTypes: ['Users', 'Verbs', 'Auth', 'Profile', 'VerbsPractice', 'VerbStatistics', 'Conjugations', 'ConjugationPractice', 'ConjugationStatistics', 'Nouns', 'NounsPractice', 'NounStatistics', 'Adjectives', 'AdjectivesPractice', 'AdjectiveStatistics'],
   endpoints: (builder) => ({
     // Auth endpoints
     login: builder.mutation<
@@ -449,6 +468,39 @@ export const api = createApi({
       invalidatesTags: ['Conjugations'],
     }),
 
+    // Conjugation practice endpoints
+    getVerbsForConjugationPractice: builder.query<{ verbs: VerbForConjugationPractice[] }, void>({
+      query: () => '/verbs/conjugations',
+      providesTags: ['ConjugationPractice'],
+    }),
+
+    // Conjugation statistics endpoints
+    getConjugationStatistics: builder.query<{ statistics: ConjugationStatisticsMap }, void>({
+      query: () => '/verbs/conjugations/statistics',
+      providesTags: ['ConjugationStatistics'],
+    }),
+    updateConjugationStatistic: builder.mutation<
+      { message: string; statistic: ConjugationStatistic & { id: string; key: string } },
+      { verbId: string; mood: string; tense: string; person: string; correct: boolean }
+    >({
+      query: (data) => ({
+        url: '/verbs/conjugations/statistics',
+        method: 'POST',
+        body: data,
+      }),
+      invalidatesTags: ['ConjugationStatistics'],
+    }),
+    resetConjugationStatistics: builder.mutation<
+      { message: string },
+      string // verbId
+    >({
+      query: (verbId) => ({
+        url: `/verbs/conjugations/statistics/${verbId}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: ['ConjugationStatistics'],
+    }),
+
     // Noun endpoints
     getNouns: builder.query<{ nouns: ImportedNoun[] }, void>({
       query: () => '/admin/nouns/import',
@@ -641,4 +693,8 @@ export const {
   useGetAdjectiveStatisticsQuery,
   useUpdateAdjectiveStatisticMutation,
   useResetAdjectiveStatisticMutation,
+  useGetVerbsForConjugationPracticeQuery,
+  useGetConjugationStatisticsQuery,
+  useUpdateConjugationStatisticMutation,
+  useResetConjugationStatisticsMutation,
 } = api
