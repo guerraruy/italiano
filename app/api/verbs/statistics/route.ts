@@ -1,39 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
-import { verify } from 'jsonwebtoken'
-
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key'
-
-// Helper function to verify authentication
-async function authenticate(request: NextRequest) {
-  const authHeader = request.headers.get('authorization')
-  
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return null
-  }
-
-  const token = authHeader.split(' ')[1]
-  
-  try {
-    const decoded = verify(token, JWT_SECRET) as { userId: string }
-    return decoded.userId
-  } catch (error) {
-    return null
-  }
-}
+import { withAuth } from '@/lib/auth'
+import { updateVerbStatisticSchema } from '@/lib/validation/verbs'
+import { z } from 'zod'
 
 // GET /api/verbs/statistics - Get all verb statistics for the logged-in user
-export async function GET(request: NextRequest) {
+export const GET = withAuth(async (request: NextRequest, userId: string) => {
   try {
-    const userId = await authenticate(request)
-    
-    if (!userId) {
-      return NextResponse.json(
-        { error: 'Authentication required' },
-        { status: 401 }
-      )
-    }
-
     // Get all statistics for the user
     const statistics = await prisma.verbStatistic.findMany({
       where: { userId },
@@ -47,46 +20,38 @@ export async function GET(request: NextRequest) {
     })
 
     // Return statistics as a map for easy lookup
-    const statsMap = statistics.reduce((acc, stat) => {
-      acc[stat.verbId] = {
-        correctAttempts: stat.correctAttempts,
-        wrongAttempts: stat.wrongAttempts,
-        lastPracticed: stat.lastPracticed,
-      }
-      return acc
-    }, {} as Record<string, { correctAttempts: number; wrongAttempts: number; lastPracticed: Date }>)
+    const statsMap = statistics.reduce(
+      (acc, stat) => {
+        acc[stat.verbId] = {
+          correctAttempts: stat.correctAttempts,
+          wrongAttempts: stat.wrongAttempts,
+          lastPracticed: stat.lastPracticed,
+        }
+        return acc
+      },
+      {} as Record<
+        string,
+        { correctAttempts: number; wrongAttempts: number; lastPracticed: Date }
+      >
+    )
 
     return NextResponse.json({ statistics: statsMap }, { status: 200 })
   } catch (error) {
-    console.error('Get verb statistics error:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
     )
   }
-}
+})
 
 // POST /api/verbs/statistics - Update verb statistics
-export async function POST(request: NextRequest) {
+export const POST = withAuth(async (request: NextRequest, userId: string) => {
   try {
-    const userId = await authenticate(request)
-    
-    if (!userId) {
-      return NextResponse.json(
-        { error: 'Authentication required' },
-        { status: 401 }
-      )
-    }
+    const body = await request.json()
 
-    const { verbId, correct } = await request.json()
-
-    // Validation
-    if (!verbId || typeof correct !== 'boolean') {
-      return NextResponse.json(
-        { error: 'Verb ID and correct flag are required' },
-        { status: 400 }
-      )
-    }
+    // Validate input
+    const validatedData = updateVerbStatisticSchema.parse(body)
+    const { verbId, correct } = validatedData
 
     // Verify verb exists
     const verb = await prisma.verb.findUnique({
@@ -94,10 +59,7 @@ export async function POST(request: NextRequest) {
     })
 
     if (!verb) {
-      return NextResponse.json(
-        { error: 'Verb not found' },
-        { status: 404 }
-      )
+      return NextResponse.json({ error: 'Verb not found' }, { status: 404 })
     }
 
     // Upsert verb statistics
@@ -109,12 +71,8 @@ export async function POST(request: NextRequest) {
         },
       },
       update: {
-        correctAttempts: correct
-          ? { increment: 1 }
-          : undefined,
-        wrongAttempts: !correct
-          ? { increment: 1 }
-          : undefined,
+        correctAttempts: correct ? { increment: 1 } : undefined,
+        wrongAttempts: !correct ? { increment: 1 } : undefined,
         lastPracticed: new Date(),
       },
       create: {
@@ -133,16 +91,24 @@ export async function POST(request: NextRequest) {
       },
     })
 
-    return NextResponse.json({ 
-      message: 'Statistics updated successfully',
-      statistic,
-    }, { status: 200 })
+    return NextResponse.json(
+      {
+        message: 'Statistics updated successfully',
+        statistic,
+      },
+      { status: 200 }
+    )
   } catch (error) {
-    console.error('Update verb statistics error:', error)
+    if (error instanceof z.ZodError) {
+      return NextResponse.json(
+        { error: 'Validation failed', details: error.issues },
+        { status: 400 }
+      )
+    }
+
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
     )
   }
-}
-
+})

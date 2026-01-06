@@ -1,48 +1,34 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
-import bcrypt from 'bcryptjs';
-import { sign } from 'jsonwebtoken';
-
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
+import { NextRequest, NextResponse } from 'next/server'
+import { prisma } from '@/lib/prisma'
+import bcrypt from 'bcryptjs'
+import { generateAccessToken } from '@/lib/auth'
+import { registerSchema } from '@/lib/validation/auth'
+import { z } from 'zod'
 
 export async function POST(request: NextRequest) {
   try {
-    const { username, email, password, name } = await request.json();
+    const body = await request.json()
 
-    // Validation
-    if (!username || !email || !password) {
-      return NextResponse.json(
-        { error: 'Username, email and password are required' },
-        { status: 400 }
-      );
-    }
-
-    if (password.length < 6) {
-      return NextResponse.json(
-        { error: 'Password must be at least 6 characters' },
-        { status: 400 }
-      );
-    }
+    // Validate input
+    const validatedData = registerSchema.parse(body)
+    const { username, email, password, name } = validatedData
 
     // Check if user already exists
     const existingUser = await prisma.user.findFirst({
       where: {
-        OR: [
-          { username },
-          { email }
-        ]
-      }
-    });
+        OR: [{ username }, { email }],
+      },
+    })
 
     if (existingUser) {
       return NextResponse.json(
         { error: 'Username or email already exists' },
         { status: 409 }
-      );
+      )
     }
 
     // Hash password
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await bcrypt.hash(password, 10)
 
     // Create user
     const user = await prisma.user.create({
@@ -59,26 +45,32 @@ export async function POST(request: NextRequest) {
         name: true,
         admin: true,
         createdAt: true,
-      }
-    });
+      },
+    })
 
     // Generate JWT token
-    const token = sign({ userId: user.id }, JWT_SECRET, { expiresIn: '7d' });
+    const token = generateAccessToken(user.id)
 
     return NextResponse.json(
-      { 
+      {
         message: 'User created successfully',
         user,
-        token
+        token,
       },
       { status: 201 }
-    );
+    )
   } catch (error) {
-    console.error('Registration error:', error);
+    if (error instanceof z.ZodError) {
+      return NextResponse.json(
+        { error: 'Validation failed', details: error.issues },
+        { status: 400 }
+      )
+    }
+
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
-    );
+    )
   }
 }
 

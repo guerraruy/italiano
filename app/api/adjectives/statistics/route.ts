@@ -1,34 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { verify } from 'jsonwebtoken'
 import { prisma } from '@/lib/prisma'
-
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key'
-
-async function authenticate(request: NextRequest) {
-  try {
-    const token = request.headers.get('authorization')?.replace('Bearer ', '')
-    if (!token) return null
-
-    const decoded = verify(token, JWT_SECRET) as { userId: string }
-
-    return decoded.userId
-  } catch {
-    return null
-  }
-}
+import { withAuth } from '@/lib/auth'
+import { updateAdjectiveStatisticSchema } from '@/lib/validation/adjectives'
+import { z } from 'zod'
 
 // GET /api/adjectives/statistics - Get all adjective statistics for the logged-in user
-export async function GET(request: NextRequest) {
+export const GET = withAuth(async (request: NextRequest, userId: string) => {
   try {
-    const userId = await authenticate(request)
-    
-    if (!userId) {
-      return NextResponse.json(
-        { error: 'Authentication required' },
-        { status: 401 }
-      )
-    }
-
     // Get all statistics for the user
     const statistics = await prisma.adjectiveStatistic.findMany({
       where: { userId },
@@ -42,46 +20,38 @@ export async function GET(request: NextRequest) {
     })
 
     // Return statistics as a map for easy lookup
-    const statsMap = statistics.reduce((acc, stat) => {
-      acc[stat.adjectiveId] = {
-        correctAttempts: stat.correctAttempts,
-        wrongAttempts: stat.wrongAttempts,
-        lastPracticed: stat.lastPracticed,
-      }
-      return acc
-    }, {} as Record<string, { correctAttempts: number; wrongAttempts: number; lastPracticed: Date }>)
+    const statsMap = statistics.reduce(
+      (acc, stat) => {
+        acc[stat.adjectiveId] = {
+          correctAttempts: stat.correctAttempts,
+          wrongAttempts: stat.wrongAttempts,
+          lastPracticed: stat.lastPracticed,
+        }
+        return acc
+      },
+      {} as Record<
+        string,
+        { correctAttempts: number; wrongAttempts: number; lastPracticed: Date }
+      >
+    )
 
     return NextResponse.json({ statistics: statsMap }, { status: 200 })
   } catch (error) {
-    console.error('Get adjective statistics error:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
     )
   }
-}
+})
 
 // POST /api/adjectives/statistics - Update adjective statistics
-export async function POST(request: NextRequest) {
+export const POST = withAuth(async (request: NextRequest, userId: string) => {
   try {
-    const userId = await authenticate(request)
-    
-    if (!userId) {
-      return NextResponse.json(
-        { error: 'Authentication required' },
-        { status: 401 }
-      )
-    }
+    const body = await request.json()
 
-    const { adjectiveId, correct } = await request.json()
-
-    // Validation
-    if (!adjectiveId || typeof correct !== 'boolean') {
-      return NextResponse.json(
-        { error: 'Adjective ID and correct flag are required' },
-        { status: 400 }
-      )
-    }
+    // Validate input
+    const validatedData = updateAdjectiveStatisticSchema.parse(body)
+    const { adjectiveId, correct } = validatedData
 
     // Verify adjective exists
     const adjective = await prisma.adjective.findUnique({
@@ -104,12 +74,8 @@ export async function POST(request: NextRequest) {
         },
       },
       update: {
-        correctAttempts: correct
-          ? { increment: 1 }
-          : undefined,
-        wrongAttempts: !correct
-          ? { increment: 1 }
-          : undefined,
+        correctAttempts: correct ? { increment: 1 } : undefined,
+        wrongAttempts: !correct ? { increment: 1 } : undefined,
         lastPracticed: new Date(),
       },
       create: {
@@ -128,16 +94,24 @@ export async function POST(request: NextRequest) {
       },
     })
 
-    return NextResponse.json({ 
-      message: 'Statistics updated successfully',
-      statistic,
-    }, { status: 200 })
+    return NextResponse.json(
+      {
+        message: 'Statistics updated successfully',
+        statistic,
+      },
+      { status: 200 }
+    )
   } catch (error) {
-    console.error('Update adjective statistics error:', error)
+    if (error instanceof z.ZodError) {
+      return NextResponse.json(
+        { error: 'Validation failed', details: error.issues },
+        { status: 400 }
+      )
+    }
+
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
     )
   }
-}
-
+})

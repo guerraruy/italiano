@@ -1,37 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
-import jwt from 'jsonwebtoken'
 import { prisma } from '@/lib/prisma'
-
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key'
-
-async function authenticate(request: NextRequest) {
-  try {
-    const authHeader = request.headers.get('authorization')
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return null
-    }
-
-    const token = authHeader.substring(7)
-    const decoded = jwt.verify(token, JWT_SECRET) as { userId: string }
-
-    return decoded.userId
-  } catch {
-    return null
-  }
-}
+import { withAuth } from '@/lib/auth'
+import { updateConjugationStatisticSchema } from '@/lib/validation/verbs'
+import { z } from 'zod'
 
 // GET /api/verbs/conjugations/statistics - Get all conjugation statistics for the logged-in user
-export async function GET(request: NextRequest) {
+export const GET = withAuth(async (request: NextRequest, userId: string) => {
   try {
-    const userId = await authenticate(request)
-
-    if (!userId) {
-      return NextResponse.json(
-        { error: 'Authentication required' },
-        { status: 401 }
-      )
-    }
-
     // Get all statistics for the user
     const statistics = await prisma.conjugationStatistic.findMany({
       where: { userId },
@@ -65,37 +40,21 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ statistics: statsMap }, { status: 200 })
   } catch (error) {
-    console.error('Get conjugation statistics error:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
     )
   }
-}
+})
 
 // POST /api/verbs/conjugations/statistics - Update conjugation statistics
-export async function POST(request: NextRequest) {
+export const POST = withAuth(async (request: NextRequest, userId: string) => {
   try {
-    const userId = await authenticate(request)
+    const body = await request.json()
 
-    if (!userId) {
-      return NextResponse.json(
-        { error: 'Authentication required' },
-        { status: 401 }
-      )
-    }
-
-    const { verbId, mood, tense, person, correct } = await request.json()
-
-    // Validation
-    if (!verbId || !mood || !tense || !person || typeof correct !== 'boolean') {
-      return NextResponse.json(
-        {
-          error: 'Verb ID, mood, tense, person, and correct flag are required',
-        },
-        { status: 400 }
-      )
-    }
+    // Validate input
+    const validatedData = updateConjugationStatisticSchema.parse(body)
+    const { verbId, mood, tense, person, correct } = validatedData
 
     // Verify verb exists
     const verb = await prisma.verb.findUnique({
@@ -160,10 +119,16 @@ export async function POST(request: NextRequest) {
       { status: 200 }
     )
   } catch (error) {
-    console.error('Update conjugation statistics error:', error)
+    if (error instanceof z.ZodError) {
+      return NextResponse.json(
+        { error: 'Validation failed', details: error.issues },
+        { status: 400 }
+      )
+    }
+
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
     )
   }
-}
+})

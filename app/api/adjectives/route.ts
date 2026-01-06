@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { verify } from 'jsonwebtoken'
 import { prisma } from '@/lib/prisma'
-
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key'
+import { withAuth } from '@/lib/auth'
 
 interface AdjectiveTranslations {
   it: string
@@ -24,31 +22,9 @@ interface AdjectiveFromDB {
   updatedAt: Date
 }
 
-async function authenticate(request: NextRequest) {
-  try {
-    const token = request.headers.get('authorization')?.replace('Bearer ', '')
-    if (!token) return null
-
-    const decoded = verify(token, JWT_SECRET) as { userId: string }
-
-    return decoded.userId
-  } catch {
-    return null
-  }
-}
-
 // GET /api/adjectives - Get all adjectives for translation practice
-export async function GET(request: NextRequest) {
+export const GET = withAuth(async (request: NextRequest, userId: string) => {
   try {
-    const userId = await authenticate(request)
-
-    if (!userId) {
-      return NextResponse.json(
-        { error: 'Authentication required' },
-        { status: 401 }
-      )
-    }
-
     // Get user profile to determine native language
     let profile = await prisma.userProfile.findUnique({
       where: { userId },
@@ -99,10 +75,9 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ adjectives: mappedAdjectives }, { status: 200 })
   } catch (error) {
-    console.error('Get adjectives error:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
     )
   }
-}
+})

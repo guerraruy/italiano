@@ -1,39 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
-import { verify } from 'jsonwebtoken'
-
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key'
-
-// Helper function to verify authentication
-async function authenticate(request: NextRequest) {
-  const authHeader = request.headers.get('authorization')
-  
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return null
-  }
-
-  const token = authHeader.split(' ')[1]
-  
-  try {
-    const decoded = verify(token, JWT_SECRET) as { userId: string }
-    return decoded.userId
-  } catch (error) {
-    return null
-  }
-}
+import { withAuth } from '@/lib/auth'
+import { updateNounStatisticSchema } from '@/lib/validation/nouns'
+import { z } from 'zod'
 
 // GET /api/nouns/statistics - Get all noun statistics for the logged-in user
-export async function GET(request: NextRequest) {
+export const GET = withAuth(async (request: NextRequest, userId: string) => {
   try {
-    const userId = await authenticate(request)
-    
-    if (!userId) {
-      return NextResponse.json(
-        { error: 'Authentication required' },
-        { status: 401 }
-      )
-    }
-
     // Get all statistics for the user
     const statistics = await prisma.nounStatistic.findMany({
       where: { userId },
@@ -58,35 +31,21 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ statistics: statsMap }, { status: 200 })
   } catch (error) {
-    console.error('Get noun statistics error:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
     )
   }
-}
+})
 
 // POST /api/nouns/statistics - Update noun statistics
-export async function POST(request: NextRequest) {
+export const POST = withAuth(async (request: NextRequest, userId: string) => {
   try {
-    const userId = await authenticate(request)
-    
-    if (!userId) {
-      return NextResponse.json(
-        { error: 'Authentication required' },
-        { status: 401 }
-      )
-    }
+    const body = await request.json()
 
-    const { nounId, correct } = await request.json()
-
-    // Validation
-    if (!nounId || typeof correct !== 'boolean') {
-      return NextResponse.json(
-        { error: 'Noun ID and correct flag are required' },
-        { status: 400 }
-      )
-    }
+    // Validate input
+    const validatedData = updateNounStatisticSchema.parse(body)
+    const { nounId, correct } = validatedData
 
     // Verify noun exists
     const noun = await prisma.noun.findUnique({
@@ -94,10 +53,7 @@ export async function POST(request: NextRequest) {
     })
 
     if (!noun) {
-      return NextResponse.json(
-        { error: 'Noun not found' },
-        { status: 404 }
-      )
+      return NextResponse.json({ error: 'Noun not found' }, { status: 404 })
     }
 
     // Upsert noun statistics
@@ -109,12 +65,8 @@ export async function POST(request: NextRequest) {
         },
       },
       update: {
-        correctAttempts: correct
-          ? { increment: 1 }
-          : undefined,
-        wrongAttempts: !correct
-          ? { increment: 1 }
-          : undefined,
+        correctAttempts: correct ? { increment: 1 } : undefined,
+        wrongAttempts: !correct ? { increment: 1 } : undefined,
         lastPracticed: new Date(),
       },
       create: {
@@ -133,17 +85,24 @@ export async function POST(request: NextRequest) {
       },
     })
 
-    return NextResponse.json({ 
-      message: 'Statistics updated successfully',
-      statistic,
-    }, { status: 200 })
+    return NextResponse.json(
+      {
+        message: 'Statistics updated successfully',
+        statistic,
+      },
+      { status: 200 }
+    )
   } catch (error) {
-    console.error('Update noun statistics error:', error)
+    if (error instanceof z.ZodError) {
+      return NextResponse.json(
+        { error: 'Validation failed', details: error.issues },
+        { status: 400 }
+      )
+    }
+
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
     )
   }
-}
-
-
+})

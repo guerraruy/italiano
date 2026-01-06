@@ -1,21 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import bcrypt from 'bcryptjs'
-import { sign } from 'jsonwebtoken'
-
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key'
+import { generateAccessToken, sanitizeUser } from '@/lib/auth'
+import { loginSchema } from '@/lib/validation/auth'
+import { z } from 'zod'
 
 export async function POST(request: NextRequest) {
   try {
-    const { username, password } = await request.json()
+    const body = await request.json()
 
-    // Validation
-    if (!username || !password) {
-      return NextResponse.json(
-        { error: 'Username and password are required' },
-        { status: 400 }
-      )
-    }
+    // Validate input
+    const validatedData = loginSchema.parse(body)
+    const { username, password } = validatedData
 
     // Find user by username or email
     const user = await prisma.user.findFirst({
@@ -42,11 +38,10 @@ export async function POST(request: NextRequest) {
     }
 
     // Generate JWT token
-    const token = sign({ userId: user.id }, JWT_SECRET, { expiresIn: '7d' })
+    const token = generateAccessToken(user.id)
 
     // Return user data (excluding password)
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { password: _, ...userWithoutPassword } = user
+    const userWithoutPassword = sanitizeUser(user)
 
     return NextResponse.json(
       {
@@ -57,7 +52,13 @@ export async function POST(request: NextRequest) {
       { status: 200 }
     )
   } catch (error) {
-    console.error('Login error:', error)
+    if (error instanceof z.ZodError) {
+      return NextResponse.json(
+        { error: 'Validation failed', details: error.issues },
+        { status: 400 }
+      )
+    }
+
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

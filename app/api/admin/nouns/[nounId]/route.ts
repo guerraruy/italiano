@@ -1,192 +1,123 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '../../../../../lib/prisma'
-import jwt from 'jsonwebtoken'
-
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-this'
-
-async function authenticate(request: NextRequest) {
-  try {
-    const authHeader = request.headers.get('authorization')
-    if (!authHeader?.startsWith('Bearer ')) {
-      return null
-    }
-
-    const token = authHeader.substring(7)
-    let decoded: { userId: string }
-    try {
-      decoded = jwt.verify(token, JWT_SECRET) as { userId: string }
-    } catch {
-      return null
-    }
-
-    // Check if user is admin
-    const user = await prisma.user.findUnique({
-      where: { id: decoded.userId },
-    })
-
-    if (!user || !user.admin) {
-      return null
-    }
-
-    return decoded.userId
-  } catch (error) {
-    return null
-  }
-}
+import { prisma } from '@/lib/prisma'
+import { Prisma } from '@prisma/client'
+import { withAdmin } from '@/lib/auth'
+import { updateNounSchema } from '@/lib/validation/nouns'
+import { z } from 'zod'
 
 // PATCH /api/admin/nouns/[nounId] - Update a noun
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: Promise<{ nounId: string }> }
+  context: { params: Promise<{ nounId: string }> }
 ) {
-  try {
-    const userId = await authenticate(request)
+  return withAdmin(async (request: NextRequest, userId: string) => {
+    try {
+      const { nounId } = await context.params
 
-    if (!userId) {
-      return NextResponse.json(
-        { error: 'Admin authentication required' },
-        { status: 401 }
-      )
-    }
-
-    const { nounId } = await params
-
-    if (!nounId) {
-      return NextResponse.json(
-        { error: 'Noun ID is required' },
-        { status: 400 }
-      )
-    }
-
-    const body = await request.json()
-    const { italian, singolare, plurale } = body
-
-    if (!italian || !singolare || !plurale) {
-      return NextResponse.json(
-        { error: 'Missing required fields: italian, singolare, plurale' },
-        { status: 400 }
-      )
-    }
-
-    // Validate structure of singolare and plurale
-    if (!singolare.it || !singolare.pt || !singolare.en) {
-      return NextResponse.json(
-        { error: 'singolare must contain it, pt, and en translations' },
-        { status: 400 }
-      )
-    }
-
-    if (!plurale.it || !plurale.pt || !plurale.en) {
-      return NextResponse.json(
-        { error: 'plurale must contain it, pt, and en translations' },
-        { status: 400 }
-      )
-    }
-
-    // Check if noun exists
-    const existingNoun = await prisma.noun.findUnique({
-      where: { id: nounId },
-    })
-
-    if (!existingNoun) {
-      return NextResponse.json({ error: 'Noun not found' }, { status: 404 })
-    }
-
-    // Check if the new italian name conflicts with another noun
-    if (italian !== existingNoun.italian) {
-      const conflictNoun = await prisma.noun.findUnique({
-        where: { italian },
-      })
-
-      if (conflictNoun) {
+      if (!nounId) {
         return NextResponse.json(
-          { error: 'A noun with this Italian name already exists' },
-          { status: 409 }
+          { error: 'Noun ID is required' },
+          { status: 400 }
         )
       }
-    }
 
-    // Update noun
-    const updatedNoun = await prisma.noun.update({
-      where: { id: nounId },
-      data: {
-        italian,
-        singolare,
-        plurale,
-      },
-    })
+      const body = await request.json()
 
-    return NextResponse.json(
-      {
+      // Validate input
+      const validatedData = updateNounSchema.parse(body)
+      const { italian, singolare, plurale } = validatedData
+
+      // Check if noun exists
+      const existingNoun = await prisma.noun.findUnique({
+        where: { id: nounId },
+      })
+
+      if (!existingNoun) {
+        return NextResponse.json({ error: 'Noun not found' }, { status: 404 })
+      }
+
+      // Check if the new italian name conflicts with another noun
+      if (italian !== existingNoun.italian) {
+        const conflictNoun = await prisma.noun.findUnique({
+          where: { italian },
+        })
+
+        if (conflictNoun) {
+          return NextResponse.json(
+            { error: 'A noun with this Italian name already exists' },
+            { status: 409 }
+          )
+        }
+      }
+
+      // Update noun
+      const updatedNoun = await prisma.noun.update({
+        where: { id: nounId },
+        data: {
+          italian,
+          singolare: singolare as Prisma.JsonObject,
+          plurale: plurale as Prisma.JsonObject,
+        },
+      })
+
+      return NextResponse.json({
         message: 'Noun updated successfully',
         noun: updatedNoun,
-      },
-      { status: 200 }
-    )
-  } catch (error) {
-    console.error('Update noun error:', error)
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    )
-  }
+      })
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return NextResponse.json(
+          { error: 'Validation failed', details: error.issues },
+          { status: 400 }
+        )
+      }
+
+      return NextResponse.json(
+        { error: 'Failed to update noun' },
+        { status: 500 }
+      )
+    }
+  })(request)
 }
 
 // DELETE /api/admin/nouns/[nounId] - Delete a noun
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: Promise<{ nounId: string }> }
+  context: { params: Promise<{ nounId: string }> }
 ) {
-  try {
-    const userId = await authenticate(request)
+  return withAdmin(async (request: NextRequest, userId: string) => {
+    try {
+      const { nounId } = await context.params
 
-    if (!userId) {
-      return NextResponse.json(
-        { error: 'Admin authentication required' },
-        { status: 401 }
-      )
-    }
+      if (!nounId) {
+        return NextResponse.json(
+          { error: 'Noun ID is required' },
+          { status: 400 }
+        )
+      }
 
-    const { nounId } = await params
+      // Check if noun exists
+      const noun = await prisma.noun.findUnique({
+        where: { id: nounId },
+      })
 
-    if (!nounId) {
-      return NextResponse.json(
-        { error: 'Noun ID is required' },
-        { status: 400 }
-      )
-    }
+      if (!noun) {
+        return NextResponse.json({ error: 'Noun not found' }, { status: 404 })
+      }
 
-    // Check if noun exists
-    const existingNoun = await prisma.noun.findUnique({
-      where: { id: nounId },
-    })
+      // Delete noun (will cascade delete statistics)
+      await prisma.noun.delete({
+        where: { id: nounId },
+      })
 
-    if (!existingNoun) {
-      return NextResponse.json({ error: 'Noun not found' }, { status: 404 })
-    }
-
-    // Delete associated statistics first
-    await prisma.nounStatistic.deleteMany({
-      where: { nounId },
-    })
-
-    // Delete the noun
-    await prisma.noun.delete({
-      where: { id: nounId },
-    })
-
-    return NextResponse.json(
-      {
+      return NextResponse.json({
         message: 'Noun deleted successfully',
-      },
-      { status: 200 }
-    )
-  } catch (error) {
-    console.error('Delete noun error:', error)
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    )
-  }
+      })
+    } catch (error) {
+      return NextResponse.json(
+        { error: 'Failed to delete noun' },
+        { status: 500 }
+      )
+    }
+  })(request)
 }
-
