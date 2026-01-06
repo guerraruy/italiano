@@ -185,7 +185,6 @@ export default function UsersList({ onError, onSuccess }: UsersListProps) {
                   <TableCell>Email</TableCell>
                   <TableCell>Name</TableCell>
                   <TableCell align='center'>Admin</TableCell>
-                  <TableCell align='center'>Lessons</TableCell>
                   <TableCell align='center'>Registered</TableCell>
                   <TableCell align='center'>Actions</TableCell>
                 </TableRow>
@@ -207,9 +206,6 @@ export default function UsersList({ onError, onSuccess }: UsersListProps) {
                       ) : (
                         <Chip label='User' size='small' />
                       )}
-                    </TableCell>
-                    <TableCell align='center'>
-                      {userData._count.lessons}
                     </TableCell>
                     <TableCell align='center'>
                       {userData.createdAt

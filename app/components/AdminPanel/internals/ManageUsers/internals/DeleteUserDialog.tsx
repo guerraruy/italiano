@@ -71,9 +71,6 @@ export default function DeleteUserDialog({
                 <strong>Name:</strong> {user.name}
               </Typography>
             )}
-            <Typography variant='body2'>
-              <strong>Lessons:</strong> {user._count.lessons}
-            </Typography>
           </Paper>
         )}
         <Alert severity='warning' sx={{ mt: 2 }}>

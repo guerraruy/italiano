@@ -30,9 +30,7 @@ import RadioButtonCheckedIcon from '@mui/icons-material/RadioButtonChecked'
 import ShowChartIcon from '@mui/icons-material/ShowChart'
 import AutorenewIcon from '@mui/icons-material/Autorenew'
 import ClearIcon from '@mui/icons-material/Clear'
-import LightbulbIcon from '@mui/icons-material/Lightbulb'
-import CheckIcon from '@mui/icons-material/Check'
-import CloseIcon from '@mui/icons-material/Close'
+import LightbulbOutlinedIcon from '@mui/icons-material/LightbulbOutlined'
 import DeleteSweepIcon from '@mui/icons-material/DeleteSweep'
 import RefreshIcon from '@mui/icons-material/Refresh'
 import {
@@ -41,6 +39,7 @@ import {
   useUpdateVerbStatisticMutation,
   useResetVerbStatisticMutation,
 } from '../store/api'
+import { Statistics } from '../components/Statistics'
 
 const PageContainer = styled(Container)(({ theme }) => ({
   paddingTop: theme.spacing(4),
@@ -90,13 +89,6 @@ const InputActionsBox = styled(Box)(({ theme }) => ({
   gap: theme.spacing(1),
   flexGrow: 1,
   maxWidth: '500px',
-}))
-
-const StatisticsBox = styled(Box)(({ theme }) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  gap: theme.spacing(0.5),
-  minWidth: '50px',
 }))
 
 const FilterBox = styled(Box)(({ theme }) => ({
@@ -237,43 +229,12 @@ const VerbItem = ({
             onClick={() => onShowAnswer(verb.id, verb.italian)}
             color='primary'
           >
-            <LightbulbIcon />
+            <LightbulbOutlinedIcon />
           </IconButton>
         </Tooltip>
       </InputActionsBox>
 
-      <StatisticsBox>
-        <Tooltip title='Correct attempts'>
-          <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 0.5,
-              color: 'success.main',
-            }}
-          >
-            <CheckIcon sx={{ fontSize: 16 }} />
-            <Typography variant='caption' fontWeight='bold'>
-              {statistics.correct}
-            </Typography>
-          </Box>
-        </Tooltip>
-        <Tooltip title='Wrong attempts'>
-          <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 0.5,
-              color: 'error.main',
-            }}
-          >
-            <CloseIcon sx={{ fontSize: 16 }} />
-            <Typography variant='caption' fontWeight='bold'>
-              {statistics.wrong}
-            </Typography>
-          </Box>
-        </Tooltip>
-      </StatisticsBox>
+      <Statistics correct={statistics.correct} wrong={statistics.wrong} />
 
       <Tooltip title='Reset statistics'>
         <IconButton

@@ -45,10 +45,7 @@ export async function GET(request: NextRequest) {
         email: true,
         name: true,
         admin: true,
-        createdAt: true,
-        _count: {
-          select: { lessons: true }
-        }
+        createdAt: true
       },
       orderBy: { createdAt: 'desc' }
     });

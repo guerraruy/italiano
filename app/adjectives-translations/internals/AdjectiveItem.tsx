@@ -10,10 +10,9 @@ import {
 import { styled } from '@mui/material/styles'
 import ClearIcon from '@mui/icons-material/Clear'
 import LightbulbOutlinedIcon from '@mui/icons-material/LightbulbOutlined'
-import CheckIcon from '@mui/icons-material/Check'
-import CloseIcon from '@mui/icons-material/Close'
 import DeleteSweepIcon from '@mui/icons-material/DeleteSweep'
 import { ListItem } from '@mui/material'
+import { Statistics } from '../../components/Statistics'
 
 const AdjectiveListItem = styled(ListItem)(({ theme }) => ({
   display: 'flex',
@@ -35,17 +34,6 @@ const AdjectiveInfo = styled(Box)(({ theme }) => ({
   alignItems: 'center',
   gap: theme.spacing(2),
   minWidth: '200px',
-}))
-
-const StatisticsBox = styled(Box)(({ theme }) => ({
-  display: 'flex',
-  gap: theme.spacing(2),
-  alignItems: 'center',
-  [theme.breakpoints.up('md')]: {
-    flexDirection: 'column',
-    gap: theme.spacing(0.5),
-    alignItems: 'flex-start',
-  },
 }))
 
 interface InputValues {
@@ -182,38 +170,10 @@ const AdjectiveItem = ({
             justifyContent: 'space-between',
           }}
         >
-          <StatisticsBox>
-            <Tooltip title='Correct attempts'>
-              <Box
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 0.5,
-                  color: 'success.main',
-                }}
-              >
-                <CheckIcon sx={{ fontSize: 16 }} />
-                <Typography variant='caption' fontWeight='bold'>
-                  {statistics.correct}
-                </Typography>
-              </Box>
-            </Tooltip>
-            <Tooltip title='Wrong attempts'>
-              <Box
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 0.5,
-                  color: 'error.main',
-                }}
-              >
-                <CloseIcon sx={{ fontSize: 16 }} />
-                <Typography variant='caption' fontWeight='bold'>
-                  {statistics.wrong}
-                </Typography>
-              </Box>
-            </Tooltip>
-          </StatisticsBox>
+          <Statistics
+            correct={statistics.correct}
+            wrong={statistics.wrong}
+          />
 
           <Box sx={{ display: 'flex', gap: 1 }}>
             <Tooltip title='Show all answers'>
@@ -492,38 +452,10 @@ const AdjectiveItem = ({
           ml: 2,
         }}
       >
-        <StatisticsBox>
-          <Tooltip title='Correct attempts'>
-            <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 0.5,
-                color: 'success.main',
-              }}
-            >
-              <CheckIcon sx={{ fontSize: 16 }} />
-              <Typography variant='caption' fontWeight='bold'>
-                {statistics.correct}
-              </Typography>
-            </Box>
-          </Tooltip>
-          <Tooltip title='Wrong attempts'>
-            <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 0.5,
-                color: 'error.main',
-              }}
-            >
-              <CloseIcon sx={{ fontSize: 16 }} />
-              <Typography variant='caption' fontWeight='bold'>
-                {statistics.wrong}
-              </Typography>
-            </Box>
-          </Tooltip>
-        </StatisticsBox>
+        <Statistics
+          correct={statistics.correct}
+          wrong={statistics.wrong}
+        />
       </Box>
 
       {/* Reset button - always at the end */}

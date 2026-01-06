@@ -21,7 +21,6 @@ import {
   DialogContentText,
   DialogActions,
   Button,
-  Chip,
 } from '@mui/material'
 import { styled } from '@mui/material/styles'
 import ScheduleIcon from '@mui/icons-material/Schedule'
@@ -29,10 +28,8 @@ import RadioButtonCheckedIcon from '@mui/icons-material/RadioButtonChecked'
 import ShowChartIcon from '@mui/icons-material/ShowChart'
 import AutorenewIcon from '@mui/icons-material/Autorenew'
 import ClearIcon from '@mui/icons-material/Clear'
-import CheckIcon from '@mui/icons-material/Check'
-import CloseIcon from '@mui/icons-material/Close'
 import DeleteSweepIcon from '@mui/icons-material/DeleteSweep'
-import LightbulbIcon from '@mui/icons-material/Lightbulb'
+import LightbulbOutlinedIcon from '@mui/icons-material/LightbulbOutlined'
 import {
   useGetVerbsForConjugationPracticeQuery,
   useGetConjugationStatisticsQuery,
@@ -40,6 +37,7 @@ import {
   useResetConjugationStatisticsMutation,
   useGetProfileQuery,
 } from '../store/api'
+import { Statistics } from '../components/Statistics'
 
 const PageContainer = styled(Container)(({ theme }) => ({
   paddingTop: theme.spacing(4),
@@ -486,7 +484,7 @@ export default function VerbTensesPage() {
               mb={2}
             >
               <Typography variant='h6' fontWeight='bold'>
-                {mood} - {tense}
+                {tense} ({mood})
               </Typography>
             </Box>
             <PersonRow>
@@ -553,31 +551,12 @@ export default function VerbTensesPage() {
                     onClick={() => handleShowAnswer(key, tenseData)}
                     color='primary'
                   >
-                    <LightbulbIcon fontSize='small' />
+                    <LightbulbOutlinedIcon fontSize='small' />
                   </IconButton>
                 </Tooltip>
               </Box>
-              <Box
-                sx={{ display: 'flex', gap: 1, alignItems: 'center', ml: 2 }}
-              >
-                <Tooltip title='Correct attempts'>
-                  <Chip
-                    icon={<CheckIcon sx={{ fontSize: 16 }} />}
-                    label={stats.correct}
-                    size='small'
-                    color='success'
-                    variant='outlined'
-                  />
-                </Tooltip>
-                <Tooltip title='Wrong attempts'>
-                  <Chip
-                    icon={<CloseIcon sx={{ fontSize: 16 }} />}
-                    label={stats.wrong}
-                    size='small'
-                    color='error'
-                    variant='outlined'
-                  />
-                </Tooltip>
+              <Box sx={{ ml: 2 }}>
+                <Statistics correct={stats.correct} wrong={stats.wrong} />
               </Box>
             </PersonRow>
           </TenseSection>
@@ -618,7 +597,7 @@ export default function VerbTensesPage() {
             mb={2}
           >
             <Typography variant='h6' fontWeight='bold'>
-              {mood} - {tense}
+              {tense} ({mood})
             </Typography>
           </Box>
           {persons.map((person) => {
@@ -694,31 +673,12 @@ export default function VerbTensesPage() {
                       onClick={() => handleShowAnswer(key, correctAnswer)}
                       color='primary'
                     >
-                      <LightbulbIcon fontSize='small' />
+                      <LightbulbOutlinedIcon fontSize='small' />
                     </IconButton>
                   </Tooltip>
                 </Box>
-                <Box
-                  sx={{ display: 'flex', gap: 1, alignItems: 'center', ml: 2 }}
-                >
-                  <Tooltip title='Correct attempts'>
-                    <Chip
-                      icon={<CheckIcon sx={{ fontSize: 16 }} />}
-                      label={stats.correct}
-                      size='small'
-                      color='success'
-                      variant='outlined'
-                    />
-                  </Tooltip>
-                  <Tooltip title='Wrong attempts'>
-                    <Chip
-                      icon={<CloseIcon sx={{ fontSize: 16 }} />}
-                      label={stats.wrong}
-                      size='small'
-                      color='error'
-                      variant='outlined'
-                    />
-                  </Tooltip>
+                <Box sx={{ ml: 2 }}>
+                  <Statistics correct={stats.correct} wrong={stats.wrong} />
                 </Box>
               </PersonRow>
             )

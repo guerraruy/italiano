@@ -8,9 +8,6 @@ export interface User {
   name: string | null
   admin: boolean
   createdAt?: string
-  _count?: {
-    lessons: number
-  }
 }
 
 export interface UserProfile {
@@ -22,11 +19,7 @@ export interface UserProfile {
   updatedAt: string
 }
 
-export interface UserData extends User {
-  _count: {
-    lessons: number
-  }
-}
+export interface UserData extends User {}
 
 export interface AuthResponse {
   user: User
