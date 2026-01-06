@@ -32,12 +32,13 @@ model User {
 
 // User profile with preferences and settings
 model UserProfile {
-  id             String   @id @default(cuid())
-  userId         String   @unique
-  nativeLanguage String   @default("pt-BR") // User's native language: pt-BR or en
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id                String   @id @default(cuid())
+  userId            String   @unique
+  nativeLanguage    String   @default("pt-BR") // User's native language: pt-BR or en
+  enabledVerbTenses String[] @default(["Indicativo.Presente", "Indicativo.Passato Prossimo", "Indicativo.Futuro Semplice"]) // Enabled verb tenses for practice
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 // Italian lessons/vocabulary

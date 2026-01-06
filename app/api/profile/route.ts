@@ -45,6 +45,11 @@ export async function GET(request: NextRequest) {
         data: {
           userId,
           nativeLanguage: 'pt-BR',
+          enabledVerbTenses: [
+            'Indicativo.Presente',
+            'Indicativo.Passato Prossimo',
+            'Indicativo.Futuro Semplice',
+          ],
         },
       })
     }
@@ -71,19 +76,19 @@ export async function PATCH(request: NextRequest) {
       )
     }
 
-    const { nativeLanguage } = await request.json()
+    const { nativeLanguage, enabledVerbTenses } = await request.json()
 
     // Validation
-    if (!nativeLanguage) {
+    if (nativeLanguage && !['pt-BR', 'en'].includes(nativeLanguage)) {
       return NextResponse.json(
-        { error: 'Native language is required' },
+        { error: 'Invalid native language. Must be pt-BR or en' },
         { status: 400 }
       )
     }
 
-    if (!['pt-BR', 'en'].includes(nativeLanguage)) {
+    if (enabledVerbTenses && !Array.isArray(enabledVerbTenses)) {
       return NextResponse.json(
-        { error: 'Invalid native language. Must be pt-BR or en' },
+        { error: 'enabledVerbTenses must be an array' },
         { status: 400 }
       )
     }
@@ -98,14 +103,23 @@ export async function PATCH(request: NextRequest) {
       profile = await prisma.userProfile.create({
         data: {
           userId,
-          nativeLanguage,
+          nativeLanguage: nativeLanguage || 'pt-BR',
+          enabledVerbTenses: enabledVerbTenses || [
+            'Indicativo.Presente',
+            'Indicativo.Passato Prossimo',
+            'Indicativo.Futuro Semplice',
+          ],
         },
       })
     } else {
       // Update existing profile
+      const updateData: { nativeLanguage?: string; enabledVerbTenses?: string[] } = {}
+      if (nativeLanguage) updateData.nativeLanguage = nativeLanguage
+      if (enabledVerbTenses) updateData.enabledVerbTenses = enabledVerbTenses
+      
       profile = await prisma.userProfile.update({
         where: { userId },
-        data: { nativeLanguage },
+        data: updateData,
       })
     }
 

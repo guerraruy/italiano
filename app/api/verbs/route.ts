@@ -45,6 +45,11 @@ export async function GET(request: NextRequest) {
         data: {
           userId,
           nativeLanguage: 'pt-BR',
+          enabledVerbTenses: [
+            'Indicativo.Presente',
+            'Indicativo.Passato Prossimo',
+            'Indicativo.Futuro Semplice',
+          ],
         },
       })
     }

@@ -127,7 +127,7 @@ export default function AdjectivesTranslationsPage() {
     adjectiveTranslation: null,
   })
   const [sortOption, setSortOption] = useState<SortOption>('none')
-  const [displayCount, setDisplayCount] = useState<DisplayCount>('all')
+  const [displayCount, setDisplayCount] = useState<DisplayCount>(10)
   const [randomSeed, setRandomSeed] = useState(0)
   const [, startTransition] = useTransition()
   const inputRefs = useRef<{ [key: string]: HTMLInputElement | null }>({})

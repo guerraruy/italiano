@@ -320,7 +320,7 @@ export default function NounsTranslationsPage() {
     nounTranslation: null,
   })
   const [sortOption, setSortOption] = useState<SortOption>('none')
-  const [displayCount, setDisplayCount] = useState<DisplayCount>('all')
+  const [displayCount, setDisplayCount] = useState<DisplayCount>(10)
   const [randomSeed, setRandomSeed] = useState(0)
   const inputRefs = useRef<{ [key: string]: HTMLInputElement | null }>({})
   const lastValidatedRef = useRef<{ [key: string]: number }>({})

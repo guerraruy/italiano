@@ -17,6 +17,7 @@ export interface UserProfile {
   id: string
   userId: string
   nativeLanguage: 'pt-BR' | 'en'
+  enabledVerbTenses: string[]
   createdAt: string
   updatedAt: string
 }
@@ -295,7 +296,7 @@ export const api = createApi({
     }),
     updateProfile: builder.mutation<
       { message: string; profile: UserProfile },
-      { nativeLanguage: 'pt-BR' | 'en' }
+      { nativeLanguage?: 'pt-BR' | 'en'; enabledVerbTenses?: string[] }
     >({
       query: (data) => ({
         url: '/profile',
