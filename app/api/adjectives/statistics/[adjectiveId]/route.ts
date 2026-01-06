@@ -1,29 +1,26 @@
 import { NextRequest, NextResponse } from 'next/server'
-import jwt from 'jsonwebtoken'
+import { verify } from 'jsonwebtoken'
 import { prisma } from '@/lib/prisma'
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key'
 
 async function authenticate(request: NextRequest) {
   try {
-    const authHeader = request.headers.get('authorization')
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return null
-    }
+    const token = request.headers.get('authorization')?.replace('Bearer ', '')
+    if (!token) return null
 
-    const token = authHeader.substring(7)
-    const decoded = jwt.verify(token, JWT_SECRET) as { userId: string }
+    const decoded = verify(token, JWT_SECRET) as { userId: string }
 
     return decoded.userId
-  } catch (error) {
+  } catch {
     return null
   }
 }
 
-// DELETE /api/nouns/statistics/[nounId] - Reset noun statistics for a specific noun
+// DELETE /api/adjectives/statistics/[adjectiveId] - Reset adjective statistics for a specific adjective
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: Promise<{ nounId: string }> }
+  { params }: { params: Promise<{ adjectiveId: string }> }
 ) {
   try {
     const userId = await authenticate(request)
@@ -35,32 +32,32 @@ export async function DELETE(
       )
     }
 
-    const { nounId } = await params
+    const { adjectiveId } = await params
 
-    if (!nounId) {
+    if (!adjectiveId) {
       return NextResponse.json(
-        { error: 'Noun ID is required' },
+        { error: 'Adjective ID is required' },
         { status: 400 }
       )
     }
 
-    // Verify noun exists
-    const noun = await prisma.noun.findUnique({
-      where: { id: nounId },
+    // Verify adjective exists
+    const adjective = await prisma.adjective.findUnique({
+      where: { id: adjectiveId },
     })
 
-    if (!noun) {
+    if (!adjective) {
       return NextResponse.json(
-        { error: 'Noun not found' },
+        { error: 'Adjective not found' },
         { status: 404 }
       )
     }
 
-    // Delete the noun statistics for this user and noun
-    await prisma.nounStatistic.deleteMany({
+    // Delete the adjective statistics for this user and adjective
+    await prisma.adjectiveStatistic.deleteMany({
       where: {
         userId,
-        nounId,
+        adjectiveId,
       },
     })
 
@@ -68,12 +65,11 @@ export async function DELETE(
       message: 'Statistics reset successfully',
     }, { status: 200 })
   } catch (error) {
-    console.error('Reset noun statistics error:', error)
+    console.error('Reset adjective statistics error:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
     )
   }
 }
-
 

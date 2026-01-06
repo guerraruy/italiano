@@ -13,6 +13,7 @@ import HomeIcon from '@mui/icons-material/Home'
 import TranslateIcon from '@mui/icons-material/Translate'
 import RecordVoiceOverIcon from '@mui/icons-material/RecordVoiceOver'
 import ScheduleIcon from '@mui/icons-material/Schedule'
+import StyleIcon from '@mui/icons-material/Style'
 import { useRouter } from 'next/navigation'
 
 const PageContainer = styled(Container)(({ theme }) => ({
@@ -65,6 +66,13 @@ export default function Home() {
       path: '/nouns-translations',
     },
     {
+      title: 'Adjectives Translations',
+      description:
+        'Practice Italian adjectives with masculine, feminine, singular and plural forms',
+      icon: <StyleIcon fontSize='inherit' />,
+      path: '/adjectives-translations',
+    },
+    {
       title: 'Verbs Translations',
       description:
         'Master Italian verbs with comprehensive translation exercises',
@@ -100,7 +108,7 @@ export default function Home() {
       <Box
         sx={{
           display: 'grid',
-          gridTemplateColumns: { xs: '1fr', md: 'repeat(3, 1fr)' },
+          gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(4, 1fr)' },
           gap: 4,
         }}
       >

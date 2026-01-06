@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import jwt from 'jsonwebtoken'
+import { Prisma } from '@prisma/client'
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-this'
 
@@ -8,7 +9,6 @@ interface AdjectiveTranslations {
   it: string
   pt: string
   en: string
-  [key: string]: string
 }
 
 interface AdjectiveGenderForms {
@@ -101,8 +101,8 @@ export async function POST(request: NextRequest) {
     const conflicts: ConflictAdjective[] = []
     const adjectivesToCreate: Array<{
       italian: string
-      maschile: AdjectiveGenderForms
-      femminile: AdjectiveGenderForms
+      maschile: Prisma.InputJsonValue
+      femminile: Prisma.InputJsonValue
     }> = []
     const adjectivesToUpdate: Array<{
       italian: string
@@ -136,8 +136,8 @@ export async function POST(request: NextRequest) {
         // New adjective, add to create list
         adjectivesToCreate.push({
           italian,
-          maschile: data.maschile,
-          femminile: data.femminile,
+          maschile: data.maschile as unknown as Prisma.InputJsonValue,
+          femminile: data.femminile as unknown as Prisma.InputJsonValue,
         })
       }
     }
@@ -170,8 +170,8 @@ export async function POST(request: NextRequest) {
       await prisma.adjective.update({
         where: { italian },
         data: {
-          maschile: data.maschile,
-          femminile: data.femminile,
+          maschile: data.maschile as unknown as Prisma.InputJsonValue,
+          femminile: data.femminile as unknown as Prisma.InputJsonValue,
         },
       })
       updated++

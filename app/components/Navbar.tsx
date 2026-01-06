@@ -22,6 +22,7 @@ import RecordVoiceOverIcon from '@mui/icons-material/RecordVoiceOver'
 import ScheduleIcon from '@mui/icons-material/Schedule'
 import MenuIcon from '@mui/icons-material/Menu'
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings'
+import StyleIcon from '@mui/icons-material/Style'
 import { useState, useSyncExternalStore } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import SettingsModal from './SettingsModal'
@@ -34,6 +35,11 @@ const menuItems = [
     text: 'Nouns Translations',
     icon: <TranslateIcon />,
     path: '/nouns-translations',
+  },
+  {
+    text: 'Adjectives Translations',
+    icon: <StyleIcon />,
+    path: '/adjectives-translations',
   },
   {
     text: 'Verbs Translations',

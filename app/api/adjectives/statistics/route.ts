@@ -1,28 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
 import { verify } from 'jsonwebtoken'
+import { prisma } from '@/lib/prisma'
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key'
 
-// Helper function to verify authentication
 async function authenticate(request: NextRequest) {
-  const authHeader = request.headers.get('authorization')
-  
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return null
-  }
-
-  const token = authHeader.split(' ')[1]
-  
   try {
+    const token = request.headers.get('authorization')?.replace('Bearer ', '')
+    if (!token) return null
+
     const decoded = verify(token, JWT_SECRET) as { userId: string }
+
     return decoded.userId
-  } catch (error) {
+  } catch {
     return null
   }
 }
 
-// GET /api/nouns/statistics - Get all noun statistics for the logged-in user
+// GET /api/adjectives/statistics - Get all adjective statistics for the logged-in user
 export async function GET(request: NextRequest) {
   try {
     const userId = await authenticate(request)
@@ -35,11 +30,11 @@ export async function GET(request: NextRequest) {
     }
 
     // Get all statistics for the user
-    const statistics = await prisma.nounStatistic.findMany({
+    const statistics = await prisma.adjectiveStatistic.findMany({
       where: { userId },
       select: {
         id: true,
-        nounId: true,
+        adjectiveId: true,
         correctAttempts: true,
         wrongAttempts: true,
         lastPracticed: true,
@@ -48,7 +43,7 @@ export async function GET(request: NextRequest) {
 
     // Return statistics as a map for easy lookup
     const statsMap = statistics.reduce((acc, stat) => {
-      acc[stat.nounId] = {
+      acc[stat.adjectiveId] = {
         correctAttempts: stat.correctAttempts,
         wrongAttempts: stat.wrongAttempts,
         lastPracticed: stat.lastPracticed,
@@ -58,7 +53,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ statistics: statsMap }, { status: 200 })
   } catch (error) {
-    console.error('Get noun statistics error:', error)
+    console.error('Get adjective statistics error:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -66,7 +61,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// POST /api/nouns/statistics - Update noun statistics
+// POST /api/adjectives/statistics - Update adjective statistics
 export async function POST(request: NextRequest) {
   try {
     const userId = await authenticate(request)
@@ -78,34 +73,34 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const { nounId, correct } = await request.json()
+    const { adjectiveId, correct } = await request.json()
 
     // Validation
-    if (!nounId || typeof correct !== 'boolean') {
+    if (!adjectiveId || typeof correct !== 'boolean') {
       return NextResponse.json(
-        { error: 'Noun ID and correct flag are required' },
+        { error: 'Adjective ID and correct flag are required' },
         { status: 400 }
       )
     }
 
-    // Verify noun exists
-    const noun = await prisma.noun.findUnique({
-      where: { id: nounId },
+    // Verify adjective exists
+    const adjective = await prisma.adjective.findUnique({
+      where: { id: adjectiveId },
     })
 
-    if (!noun) {
+    if (!adjective) {
       return NextResponse.json(
-        { error: 'Noun not found' },
+        { error: 'Adjective not found' },
         { status: 404 }
       )
     }
 
-    // Upsert noun statistics
-    const statistic = await prisma.nounStatistic.upsert({
+    // Upsert adjective statistics
+    const statistic = await prisma.adjectiveStatistic.upsert({
       where: {
-        userId_nounId: {
+        userId_adjectiveId: {
           userId,
-          nounId,
+          adjectiveId,
         },
       },
       update: {
@@ -119,14 +114,14 @@ export async function POST(request: NextRequest) {
       },
       create: {
         userId,
-        nounId,
+        adjectiveId,
         correctAttempts: correct ? 1 : 0,
         wrongAttempts: correct ? 0 : 1,
         lastPracticed: new Date(),
       },
       select: {
         id: true,
-        nounId: true,
+        adjectiveId: true,
         correctAttempts: true,
         wrongAttempts: true,
         lastPracticed: true,
@@ -138,12 +133,11 @@ export async function POST(request: NextRequest) {
       statistic,
     }, { status: 200 })
   } catch (error) {
-    console.error('Update noun statistics error:', error)
+    console.error('Update adjective statistics error:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
     )
   }
 }
-
 

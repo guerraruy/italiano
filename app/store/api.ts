@@ -219,6 +219,10 @@ export interface ImportAdjectivesResponse {
 export interface AdjectiveForPractice {
   id: string
   italian: string
+  masculineSingular: string
+  masculinePlural: string
+  feminineSingular: string
+  femininePlural: string
   translation: string
 }
 
