@@ -1,9 +1,10 @@
+import { Prisma } from '@prisma/client'
 import { NextRequest, NextResponse } from 'next/server'
+import { z } from 'zod'
+
 import { withAdmin } from '@/lib/auth'
 import { verbRepository, conjugationRepository } from '@/lib/repositories'
 import { importConjugationsSchema } from '@/lib/validation/verbs'
-import { Prisma } from '@prisma/client'
-import { z } from 'zod'
 
 interface ConjugationData {
   [mood: string]: {
@@ -34,7 +35,8 @@ type VerbWithConjugations = {
 }
 
 export async function POST(request: NextRequest) {
-  return withAdmin(async (request: NextRequest, userId: string) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  return withAdmin(async (request: NextRequest, _userId: string) => {
     try {
       const body = await request.json()
 
@@ -44,9 +46,7 @@ export async function POST(request: NextRequest) {
 
       // Find or validate verbs exist in the database
       const verbNames = Object.keys(conjugations)
-      const existingVerbs = (await verbRepository.findByItalianNames(
-        verbNames
-      )) as any[]
+      const existingVerbs = await verbRepository.findByItalianNames(verbNames)
 
       // Get conjugations for these verbs
       const verbsWithConjugations: VerbWithConjugations[] = []
@@ -54,7 +54,17 @@ export async function POST(request: NextRequest) {
         const conj = await conjugationRepository.findByVerbId(verb.id)
         verbsWithConjugations.push({
           ...verb,
-          conjugations: conj ? [conj] : [],
+          conjugations: conj
+            ? [
+                {
+                  id: conj.id,
+                  verbId: conj.verbId,
+                  conjugation: conj.conjugation as ConjugationData,
+                  createdAt: conj.createdAt,
+                  updatedAt: conj.updatedAt,
+                },
+              ]
+            : [],
         })
       }
 
@@ -178,13 +188,14 @@ export async function POST(request: NextRequest) {
 
 // GET endpoint to fetch all verb conjugations
 export async function GET(request: NextRequest) {
-  return withAdmin(async (request: NextRequest, userId: string) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  return withAdmin(async (_request: NextRequest, _userId: string) => {
     try {
       // Use conjugation repository to get all conjugations with verbs
       const conjugations = await conjugationRepository.findAllWithVerbs()
 
       return NextResponse.json({ conjugations })
-    } catch (error) {
+    } catch {
       return NextResponse.json(
         { error: 'Failed to fetch conjugations' },
         { status: 500 }

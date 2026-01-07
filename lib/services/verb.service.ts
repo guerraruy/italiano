@@ -115,8 +115,8 @@ export class VerbService extends BaseService {
    */
   async updateConjugation(
     conjugationId: string,
-    conjugationData: any
-  ): Promise<any> {
+    conjugationData: Prisma.InputJsonValue
+  ): Promise<{ id: string; verbId: string; conjugation: Prisma.JsonValue }> {
     try {
       this.logOperation('updateConjugation', { conjugationId })
 

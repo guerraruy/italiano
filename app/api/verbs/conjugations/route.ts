@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+
 import { withAuth } from '@/lib/auth'
 import { verbService, profileService } from '@/lib/services'
 
@@ -10,23 +11,38 @@ export const GET = withAuth(async (request: NextRequest, userId: string) => {
     const nativeLanguage = profile?.nativeLanguage || 'pt-BR'
 
     // Use verb service to get verbs with conjugations
-    const verbsWithConjugations = await verbService.getVerbsWithConjugations()
+    const verbsWithConjugationsRaw =
+      await verbService.getVerbsWithConjugations()
 
     // Transform data to match frontend expectations
     // Filter out verbs without conjugations and transform the structure
+    type VerbWithConjugations = {
+      id: string
+      italian: string
+      tr_ptBR: string
+      tr_en: string | null
+      regular: boolean
+      reflexive: boolean
+      conjugations: Array<{ conjugation: unknown }>
+    }
+
+    const verbsWithConjugations =
+      verbsWithConjugationsRaw as unknown as VerbWithConjugations[]
+
     const verbs = verbsWithConjugations
-      .filter((verb: any) => verb.conjugations && verb.conjugations.length > 0)
-      .map((verb: any) => ({
+      .filter((verb) => verb.conjugations && verb.conjugations.length > 0)
+      .map((verb) => ({
         id: verb.id,
         italian: verb.italian,
-        translation: nativeLanguage === 'en' ? verb.tr_en || verb.tr_ptBR : verb.tr_ptBR,
+        translation:
+          nativeLanguage === 'en' ? verb.tr_en || verb.tr_ptBR : verb.tr_ptBR,
         regular: verb.regular,
         reflexive: verb.reflexive,
         conjugation: verb.conjugations[0].conjugation, // Get first conjugation
       }))
 
     return NextResponse.json({ verbs }, { status: 200 })
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

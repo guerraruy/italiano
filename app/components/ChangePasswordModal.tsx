@@ -92,10 +92,11 @@ export default function ChangePasswordModal({
       setTimeout(() => {
         handleClose()
       }, 2000)
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Change password error:', err)
+      const error = err as { data?: { error?: string } }
       setError(
-        err?.data?.error || 'Failed to change password. Please try again.'
+        error?.data?.error || 'Failed to change password. Please try again.'
       )
     }
   }

@@ -3,6 +3,8 @@ import React from 'react'
 import { Box, Alert } from '@mui/material'
 import { styled } from '@mui/material/styles'
 
+import type { ConjugationData } from '@/app/store/api'
+
 import { TenseSection } from './internals'
 
 const ConjugationGrid = styled(Box)(({ theme }) => ({
@@ -11,7 +13,7 @@ const ConjugationGrid = styled(Box)(({ theme }) => ({
 
 interface Verb {
   id: string
-  conjugation: any
+  conjugation: ConjugationData
 }
 
 interface ConjugationFormProps {
@@ -127,4 +129,3 @@ export const ConjugationForm: React.FC<ConjugationFormProps> = ({
     </ConjugationGrid>
   )
 }
-

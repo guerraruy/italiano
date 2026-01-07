@@ -16,14 +16,22 @@ import { NextRequest, NextResponse } from 'next/server'
 import { logger, PerformanceTimer } from '@/lib/logger'
 
 /**
+ * Route context type for Next.js App Router
+ */
+type RouteContext = { params?: Record<string, string | string[]> }
+
+/**
  * Wrap a route handler with logging
  */
 export function withLogging<T = unknown>(
-  handler: (request: NextRequest, ...args: any[]) => Promise<NextResponse<T>>
+  handler: (
+    request: NextRequest,
+    context?: RouteContext
+  ) => Promise<NextResponse<T>>
 ) {
   return async (
     request: NextRequest,
-    ...args: any[]
+    context?: RouteContext
   ): Promise<NextResponse<T>> => {
     const requestId = randomUUID()
     const timer = new PerformanceTimer()
@@ -42,7 +50,7 @@ export function withLogging<T = unknown>(
 
     try {
       // Execute handler
-      const response = await handler(request, ...args)
+      const response = await handler(request, context)
 
       // Log successful response
       const duration = timer.elapsed()
@@ -75,13 +83,13 @@ export function withAuthLogging<T = unknown>(
   handler: (
     request: NextRequest,
     userId: string,
-    ...args: any[]
+    context?: RouteContext
   ) => Promise<NextResponse<T>>
 ) {
   return async (
     request: NextRequest,
     userId: string,
-    ...args: any[]
+    context?: RouteContext
   ): Promise<NextResponse<T>> => {
     const requestId = randomUUID()
     const timer = new PerformanceTimer()
@@ -100,7 +108,7 @@ export function withAuthLogging<T = unknown>(
 
     try {
       // Execute handler
-      const response = await handler(request, userId, ...args)
+      const response = await handler(request, userId, context)
 
       // Log successful response
       const duration = timer.elapsed()

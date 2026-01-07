@@ -10,18 +10,19 @@ import { logger } from '@/lib/logger'
 
 export abstract class BaseRepository<T, CreateInput, UpdateInput> {
   protected abstract modelName: Prisma.ModelName
+  // Prisma model delegates have complex generic types that can't be easily typed
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  protected abstract model: any // Prisma model delegate
+  protected abstract model: any
 
   /**
    * Find a single record by ID
    */
   async findById(id: string, include?: object): Promise<T | null> {
     try {
-      return await this.model.findUnique({
+      return (await this.model.findUnique({
         where: { id },
         ...(include && { include }),
-      })
+      })) as T | null
     } catch (error) {
       logger.error(`${this.modelName}.findById failed`, error, { id })
       throw error
@@ -33,10 +34,10 @@ export abstract class BaseRepository<T, CreateInput, UpdateInput> {
    */
   async findUnique(where: object, include?: object): Promise<T | null> {
     try {
-      return await this.model.findUnique({
+      return (await this.model.findUnique({
         where,
         ...(include && { include }),
-      })
+      })) as T | null
     } catch (error) {
       logger.error(`${this.modelName}.findUnique failed`, error, { where })
       throw error
@@ -54,7 +55,7 @@ export abstract class BaseRepository<T, CreateInput, UpdateInput> {
     take?: number
   }): Promise<T[]> {
     try {
-      return await this.model.findMany(options)
+      return (await this.model.findMany(options)) as T[]
     } catch (error) {
       logger.error(`${this.modelName}.findMany failed`, error, { options })
       throw error
@@ -66,10 +67,10 @@ export abstract class BaseRepository<T, CreateInput, UpdateInput> {
    */
   async create(data: CreateInput, include?: object): Promise<T> {
     try {
-      return await this.model.create({
+      return (await this.model.create({
         data,
         ...(include && { include }),
-      })
+      })) as T
     } catch (error) {
       logger.error(`${this.modelName}.create failed`, error, { data })
       throw error
@@ -96,11 +97,11 @@ export abstract class BaseRepository<T, CreateInput, UpdateInput> {
    */
   async update(id: string, data: UpdateInput, include?: object): Promise<T> {
     try {
-      return await this.model.update({
+      return (await this.model.update({
         where: { id },
         data,
         ...(include && { include }),
-      })
+      })) as T
     } catch (error) {
       logger.error(`${this.modelName}.update failed`, error, { id, data })
       throw error
@@ -133,9 +134,9 @@ export abstract class BaseRepository<T, CreateInput, UpdateInput> {
    */
   async delete(id: string): Promise<T> {
     try {
-      return await this.model.delete({
+      return (await this.model.delete({
         where: { id },
-      })
+      })) as T
     } catch (error) {
       logger.error(`${this.modelName}.delete failed`, error, { id })
       throw error

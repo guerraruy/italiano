@@ -39,15 +39,27 @@ export const updateVerbStatisticSchema = z.object({
   correct: z.boolean(),
 })
 
+// ConjugationData type schema
+const conjugationDataSchema = z.record(
+  z.string(),
+  z.record(
+    z.string(),
+    z.union([
+      z.record(z.string(), z.string()), // For forms with persons
+      z.string(), // For simple forms like Participio
+    ])
+  )
+)
+
 export const importConjugationsSchema = z.object({
-  conjugations: z.record(z.string(), z.any()), // ConjugationData is complex, validate structure separately
+  conjugations: z.record(z.string(), conjugationDataSchema),
   resolveConflicts: z
     .record(z.string(), z.enum(['keep', 'replace']))
     .optional(),
 })
 
 export const updateConjugationSchema = z.object({
-  conjugation: z.any(), // ConjugationData structure
+  conjugation: conjugationDataSchema,
 })
 
 export const updateConjugationStatisticSchema = z.object({
@@ -67,4 +79,3 @@ export type UpdateConjugationInput = z.infer<typeof updateConjugationSchema>
 export type UpdateConjugationStatisticInput = z.infer<
   typeof updateConjugationStatisticSchema
 >
-

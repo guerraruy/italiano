@@ -38,10 +38,12 @@ const PersonLabel = styled(Typography)(({ theme }) => ({
   color: theme.palette.text.secondary,
 }))
 
+type TenseData = Record<string, string> | string
+
 interface TenseSectionProps {
   mood: string
   tense: string
-  tenseData: any
+  tenseData: TenseData
   verbId: string
   inputValues: { [key: string]: string }
   validationState: { [key: string]: 'correct' | 'incorrect' | null }
@@ -113,6 +115,10 @@ export const TenseSection: React.FC<TenseSectionProps> = ({
   onShowAnswer,
   onKeyDown,
 }) => {
+  // Callback factory for setting input refs
+  const setInputRef = (key: string) => (el: HTMLInputElement | null) => {
+    inputRefs.current[key] = el
+  }
   // Handle simple forms (string values like Participio, Gerundio, Infinito)
   if (typeof tenseData === 'string') {
     const key = createInputKey(mood, tense, 'form')
@@ -154,7 +160,7 @@ export const TenseSection: React.FC<TenseSectionProps> = ({
               }
               sx={inputStyle}
               autoComplete='off'
-              inputRef={(el) => (inputRefs.current[key] = el)}
+              inputRef={setInputRef(key)}
               slotProps={{
                 input: {
                   endAdornment: (
@@ -247,7 +253,7 @@ export const TenseSection: React.FC<TenseSectionProps> = ({
                 }
                 sx={inputStyle}
                 autoComplete='off'
-                inputRef={(el) => (inputRefs.current[key] = el)}
+                inputRef={setInputRef(key)}
                 slotProps={{
                   input: {
                     endAdornment: (
@@ -286,4 +292,3 @@ export const TenseSection: React.FC<TenseSectionProps> = ({
     </StyledTenseSection>
   )
 }
-
