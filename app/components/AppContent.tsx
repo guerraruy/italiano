@@ -1,8 +1,9 @@
 'use client'
-import { AuthProvider } from '../contexts/AuthContext'
+import { ReactNode } from 'react'
+
 import LoginModal from './LoginModal'
 import Navbar from './Navbar'
-import { ReactNode } from 'react'
+import { AuthProvider } from '../contexts/AuthContext'
 
 export default function AppContent({ children }: { children: ReactNode }) {
   return (

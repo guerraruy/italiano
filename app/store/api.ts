@@ -315,7 +315,8 @@ export const api = createApi({
         method: 'PATCH',
         body: data,
       }),
-      invalidatesTags: ['Profile'],
+      // Invalidate profile and all practice data to refetch translations in new language
+      invalidatesTags: ['Profile', 'VerbsPractice', 'NounsPractice', 'AdjectivesPractice', 'ConjugationPractice'],
     }),
 
     // Admin User endpoints

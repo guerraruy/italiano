@@ -1,5 +1,13 @@
 'use client'
 import React, { useState, useRef, useCallback, useMemo, useEffect } from 'react'
+
+import AutorenewIcon from '@mui/icons-material/Autorenew'
+import ClearIcon from '@mui/icons-material/Clear'
+import DeleteSweepIcon from '@mui/icons-material/DeleteSweep'
+import LightbulbOutlinedIcon from '@mui/icons-material/LightbulbOutlined'
+import RadioButtonCheckedIcon from '@mui/icons-material/RadioButtonChecked'
+import ScheduleIcon from '@mui/icons-material/Schedule'
+import ShowChartIcon from '@mui/icons-material/ShowChart'
 import {
   Container,
   Typography,
@@ -23,13 +31,8 @@ import {
   Button,
 } from '@mui/material'
 import { styled } from '@mui/material/styles'
-import ScheduleIcon from '@mui/icons-material/Schedule'
-import RadioButtonCheckedIcon from '@mui/icons-material/RadioButtonChecked'
-import ShowChartIcon from '@mui/icons-material/ShowChart'
-import AutorenewIcon from '@mui/icons-material/Autorenew'
-import ClearIcon from '@mui/icons-material/Clear'
-import DeleteSweepIcon from '@mui/icons-material/DeleteSweep'
-import LightbulbOutlinedIcon from '@mui/icons-material/LightbulbOutlined'
+
+import { Statistics } from '../components/Statistics'
 import {
   useGetVerbsForConjugationPracticeQuery,
   useGetConjugationStatisticsQuery,
@@ -37,7 +40,6 @@ import {
   useResetConjugationStatisticsMutation,
   useGetProfileQuery,
 } from '../store/api'
-import { Statistics } from '../components/Statistics'
 
 const PageContainer = styled(Container)(({ theme }) => ({
   paddingTop: theme.spacing(4),
