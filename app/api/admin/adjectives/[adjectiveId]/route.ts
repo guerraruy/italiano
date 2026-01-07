@@ -1,9 +1,8 @@
-import { Prisma } from '@prisma/client'
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 
 import { withAdmin } from '@/lib/auth'
-import { prisma } from '@/lib/prisma'
+import { adjectiveService } from '@/lib/services'
 import { updateAdjectiveSchema } from '@/lib/validation/adjectives'
 
 // PATCH endpoint to update an adjective
@@ -26,43 +25,12 @@ export async function PATCH(
 
       // Validate input
       const validatedData = updateAdjectiveSchema.parse(body)
-      const { italian, maschile, femminile } = validatedData
 
-      // Check if adjective exists
-      const existingAdjective = await prisma.adjective.findUnique({
-        where: { id: adjectiveId },
-      })
-
-      if (!existingAdjective) {
-        return NextResponse.json(
-          { error: 'Adjective not found' },
-          { status: 404 }
-        )
-      }
-
-      // Check if the italian name is being changed and if it conflicts with another adjective
-      if (italian !== existingAdjective.italian) {
-        const conflictingAdjective = await prisma.adjective.findUnique({
-          where: { italian },
-        })
-
-        if (conflictingAdjective && conflictingAdjective.id !== adjectiveId) {
-          return NextResponse.json(
-            { error: 'An adjective with this Italian name already exists' },
-            { status: 409 }
-          )
-        }
-      }
-
-      // Update the adjective
-      const updatedAdjective = await prisma.adjective.update({
-        where: { id: adjectiveId },
-        data: {
-          italian,
-          maschile: maschile as Prisma.JsonObject,
-          femminile: femminile as Prisma.JsonObject,
-        },
-      })
+      // Use adjective service to update adjective
+      const updatedAdjective = await adjectiveService.updateAdjective(
+        adjectiveId,
+        validatedData
+      )
 
       return NextResponse.json({
         message: 'Adjective updated successfully',
@@ -74,6 +42,23 @@ export async function PATCH(
           { error: 'Validation failed', details: error.issues },
           { status: 400 }
         )
+      }
+
+      if (error instanceof Error) {
+        if (error.message === 'Adjective not found') {
+          return NextResponse.json(
+            { error: 'Adjective not found' },
+            { status: 404 }
+          )
+        }
+        if (
+          error.message === 'An adjective with this Italian name already exists'
+        ) {
+          return NextResponse.json(
+            { error: 'An adjective with this Italian name already exists' },
+            { status: 409 }
+          )
+        }
       }
 
       return NextResponse.json(
@@ -100,27 +85,20 @@ export async function DELETE(
         )
       }
 
-      // Check if adjective exists
-      const adjective = await prisma.adjective.findUnique({
-        where: { id: adjectiveId },
-      })
+      // Use adjective service to delete adjective
+      await adjectiveService.deleteAdjective(adjectiveId)
 
-      if (!adjective) {
+      return NextResponse.json({
+        message: 'Adjective deleted successfully',
+      })
+    } catch (error) {
+      if (error instanceof Error && error.message === 'Adjective not found') {
         return NextResponse.json(
           { error: 'Adjective not found' },
           { status: 404 }
         )
       }
 
-      // Delete the adjective (will cascade delete statistics)
-      await prisma.adjective.delete({
-        where: { id: adjectiveId },
-      })
-
-      return NextResponse.json({
-        message: 'Adjective deleted successfully',
-      })
-    } catch (error) {
       return NextResponse.json(
         { error: 'Failed to delete adjective' },
         { status: 500 }

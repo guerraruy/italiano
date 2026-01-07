@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 
 import { withAuth } from '@/lib/auth'
-import { prisma } from '@/lib/prisma'
+import { statisticsService, nounService } from '@/lib/services'
 import { nounIdSchema } from '@/lib/validation/nouns'
 
 // DELETE /api/nouns/statistics/[nounId] - Reset noun statistics for a specific noun
@@ -18,21 +18,14 @@ export async function DELETE(
       nounIdSchema.parse({ nounId })
 
       // Verify noun exists
-      const noun = await prisma.noun.findUnique({
-        where: { id: nounId },
-      })
+      const noun = await nounService.getNounById(nounId)
 
       if (!noun) {
         return NextResponse.json({ error: 'Noun not found' }, { status: 404 })
       }
 
-      // Delete the noun statistics for this user and noun
-      await prisma.nounStatistic.deleteMany({
-        where: {
-          userId,
-          nounId,
-        },
-      })
+      // Use statistics service to reset noun statistics
+      await statisticsService.resetNounStatistics(userId, nounId)
 
       return NextResponse.json(
         {

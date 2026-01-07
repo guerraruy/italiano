@@ -3,7 +3,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 
 import { withAdmin } from '@/lib/auth'
-import { prisma } from '@/lib/prisma'
+import { adjectiveRepository } from '@/lib/repositories'
+import { adjectiveService } from '@/lib/services'
 import { importAdjectivesSchema } from '@/lib/validation/adjectives'
 
 interface AdjectiveTranslations {
@@ -42,13 +43,8 @@ export async function POST(request: NextRequest) {
 
       // Check for existing adjectives (conflicts)
       const adjectiveNames = Object.keys(adjectives)
-      const existingAdjectives = await prisma.adjective.findMany({
-        where: {
-          italian: {
-            in: adjectiveNames,
-          },
-        },
-      })
+      const existingAdjectives =
+        await adjectiveRepository.findByItalianNames(adjectiveNames)
 
       const existingAdjectiveMap = new Map<
         string,
@@ -124,20 +120,15 @@ export async function POST(request: NextRequest) {
 
       // Create new adjectives
       if (adjectivesToCreate.length > 0) {
-        const result = await prisma.adjective.createMany({
-          data: adjectivesToCreate,
-        })
+        const result = await adjectiveRepository.createMany(adjectivesToCreate)
         created = result.count
       }
 
       // Update existing adjectives
       for (const { italian, data } of adjectivesToUpdate) {
-        await prisma.adjective.update({
-          where: { italian },
-          data: {
-            maschile: data.maschile as unknown as Prisma.InputJsonValue,
-            femminile: data.femminile as unknown as Prisma.InputJsonValue,
-          },
+        await adjectiveRepository.updateByItalian(italian, {
+          maschile: data.maschile as unknown as Prisma.InputJsonValue,
+          femminile: data.femminile as unknown as Prisma.InputJsonValue,
         })
         updated++
       }
@@ -167,11 +158,8 @@ export async function POST(request: NextRequest) {
 export async function GET(request: NextRequest) {
   return withAdmin(async (request: NextRequest, userId: string) => {
     try {
-      const adjectives = await prisma.adjective.findMany({
-        orderBy: {
-          italian: 'asc',
-        },
-      })
+      // Use adjective service to get all adjectives
+      const adjectives = await adjectiveService.getAllAdjectives()
 
       return NextResponse.json({ adjectives })
     } catch (error) {

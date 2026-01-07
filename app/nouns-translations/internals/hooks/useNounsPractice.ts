@@ -65,7 +65,7 @@ export const useNounsPractice = () => {
   )
 
   const handleValidation = useCallback(
-    (nounId: string) => {
+    (nounId: string, saveStatistics = true) => {
       const noun = data?.nouns.find((n) => n.id === nounId)
       if (!noun) return
 
@@ -116,8 +116,8 @@ export const useNounsPractice = () => {
       // Both must be correct to count as correct in statistics
       const bothCorrect = isSingularCorrect && isPluralCorrect
 
-      // Only save statistics if both fields have input
-      if (hasSingularInput && hasPluralInput) {
+      // Only save statistics if both fields have input and saveStatistics is true
+      if (saveStatistics && hasSingularInput && hasPluralInput) {
         updateNounStatistic({ nounId, correct: bothCorrect }).catch((error) => {
           console.error('Failed to update statistics:', error)
         })

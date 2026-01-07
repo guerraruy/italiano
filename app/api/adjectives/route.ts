@@ -1,71 +1,46 @@
 import { NextRequest, NextResponse } from 'next/server'
 
 import { withAuth } from '@/lib/auth'
-import { prisma } from '@/lib/prisma'
-
-interface AdjectiveTranslations {
-  it: string
-  pt: string
-  en: string
-}
+import { adjectiveService } from '@/lib/services'
+import { profileService } from '@/lib/services'
 
 interface AdjectiveGenderForms {
-  singolare: AdjectiveTranslations
-  plurale: AdjectiveTranslations
+  singolare: {
+    it: string
+    pt: string
+    en: string
+  }
+  plurale: {
+    it: string
+    pt: string
+    en: string
+  }
 }
 
-interface AdjectiveFromDB {
-  id: string
-  italian: string
-  maschile: unknown
-  femminile: unknown
-  createdAt: Date
-  updatedAt: Date
-}
-
-// GET /api/adjectives - Get all adjectives for translation practice
+// GET /api/adjectives - Get all adjectives for practice
 export const GET = withAuth(async (request: NextRequest, userId: string) => {
   try {
     // Get user profile to determine native language
-    let profile = await prisma.userProfile.findUnique({
-      where: { userId },
-    })
+    const profile = await profileService.getProfile(userId)
+    const nativeLanguage = profile.nativeLanguage
 
-    // If profile doesn't exist, create it with default values
-    if (!profile) {
-      profile = await prisma.userProfile.create({
-        data: {
-          userId,
-          nativeLanguage: 'pt-BR',
-          enabledVerbTenses: [
-            'Indicativo.Presente',
-            'Indicativo.Passato Prossimo',
-            'Indicativo.Futuro Semplice',
-          ],
-        },
-      })
-    }
+    // Use adjective service to get all adjectives
+    const adjectivesData = await adjectiveService.getAllAdjectives()
 
-    // Get all adjectives from database
-    const adjectives = await prisma.adjective.findMany({
-      orderBy: {
-        italian: 'asc',
-      },
-    })
+    // Transform adjectives to practice format
+    const adjectives = adjectivesData.map((adj) => {
+      const maschile = adj.maschile as unknown as AdjectiveGenderForms
+      const femminile = adj.femminile as unknown as AdjectiveGenderForms
 
-    // Map adjectives to include the translation in user's native language
-    const mappedAdjectives = adjectives.map((adjective: AdjectiveFromDB) => {
-      const maschile = adjective.maschile as AdjectiveGenderForms
-      const femminile = adjective.femminile as AdjectiveGenderForms
-
+      // Get translation based on native language
       const translation =
-        profile!.nativeLanguage === 'pt-BR'
-          ? maschile.singolare.pt
-          : maschile.singolare.en
+        nativeLanguage === 'en'
+          ? maschile.singolare.en
+          : maschile.singolare.pt
 
       return {
-        id: adjective.id,
-        italian: adjective.italian,
+        id: adj.id,
+        italian: adj.italian,
         masculineSingular: maschile.singolare.it,
         masculinePlural: maschile.plurale.it,
         feminineSingular: femminile.singolare.it,
@@ -74,8 +49,9 @@ export const GET = withAuth(async (request: NextRequest, userId: string) => {
       }
     })
 
-    return NextResponse.json({ adjectives: mappedAdjectives }, { status: 200 })
+    return NextResponse.json({ adjectives }, { status: 200 })
   } catch (error) {
+    console.error('Error in GET /api/adjectives:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

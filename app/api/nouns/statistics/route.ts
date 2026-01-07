@@ -2,23 +2,14 @@ import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 
 import { withAuth } from '@/lib/auth'
-import { prisma } from '@/lib/prisma'
+import { statisticsService, nounService } from '@/lib/services'
 import { updateNounStatisticSchema } from '@/lib/validation/nouns'
 
 // GET /api/nouns/statistics - Get all noun statistics for the logged-in user
 export const GET = withAuth(async (request: NextRequest, userId: string) => {
   try {
-    // Get all statistics for the user
-    const statistics = await prisma.nounStatistic.findMany({
-      where: { userId },
-      select: {
-        id: true,
-        nounId: true,
-        correctAttempts: true,
-        wrongAttempts: true,
-        lastPracticed: true,
-      },
-    })
+    // Use statistics service to get noun statistics
+    const statistics = await statisticsService.getNounStatistics(userId)
 
     // Return statistics as a map for easy lookup
     const statsMap = statistics.reduce(
@@ -55,42 +46,18 @@ export const POST = withAuth(async (request: NextRequest, userId: string) => {
     const { nounId, correct } = validatedData
 
     // Verify noun exists
-    const noun = await prisma.noun.findUnique({
-      where: { id: nounId },
-    })
+    const noun = await nounService.getNounById(nounId)
 
     if (!noun) {
       return NextResponse.json({ error: 'Noun not found' }, { status: 404 })
     }
 
-    // Upsert noun statistics
-    const statistic = await prisma.nounStatistic.upsert({
-      where: {
-        userId_nounId: {
-          userId,
-          nounId,
-        },
-      },
-      update: {
-        correctAttempts: correct ? { increment: 1 } : undefined,
-        wrongAttempts: !correct ? { increment: 1 } : undefined,
-        lastPracticed: new Date(),
-      },
-      create: {
-        userId,
-        nounId,
-        correctAttempts: correct ? 1 : 0,
-        wrongAttempts: correct ? 0 : 1,
-        lastPracticed: new Date(),
-      },
-      select: {
-        id: true,
-        nounId: true,
-        correctAttempts: true,
-        wrongAttempts: true,
-        lastPracticed: true,
-      },
-    })
+    // Use statistics service to update noun statistic
+    const statistic = await statisticsService.updateNounStatistic(
+      userId,
+      nounId,
+      correct
+    )
 
     return NextResponse.json(
       {

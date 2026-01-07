@@ -2,10 +2,10 @@ import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 
 import { withAuth } from '@/lib/auth'
-import { prisma } from '@/lib/prisma'
+import { statisticsService, adjectiveService } from '@/lib/services'
 import { adjectiveIdSchema } from '@/lib/validation/adjectives'
 
-// DELETE /api/adjectives/statistics/[adjectiveId] - Reset adjective statistics
+// DELETE /api/adjectives/statistics/[adjectiveId] - Reset adjective statistics for a specific adjective
 export async function DELETE(
   request: NextRequest,
   context: { params: Promise<{ adjectiveId: string }> }
@@ -18,9 +18,7 @@ export async function DELETE(
       adjectiveIdSchema.parse({ adjectiveId })
 
       // Verify adjective exists
-      const adjective = await prisma.adjective.findUnique({
-        where: { id: adjectiveId },
-      })
+      const adjective = await adjectiveService.getAdjectiveById(adjectiveId)
 
       if (!adjective) {
         return NextResponse.json(
@@ -29,13 +27,8 @@ export async function DELETE(
         )
       }
 
-      // Delete the adjective statistics for this user and adjective
-      await prisma.adjectiveStatistic.deleteMany({
-        where: {
-          userId,
-          adjectiveId,
-        },
-      })
+      // Use statistics service to reset adjective statistics
+      await statisticsService.resetAdjectiveStatistics(userId, adjectiveId)
 
       return NextResponse.json(
         {

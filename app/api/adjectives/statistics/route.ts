@@ -2,23 +2,14 @@ import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 
 import { withAuth } from '@/lib/auth'
-import { prisma } from '@/lib/prisma'
+import { statisticsService, adjectiveService } from '@/lib/services'
 import { updateAdjectiveStatisticSchema } from '@/lib/validation/adjectives'
 
 // GET /api/adjectives/statistics - Get all adjective statistics for the logged-in user
 export const GET = withAuth(async (request: NextRequest, userId: string) => {
   try {
-    // Get all statistics for the user
-    const statistics = await prisma.adjectiveStatistic.findMany({
-      where: { userId },
-      select: {
-        id: true,
-        adjectiveId: true,
-        correctAttempts: true,
-        wrongAttempts: true,
-        lastPracticed: true,
-      },
-    })
+    // Use statistics service to get adjective statistics
+    const statistics = await statisticsService.getAdjectiveStatistics(userId)
 
     // Return statistics as a map for easy lookup
     const statsMap = statistics.reduce(
@@ -55,9 +46,7 @@ export const POST = withAuth(async (request: NextRequest, userId: string) => {
     const { adjectiveId, correct } = validatedData
 
     // Verify adjective exists
-    const adjective = await prisma.adjective.findUnique({
-      where: { id: adjectiveId },
-    })
+    const adjective = await adjectiveService.getAdjectiveById(adjectiveId)
 
     if (!adjective) {
       return NextResponse.json(
@@ -66,34 +55,12 @@ export const POST = withAuth(async (request: NextRequest, userId: string) => {
       )
     }
 
-    // Upsert adjective statistics
-    const statistic = await prisma.adjectiveStatistic.upsert({
-      where: {
-        userId_adjectiveId: {
-          userId,
-          adjectiveId,
-        },
-      },
-      update: {
-        correctAttempts: correct ? { increment: 1 } : undefined,
-        wrongAttempts: !correct ? { increment: 1 } : undefined,
-        lastPracticed: new Date(),
-      },
-      create: {
-        userId,
-        adjectiveId,
-        correctAttempts: correct ? 1 : 0,
-        wrongAttempts: correct ? 0 : 1,
-        lastPracticed: new Date(),
-      },
-      select: {
-        id: true,
-        adjectiveId: true,
-        correctAttempts: true,
-        wrongAttempts: true,
-        lastPracticed: true,
-      },
-    })
+    // Use statistics service to update adjective statistic
+    const statistic = await statisticsService.updateAdjectiveStatistic(
+      userId,
+      adjectiveId,
+      correct
+    )
 
     return NextResponse.json(
       {

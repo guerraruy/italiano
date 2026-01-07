@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 
 import { withAdmin } from '@/lib/auth'
-import { prisma } from '@/lib/prisma'
+import { nounRepository } from '@/lib/repositories'
+import { nounService } from '@/lib/services'
 import { importNounsSchema } from '@/lib/validation/nouns'
 
 interface NounTranslations {
@@ -37,13 +38,7 @@ export async function POST(request: NextRequest) {
 
       // Check for existing nouns (conflicts)
       const nounNames = Object.keys(nouns)
-      const existingNouns = await prisma.noun.findMany({
-        where: {
-          italian: {
-            in: nounNames,
-          },
-        },
-      })
+      const existingNouns = await nounRepository.findByItalianNames(nounNames)
 
       const existingNounMap = new Map<
         string,
@@ -119,20 +114,15 @@ export async function POST(request: NextRequest) {
 
       // Create new nouns
       if (nounsToCreate.length > 0) {
-        const result = await prisma.noun.createMany({
-          data: nounsToCreate,
-        })
+        const result = await nounRepository.createMany(nounsToCreate)
         created = result.count
       }
 
       // Update existing nouns
       for (const { italian, data } of nounsToUpdate) {
-        await prisma.noun.update({
-          where: { italian },
-          data: {
-            singolare: data.singolare,
-            plurale: data.plurale,
-          },
+        await nounRepository.updateByItalian(italian, {
+          singolare: data.singolare,
+          plurale: data.plurale,
         })
         updated++
       }
@@ -162,11 +152,8 @@ export async function POST(request: NextRequest) {
 export async function GET(request: NextRequest) {
   return withAdmin(async (request: NextRequest, userId: string) => {
     try {
-      const nouns = await prisma.noun.findMany({
-        orderBy: {
-          italian: 'asc',
-        },
-      })
+      // Use noun service to get all nouns
+      const nouns = await nounService.getAllNouns()
 
       return NextResponse.json({ nouns })
     } catch (error) {

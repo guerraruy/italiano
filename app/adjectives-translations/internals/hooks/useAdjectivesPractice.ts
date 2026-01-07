@@ -226,10 +226,10 @@ export const useAdjectivesPractice = () => {
         setInputValues((prev) => ({
           ...prev,
           [adjectiveId]: {
-            masculineSingular: adjective.masculineSingular,
-            masculinePlural: adjective.masculinePlural,
-            feminineSingular: adjective.feminineSingular,
-            femininePlural: adjective.femininePlural,
+            masculineSingular: adjective.masculineSingular || '',
+            masculinePlural: adjective.masculinePlural || '',
+            feminineSingular: adjective.feminineSingular || '',
+            femininePlural: adjective.femininePlural || '',
           },
         }))
         setValidationState((prev) => ({

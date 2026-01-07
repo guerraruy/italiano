@@ -36,7 +36,7 @@ interface NounItemProps {
     field: 'singular' | 'plural',
     value: string
   ) => void
-  onValidation: (nounId: string) => void
+  onValidation: (nounId: string, saveStatistics?: boolean) => void
   onClearInput: (nounId: string, field: 'singular' | 'plural') => void
   onShowAnswer: (nounId: string) => void
   onResetStatistics: (nounId: string) => void
@@ -118,9 +118,9 @@ const NounItem = ({
           fullWidth
           size='small'
           placeholder='Type the Italian singular...'
-          value={inputValues.singular}
+          value={inputValues.singular || ''}
           onChange={(e) => onInputChange(noun.id, 'singular', e.target.value)}
-          onBlur={() => onValidation(noun.id)}
+          onBlur={() => onValidation(noun.id, false)}
           onKeyDown={(e) => onKeyDown(e, noun.id, 'singular', index)}
           sx={getInputStyle(validationState.singular)}
           autoComplete='off'
@@ -149,7 +149,7 @@ const NounItem = ({
           fullWidth
           size='small'
           placeholder='Type the Italian plural...'
-          value={inputValues.plural}
+          value={inputValues.plural || ''}
           onChange={(e) => onInputChange(noun.id, 'plural', e.target.value)}
           onBlur={() => onValidation(noun.id)}
           onKeyDown={(e) => onKeyDown(e, noun.id, 'plural', index)}
