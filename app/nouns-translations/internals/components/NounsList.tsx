@@ -2,13 +2,13 @@ import React from 'react'
 
 import { List, Alert } from '@mui/material'
 
-import { InputValues, ValidationState } from './types'
 import { NounItem } from '../components/NounItem'
 import {
   FilterControls,
   SortOption,
   DisplayCount,
 } from '../components/NounItem/internals'
+import { InputValues, ValidationState } from '../types'
 
 interface Noun {
   id: string
