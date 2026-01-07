@@ -1,20 +1,9 @@
-import { Prisma } from '@prisma/client'
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 
 import { withAdmin } from '@/lib/auth'
-import { prisma } from '@/lib/prisma'
+import { verbService } from '@/lib/services'
 import { updateConjugationSchema } from '@/lib/validation/verbs'
-
-interface ConjugationData {
-  [mood: string]: {
-    [tense: string]:
-      | {
-          [person: string]: string
-        }
-      | string // For simple forms like Participio Presente/Passato
-  }
-}
 
 // PATCH /api/admin/verbs/conjugations/[conjugationId] - Update a conjugation
 export async function PATCH(
@@ -38,27 +27,11 @@ export async function PATCH(
       const validatedData = updateConjugationSchema.parse(body)
       const { conjugation } = validatedData
 
-      // Check if conjugation exists
-      const existing = await prisma.verbConjugation.findUnique({
-        where: { id: conjugationId },
-        include: { verb: true },
-      })
-
-      if (!existing) {
-        return NextResponse.json(
-          { error: 'Conjugation not found' },
-          { status: 404 }
-        )
-      }
-
-      // Update conjugation
-      const updated = await prisma.verbConjugation.update({
-        where: { id: conjugationId },
-        data: {
-          conjugation: conjugation as Prisma.JsonObject,
-        },
-        include: { verb: true },
-      })
+      // Use verb service to update conjugation
+      const updated = await verbService.updateConjugation(
+        conjugationId,
+        conjugation
+      )
 
       return NextResponse.json({
         message: 'Conjugation updated successfully',
@@ -69,6 +42,13 @@ export async function PATCH(
         return NextResponse.json(
           { error: 'Validation failed', details: error.issues },
           { status: 400 }
+        )
+      }
+
+      if (error instanceof Error && error.message === 'Conjugation not found') {
+        return NextResponse.json(
+          { error: 'Conjugation not found' },
+          { status: 404 }
         )
       }
 
@@ -96,28 +76,20 @@ export async function DELETE(
         )
       }
 
-      // Check if conjugation exists
-      const conjugation = await prisma.verbConjugation.findUnique({
-        where: { id: conjugationId },
-        include: { verb: true },
-      })
+      // Use verb service to delete conjugation
+      await verbService.deleteConjugation(conjugationId)
 
-      if (!conjugation) {
+      return NextResponse.json({
+        message: 'Conjugation deleted successfully',
+      })
+    } catch (error) {
+      if (error instanceof Error && error.message === 'Conjugation not found') {
         return NextResponse.json(
           { error: 'Conjugation not found' },
           { status: 404 }
         )
       }
 
-      // Delete conjugation
-      await prisma.verbConjugation.delete({
-        where: { id: conjugationId },
-      })
-
-      return NextResponse.json({
-        message: 'Conjugation deleted successfully',
-      })
-    } catch (error) {
       return NextResponse.json(
         { error: 'Failed to delete conjugation' },
         { status: 500 }

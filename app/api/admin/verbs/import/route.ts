@@ -1,10 +1,10 @@
-import { Verb } from '@prisma/client'
 import { NextRequest, NextResponse } from 'next/server'
-import { z } from 'zod'
-
 import { withAdmin } from '@/lib/auth'
-import { prisma } from '@/lib/prisma'
+import { verbService } from '@/lib/services'
+import { verbRepository } from '@/lib/repositories'
 import { importVerbsSchema } from '@/lib/validation/verbs'
+import { z } from 'zod'
+import type { Verb } from '@prisma/client'
 
 interface VerbData {
   regular: boolean
@@ -35,13 +35,7 @@ export async function POST(request: NextRequest) {
 
       // Check for existing verbs (conflicts)
       const verbNames = Object.keys(verbs)
-      const existingVerbs = await prisma.verb.findMany({
-        where: {
-          italian: {
-            in: verbNames,
-          },
-        },
-      })
+      const existingVerbs = await verbRepository.findByItalianNames(verbNames)
 
       const existingVerbMap = new Map<string, Verb>(
         existingVerbs.map((v: Verb) => [v.italian, v])
@@ -112,23 +106,17 @@ export async function POST(request: NextRequest) {
 
       // Create new verbs
       if (verbsToCreate.length > 0) {
-        const result = await prisma.verb.createMany({
-          data: verbsToCreate,
-          skipDuplicates: true,
-        })
+        const result = await verbRepository.createMany(verbsToCreate)
         created = result.count
       }
 
       // Update existing verbs
       for (const { italian, data } of verbsToUpdate) {
-        await prisma.verb.update({
-          where: { italian },
-          data: {
-            regular: data.regular,
-            reflexive: data.reflexive,
-            tr_ptBR: data.tr_ptBR,
-            tr_en: data.tr_en,
-          },
+        await verbRepository.updateByItalian(italian, {
+          regular: data.regular,
+          reflexive: data.reflexive,
+          tr_ptBR: data.tr_ptBR,
+          tr_en: data.tr_en || null,
         })
         updated++
       }
@@ -159,11 +147,8 @@ export async function POST(request: NextRequest) {
 export async function GET(request: NextRequest) {
   return withAdmin(async (request: NextRequest, userId: string) => {
     try {
-      const verbs = await prisma.verb.findMany({
-        orderBy: {
-          italian: 'asc',
-        },
-      })
+      // Use verb service to get all verbs
+      const verbs = await verbService.getAllVerbs()
 
       return NextResponse.json({ verbs })
     } catch (error) {

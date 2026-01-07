@@ -247,6 +247,8 @@ export const useVerbConjugationPractice = () => {
     const keys: string[] = []
     const conjugation = selectedVerb.conjugation
 
+    if (!conjugation) return []
+
     enabledVerbTenses.forEach((tenseKey) => {
       const [mood, tense] = tenseKey.split('.')
       const moodData = conjugation[mood]

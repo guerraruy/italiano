@@ -1,11 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { withAuth } from '@/lib/auth'
+import { statisticsService, verbService } from '@/lib/services'
+import { verbIdSchema } from '@/lib/validation/verbs'
 import { z } from 'zod'
 
-import { withAuth } from '@/lib/auth'
-import { prisma } from '@/lib/prisma'
-import { verbIdSchema } from '@/lib/validation/verbs'
-
-// DELETE /api/verbs/conjugations/statistics/[verbId] - Reset conjugation statistics for a verb
+// DELETE /api/verbs/conjugations/statistics/[verbId] - Reset conjugation statistics for a specific verb
 export async function DELETE(
   request: NextRequest,
   context: { params: Promise<{ verbId: string }> }
@@ -17,17 +16,19 @@ export async function DELETE(
       // Validate verbId
       verbIdSchema.parse({ verbId })
 
-      // Delete all conjugation statistics for this user and verb
-      await prisma.conjugationStatistic.deleteMany({
-        where: {
-          userId,
-          verbId,
-        },
-      })
+      // Verify verb exists
+      const verb = await verbService.getVerbById(verbId)
+
+      if (!verb) {
+        return NextResponse.json({ error: 'Verb not found' }, { status: 404 })
+      }
+
+      // Use statistics service to reset conjugation statistics
+      await statisticsService.resetConjugationStatistics(userId, verbId)
 
       return NextResponse.json(
         {
-          message: 'Conjugation statistics reset successfully',
+          message: 'Statistics reset successfully',
         },
         { status: 200 }
       )

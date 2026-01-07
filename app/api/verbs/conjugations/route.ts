@@ -1,46 +1,28 @@
 import { NextRequest, NextResponse } from 'next/server'
-
 import { withAuth } from '@/lib/auth'
-import { prisma } from '@/lib/prisma'
+import { verbService, profileService } from '@/lib/services'
 
-// GET /api/verbs/conjugations - Get all verbs with conjugations for practice
+// GET /api/verbs/conjugations - Get verbs with their conjugations for practice
 export const GET = withAuth(async (request: NextRequest, userId: string) => {
   try {
-    // Get user's native language preference
-    const profile = await prisma.userProfile.findUnique({
-      where: { userId },
-      select: { nativeLanguage: true },
-    })
-
+    // Get user profile to determine native language
+    const profile = await profileService.getProfile(userId)
     const nativeLanguage = profile?.nativeLanguage || 'pt-BR'
 
-    // Get all verbs with their conjugations
-    const verbsWithConjugations = await prisma.verb.findMany({
-      include: {
-        conjugations: {
-          select: {
-            conjugation: true,
-          },
-        },
-      },
-      orderBy: {
-        italian: 'asc',
-      },
-    })
+    // Use verb service to get verbs with conjugations
+    const verbsWithConjugations = await verbService.getVerbsWithConjugations()
 
-    // Filter only verbs that have conjugations and format for practice
+    // Transform data to match frontend expectations
+    // Filter out verbs without conjugations and transform the structure
     const verbs = verbsWithConjugations
-      .filter((verb) => verb.conjugations.length > 0)
-      .map((verb) => ({
+      .filter((verb: any) => verb.conjugations && verb.conjugations.length > 0)
+      .map((verb: any) => ({
         id: verb.id,
         italian: verb.italian,
-        translation:
-          nativeLanguage === 'pt-BR'
-            ? verb.tr_ptBR
-            : verb.tr_en || verb.tr_ptBR,
+        translation: nativeLanguage === 'en' ? verb.tr_en || verb.tr_ptBR : verb.tr_ptBR,
         regular: verb.regular,
         reflexive: verb.reflexive,
-        conjugation: verb.conjugations[0].conjugation,
+        conjugation: verb.conjugations[0].conjugation, // Get first conjugation
       }))
 
     return NextResponse.json({ verbs }, { status: 200 })

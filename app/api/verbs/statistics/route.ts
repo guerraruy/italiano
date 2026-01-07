@@ -1,23 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
 import { withAuth } from '@/lib/auth'
+import { statisticsService, verbService } from '@/lib/services'
 import { updateVerbStatisticSchema } from '@/lib/validation/verbs'
 import { z } from 'zod'
 
 // GET /api/verbs/statistics - Get all verb statistics for the logged-in user
 export const GET = withAuth(async (request: NextRequest, userId: string) => {
   try {
-    // Get all statistics for the user
-    const statistics = await prisma.verbStatistic.findMany({
-      where: { userId },
-      select: {
-        id: true,
-        verbId: true,
-        correctAttempts: true,
-        wrongAttempts: true,
-        lastPracticed: true,
-      },
-    })
+    // Use statistics service to get verb statistics
+    const statistics = await statisticsService.getVerbStatistics(userId)
 
     // Return statistics as a map for easy lookup
     const statsMap = statistics.reduce(
@@ -54,42 +45,18 @@ export const POST = withAuth(async (request: NextRequest, userId: string) => {
     const { verbId, correct } = validatedData
 
     // Verify verb exists
-    const verb = await prisma.verb.findUnique({
-      where: { id: verbId },
-    })
+    const verb = await verbService.getVerbById(verbId)
 
     if (!verb) {
       return NextResponse.json({ error: 'Verb not found' }, { status: 404 })
     }
 
-    // Upsert verb statistics
-    const statistic = await prisma.verbStatistic.upsert({
-      where: {
-        userId_verbId: {
-          userId,
-          verbId,
-        },
-      },
-      update: {
-        correctAttempts: correct ? { increment: 1 } : undefined,
-        wrongAttempts: !correct ? { increment: 1 } : undefined,
-        lastPracticed: new Date(),
-      },
-      create: {
-        userId,
-        verbId,
-        correctAttempts: correct ? 1 : 0,
-        wrongAttempts: correct ? 0 : 1,
-        lastPracticed: new Date(),
-      },
-      select: {
-        id: true,
-        verbId: true,
-        correctAttempts: true,
-        wrongAttempts: true,
-        lastPracticed: true,
-      },
-    })
+    // Use statistics service to update verb statistic
+    const statistic = await statisticsService.updateVerbStatistic(
+      userId,
+      verbId,
+      correct
+    )
 
     return NextResponse.json(
       {

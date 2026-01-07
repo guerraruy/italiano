@@ -6,9 +6,9 @@
 
 export * from './base.repository'
 export * from './user.repository'
-// export * from './verb.repository'
+export * from './verb.repository'
 export * from './noun.repository'
 export * from './adjective.repository'
 export * from './profile.repository'
 export * from './statistics.repository'
-// export * from './conjugation.repository'
+export * from './conjugation.repository'

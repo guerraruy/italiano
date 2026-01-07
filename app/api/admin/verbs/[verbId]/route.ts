@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 
 import { withAdmin } from '@/lib/auth'
-import { prisma } from '@/lib/prisma'
+import { verbService } from '@/lib/services'
 import { updateVerbSchema, verbIdSchema } from '@/lib/validation/verbs'
 
 // PATCH /api/admin/verbs/[verbId] - Update a verb
@@ -21,42 +21,9 @@ export async function PATCH(
 
       // Validate input
       const validatedData = updateVerbSchema.parse(body)
-      const { italian, regular, reflexive, tr_ptBR, tr_en } = validatedData
 
-      // Check if verb exists
-      const existingVerb = await prisma.verb.findUnique({
-        where: { id: verbId },
-      })
-
-      if (!existingVerb) {
-        return NextResponse.json({ error: 'Verb not found' }, { status: 404 })
-      }
-
-      // Check if the new italian name conflicts with another verb
-      if (italian !== existingVerb.italian) {
-        const conflictVerb = await prisma.verb.findUnique({
-          where: { italian },
-        })
-
-        if (conflictVerb) {
-          return NextResponse.json(
-            { error: 'A verb with this Italian name already exists' },
-            { status: 409 }
-          )
-        }
-      }
-
-      // Update verb
-      const updatedVerb = await prisma.verb.update({
-        where: { id: verbId },
-        data: {
-          italian,
-          regular,
-          reflexive,
-          tr_ptBR,
-          tr_en: tr_en || null,
-        },
-      })
+      // Use verb service to update verb
+      const updatedVerb = await verbService.updateVerb(verbId, validatedData)
 
       return NextResponse.json({
         message: 'Verb updated successfully',
@@ -68,6 +35,18 @@ export async function PATCH(
           { error: 'Validation failed', details: error.issues },
           { status: 400 }
         )
+      }
+
+      if (error instanceof Error) {
+        if (error.message === 'Verb not found') {
+          return NextResponse.json({ error: 'Verb not found' }, { status: 404 })
+        }
+        if (error.message === 'A verb with this Italian name already exists') {
+          return NextResponse.json(
+            { error: 'A verb with this Italian name already exists' },
+            { status: 409 }
+          )
+        }
       }
 
       return NextResponse.json(
@@ -90,19 +69,8 @@ export async function DELETE(
       // Validate verbId
       verbIdSchema.parse({ verbId })
 
-      // Check if verb exists
-      const verb = await prisma.verb.findUnique({
-        where: { id: verbId },
-      })
-
-      if (!verb) {
-        return NextResponse.json({ error: 'Verb not found' }, { status: 404 })
-      }
-
-      // Delete verb (will cascade delete statistics and conjugations)
-      await prisma.verb.delete({
-        where: { id: verbId },
-      })
+      // Use verb service to delete verb
+      await verbService.deleteVerb(verbId)
 
       return NextResponse.json({
         message: 'Verb deleted successfully',
@@ -113,6 +81,10 @@ export async function DELETE(
           { error: 'Validation failed', details: error.issues },
           { status: 400 }
         )
+      }
+
+      if (error instanceof Error && error.message === 'Verb not found') {
+        return NextResponse.json({ error: 'Verb not found' }, { status: 404 })
       }
 
       return NextResponse.json(

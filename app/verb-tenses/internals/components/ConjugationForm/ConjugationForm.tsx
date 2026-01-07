@@ -84,6 +84,15 @@ export const ConjugationForm: React.FC<ConjugationFormProps> = ({
 
   const conjugation = selectedVerb.conjugation
 
+  if (!conjugation) {
+    return (
+      <Alert severity='warning'>
+        No conjugation data available for this verb. Please ask your
+        administrator to import conjugation data.
+      </Alert>
+    )
+  }
+
   return (
     <ConjugationGrid>
       {enabledVerbTenses.map((tenseKey) => {

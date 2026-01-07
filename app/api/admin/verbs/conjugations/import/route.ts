@@ -1,10 +1,9 @@
-import { Prisma } from '@prisma/client'
 import { NextRequest, NextResponse } from 'next/server'
-import { z } from 'zod'
-
 import { withAdmin } from '@/lib/auth'
-import { prisma } from '@/lib/prisma'
+import { verbRepository, conjugationRepository } from '@/lib/repositories'
 import { importConjugationsSchema } from '@/lib/validation/verbs'
+import { Prisma } from '@prisma/client'
+import { z } from 'zod'
 
 interface ConjugationData {
   [mood: string]: {
@@ -45,19 +44,22 @@ export async function POST(request: NextRequest) {
 
       // Find or validate verbs exist in the database
       const verbNames = Object.keys(conjugations)
-      const existingVerbs = (await prisma.verb.findMany({
-        where: {
-          italian: {
-            in: verbNames,
-          },
-        },
-        include: {
-          conjugations: true,
-        },
-      })) as VerbWithConjugations[]
+      const existingVerbs = (await verbRepository.findByItalianNames(
+        verbNames
+      )) as any[]
+
+      // Get conjugations for these verbs
+      const verbsWithConjugations: VerbWithConjugations[] = []
+      for (const verb of existingVerbs) {
+        const conj = await conjugationRepository.findByVerbId(verb.id)
+        verbsWithConjugations.push({
+          ...verb,
+          conjugations: conj ? [conj] : [],
+        })
+      }
 
       const existingVerbMap = new Map<string, VerbWithConjugations>(
-        existingVerbs.map((v) => [v.italian, v])
+        verbsWithConjugations.map((v) => [v.italian, v])
       )
 
       // Check for missing verbs
@@ -134,24 +136,22 @@ export async function POST(request: NextRequest) {
 
       // Create new conjugations
       for (const { verbId, conjugation } of conjugationsToCreate) {
-        await prisma.verbConjugation.create({
-          data: {
-            verbId,
-            conjugation: conjugation as Prisma.InputJsonValue,
-          },
+        await conjugationRepository.create({
+          verb: { connect: { id: verbId } },
+          conjugation: conjugation as Prisma.InputJsonValue,
         })
         created++
       }
 
       // Update existing conjugations
       for (const { verbId, conjugation } of conjugationsToUpdate) {
-        await prisma.verbConjugation.updateMany({
-          where: { verbId },
-          data: {
+        const existing = await conjugationRepository.findByVerbId(verbId)
+        if (existing) {
+          await conjugationRepository.update(existing.id, {
             conjugation: conjugation as Prisma.InputJsonValue,
-          },
-        })
-        updated++
+          })
+          updated++
+        }
       }
 
       return NextResponse.json({
@@ -180,22 +180,8 @@ export async function POST(request: NextRequest) {
 export async function GET(request: NextRequest) {
   return withAdmin(async (request: NextRequest, userId: string) => {
     try {
-      const conjugations = await prisma.verbConjugation.findMany({
-        include: {
-          verb: {
-            select: {
-              italian: true,
-              regular: true,
-              reflexive: true,
-            },
-          },
-        },
-        orderBy: {
-          verb: {
-            italian: 'asc',
-          },
-        },
-      })
+      // Use conjugation repository to get all conjugations with verbs
+      const conjugations = await conjugationRepository.findAllWithVerbs()
 
       return NextResponse.json({ conjugations })
     } catch (error) {

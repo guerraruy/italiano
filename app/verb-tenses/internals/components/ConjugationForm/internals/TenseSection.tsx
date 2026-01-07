@@ -193,7 +193,16 @@ export const TenseSection: React.FC<TenseSectionProps> = ({
   }
 
   // Handle person-based conjugations (object values)
-  const persons = Object.keys(tenseData)
+  // Define the correct order for Italian conjugation persons
+  const personOrder = ['io', 'tu', 'lui/lei', 'noi', 'voi', 'loro']
+  const persons = Object.keys(tenseData).sort((a, b) => {
+    const indexA = personOrder.indexOf(a)
+    const indexB = personOrder.indexOf(b)
+    // If a person is not in the defined order, place it at the end
+    if (indexA === -1) return 1
+    if (indexB === -1) return -1
+    return indexA - indexB
+  })
 
   return (
     <StyledTenseSection elevation={2}>

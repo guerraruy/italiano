@@ -1,27 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { z } from 'zod'
-
 import { withAuth } from '@/lib/auth'
-import { prisma } from '@/lib/prisma'
+import { statisticsService, verbService } from '@/lib/services'
 import { updateConjugationStatisticSchema } from '@/lib/validation/verbs'
+import { z } from 'zod'
 
 // GET /api/verbs/conjugations/statistics - Get all conjugation statistics for the logged-in user
 export const GET = withAuth(async (request: NextRequest, userId: string) => {
   try {
-    // Get all statistics for the user
-    const statistics = await prisma.conjugationStatistic.findMany({
-      where: { userId },
-      select: {
-        id: true,
-        verbId: true,
-        mood: true,
-        tense: true,
-        person: true,
-        correctAttempts: true,
-        wrongAttempts: true,
-        lastPracticed: true,
-      },
-    })
+    // Use statistics service to get conjugation statistics
+    const statistics = await statisticsService.getConjugationStatistics(userId)
 
     // Return statistics as a map for easy lookup
     // Key format: "verbId:mood:tense:person"
@@ -58,64 +45,26 @@ export const POST = withAuth(async (request: NextRequest, userId: string) => {
     const { verbId, mood, tense, person, correct } = validatedData
 
     // Verify verb exists
-    const verb = await prisma.verb.findUnique({
-      where: { id: verbId },
-    })
+    const verb = await verbService.getVerbById(verbId)
 
     if (!verb) {
       return NextResponse.json({ error: 'Verb not found' }, { status: 404 })
     }
 
-    // Upsert conjugation statistics
-    const statistic = await prisma.conjugationStatistic.upsert({
-      where: {
-        userId_verbId_mood_tense_person: {
-          userId,
-          verbId,
-          mood,
-          tense,
-          person,
-        },
-      },
-      update: {
-        correctAttempts: correct ? { increment: 1 } : undefined,
-        wrongAttempts: !correct ? { increment: 1 } : undefined,
-        lastPracticed: new Date(),
-      },
-      create: {
-        userId,
-        verbId,
-        mood,
-        tense,
-        person,
-        correctAttempts: correct ? 1 : 0,
-        wrongAttempts: correct ? 0 : 1,
-        lastPracticed: new Date(),
-      },
-      select: {
-        id: true,
-        verbId: true,
-        mood: true,
-        tense: true,
-        person: true,
-        correctAttempts: true,
-        wrongAttempts: true,
-        lastPracticed: true,
-      },
-    })
-
-    const key = `${statistic.verbId}:${statistic.mood}:${statistic.tense}:${statistic.person}`
+    // Use statistics service to update conjugation statistic
+    const statistic = await statisticsService.updateConjugationStatistic(
+      userId,
+      verbId,
+      mood,
+      tense,
+      person,
+      correct
+    )
 
     return NextResponse.json(
       {
         message: 'Statistics updated successfully',
-        statistic: {
-          id: statistic.id,
-          key,
-          correctAttempts: statistic.correctAttempts,
-          wrongAttempts: statistic.wrongAttempts,
-          lastPracticed: statistic.lastPracticed,
-        },
+        statistic,
       },
       { status: 200 }
     )

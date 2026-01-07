@@ -1,51 +1,27 @@
 import { NextRequest, NextResponse } from 'next/server'
-
 import { withAuth } from '@/lib/auth'
-import { prisma } from '@/lib/prisma'
+import { verbService, profileService } from '@/lib/services'
 
-// GET /api/verbs - Get all verbs for translation practice
+// GET /api/verbs - Get all verbs for practice
 export const GET = withAuth(async (request: NextRequest, userId: string) => {
   try {
     // Get user profile to determine native language
-    let profile = await prisma.userProfile.findUnique({
-      where: { userId },
-    })
+    const profile = await profileService.getProfile(userId)
+    const nativeLanguage = profile?.nativeLanguage || 'pt-BR'
 
-    // If profile doesn't exist, create it with default values
-    if (!profile) {
-      profile = await prisma.userProfile.create({
-        data: {
-          userId,
-          nativeLanguage: 'pt-BR',
-          enabledVerbTenses: [
-            'Indicativo.Presente',
-            'Indicativo.Passato Prossimo',
-            'Indicativo.Futuro Semplice',
-          ],
-        },
-      })
-    }
+    // Use verb service to get all verbs
+    const verbs = await verbService.getAllVerbs()
 
-    // Get all verbs from database
-    const verbs = await prisma.verb.findMany({
-      orderBy: {
-        italian: 'asc',
-      },
-    })
-
-    // Map verbs to include the translation in user's native language
-    const mappedVerbs = verbs.map((verb) => ({
+    // Map verbs to include the correct translation based on user's native language
+    const verbsForPractice = verbs.map((verb) => ({
       id: verb.id,
       italian: verb.italian,
-      translation:
-        profile!.nativeLanguage === 'pt-BR'
-          ? verb.tr_ptBR
-          : verb.tr_en || verb.tr_ptBR,
+      translation: nativeLanguage === 'en' ? verb.tr_en || verb.tr_ptBR : verb.tr_ptBR,
       regular: verb.regular,
       reflexive: verb.reflexive,
     }))
 
-    return NextResponse.json({ verbs: mappedVerbs }, { status: 200 })
+    return NextResponse.json({ verbs: verbsForPractice }, { status: 200 })
   } catch (error) {
     return NextResponse.json(
       { error: 'Internal server error' },
