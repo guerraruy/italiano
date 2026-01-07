@@ -1,8 +1,9 @@
 import React from 'react'
-import { Box, Tooltip, Typography } from '@mui/material'
-import { styled } from '@mui/material/styles'
+
 import CheckIcon from '@mui/icons-material/Check'
 import CloseIcon from '@mui/icons-material/Close'
+import { Box, Tooltip, Typography } from '@mui/material'
+import { styled } from '@mui/material/styles'
 
 const StatisticsBox = styled(Box)(({ theme }) => ({
   display: 'flex',

@@ -1,4 +1,13 @@
 'use client'
+import { useState, useSyncExternalStore } from 'react'
+
+import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings'
+import HomeIcon from '@mui/icons-material/Home'
+import MenuIcon from '@mui/icons-material/Menu'
+import RecordVoiceOverIcon from '@mui/icons-material/RecordVoiceOver'
+import ScheduleIcon from '@mui/icons-material/Schedule'
+import StyleIcon from '@mui/icons-material/Style'
+import TranslateIcon from '@mui/icons-material/Translate'
 import {
   AppBar,
   Toolbar,
@@ -16,15 +25,8 @@ import {
   useTheme,
   useMediaQuery,
 } from '@mui/material'
-import HomeIcon from '@mui/icons-material/Home'
-import TranslateIcon from '@mui/icons-material/Translate'
-import RecordVoiceOverIcon from '@mui/icons-material/RecordVoiceOver'
-import ScheduleIcon from '@mui/icons-material/Schedule'
-import MenuIcon from '@mui/icons-material/Menu'
-import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings'
-import StyleIcon from '@mui/icons-material/Style'
-import { useState, useSyncExternalStore } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
+
 import SettingsModal from './SettingsModal'
 import UserMenu from './UserMenu'
 import { useAuth } from '../contexts/AuthContext'

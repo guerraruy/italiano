@@ -1,4 +1,7 @@
 'use client'
+import { useState } from 'react'
+
+import CloseIcon from '@mui/icons-material/Close'
 import {
   Dialog,
   DialogTitle,
@@ -13,8 +16,7 @@ import {
   CircularProgress,
   Alert,
 } from '@mui/material'
-import CloseIcon from '@mui/icons-material/Close'
-import { useState } from 'react'
+
 import { useChangePasswordMutation } from '../store/api'
 
 interface ChangePasswordModalProps {
@@ -85,14 +87,16 @@ export default function ChangePasswordModal({
       setCurrentPassword('')
       setNewPassword('')
       setConfirmPassword('')
-      
+
       // Close modal after 2 seconds
       setTimeout(() => {
         handleClose()
       }, 2000)
     } catch (err: any) {
       console.error('Change password error:', err)
-      setError(err?.data?.error || 'Failed to change password. Please try again.')
+      setError(
+        err?.data?.error || 'Failed to change password. Please try again.'
+      )
     }
   }
 
@@ -116,7 +120,9 @@ export default function ChangePasswordModal({
       <Divider />
       <form onSubmit={handleSubmit}>
         <DialogContent>
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5, py: 2 }}>
+          <Box
+            sx={{ display: 'flex', flexDirection: 'column', gap: 2.5, py: 2 }}
+          >
             <Typography variant='body2' color='text.secondary'>
               Please enter your current password and choose a new password.
             </Typography>
@@ -128,9 +134,7 @@ export default function ChangePasswordModal({
             )}
 
             {success && (
-              <Alert severity='success'>
-                Password changed successfully!
-              </Alert>
+              <Alert severity='success'>Password changed successfully!</Alert>
             )}
 
             <TextField
@@ -180,11 +184,7 @@ export default function ChangePasswordModal({
         </DialogContent>
         <Divider />
         <DialogActions sx={{ px: 3, py: 2 }}>
-          <Button
-            onClick={handleClose}
-            variant='outlined'
-            disabled={isLoading}
-          >
+          <Button onClick={handleClose} variant='outlined' disabled={isLoading}>
             Cancel
           </Button>
           <Button
@@ -200,4 +200,3 @@ export default function ChangePasswordModal({
     </Dialog>
   )
 }
-

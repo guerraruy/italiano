@@ -1,5 +1,9 @@
 'use client'
 import { useState } from 'react'
+
+import LockIcon from '@mui/icons-material/Lock'
+import LogoutIcon from '@mui/icons-material/Logout'
+import SettingsIcon from '@mui/icons-material/Settings'
 import {
   IconButton,
   Menu,
@@ -11,11 +15,9 @@ import {
   Typography,
   Box,
 } from '@mui/material'
-import LogoutIcon from '@mui/icons-material/Logout'
-import SettingsIcon from '@mui/icons-material/Settings'
-import LockIcon from '@mui/icons-material/Lock'
-import { useAuth } from '../contexts/AuthContext'
+
 import ChangePasswordModal from './ChangePasswordModal'
+import { useAuth } from '../contexts/AuthContext'
 
 interface UserMenuProps {
   onSettingsClick: () => void

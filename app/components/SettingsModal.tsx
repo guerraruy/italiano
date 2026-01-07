@@ -1,5 +1,7 @@
 'use client'
 import { useState, useEffect } from 'react'
+
+import CloseIcon from '@mui/icons-material/Close'
 import {
   Dialog,
   DialogTitle,
@@ -20,45 +22,31 @@ import {
   Checkbox,
   FormGroup,
 } from '@mui/material'
-import CloseIcon from '@mui/icons-material/Close'
+
 import { useGetProfileQuery, useUpdateProfileMutation } from '../store/api'
 
 // Define all available verb tenses based on conjugation structure
 const VERB_TENSES = [
-  { category: 'Indicativo', tenses: [
-    'Presente', 
-    'Passato Prossimo', 
-    'Imperfetto', 
-    'Trapassato Prossimo', 
-    'Futuro Semplice', 
-    'Passato Remoto'
-  ]},
-  { category: 'Congiuntivo', tenses: [
-    'Presente', 
-    'Passato', 
-    'Imperfetto', 
-    'Trapassato'
-  ]},
-  { category: 'Condizionale', tenses: [
-    'Presente', 
-    'Passato'
-  ]},
-  { category: 'Imperativo', tenses: [
-    'Affirmativo', 
-    'Negativo'
-  ]},
-  { category: 'Participio', tenses: [
-    'Presente', 
-    'Passato'
-  ]},
-  { category: 'Gerundio', tenses: [
-    'Presente', 
-    'Passato'
-  ]},
-  { category: 'Infinito', tenses: [
-    'Presente', 
-    'Passato'
-  ]},
+  {
+    category: 'Indicativo',
+    tenses: [
+      'Presente',
+      'Passato Prossimo',
+      'Imperfetto',
+      'Trapassato Prossimo',
+      'Futuro Semplice',
+      'Passato Remoto',
+    ],
+  },
+  {
+    category: 'Congiuntivo',
+    tenses: ['Presente', 'Passato', 'Imperfetto', 'Trapassato'],
+  },
+  { category: 'Condizionale', tenses: ['Presente', 'Passato'] },
+  { category: 'Imperativo', tenses: ['Affirmativo', 'Negativo'] },
+  { category: 'Participio', tenses: ['Presente', 'Passato'] },
+  { category: 'Gerundio', tenses: ['Presente', 'Passato'] },
+  { category: 'Infinito', tenses: ['Presente', 'Passato'] },
 ]
 
 interface SettingsModalProps {
@@ -79,24 +67,25 @@ export default function SettingsModal({ open, onClose }: SettingsModalProps) {
     'Indicativo.Passato Prossimo',
     'Indicativo.Futuro Semplice',
   ]
-  
+
   const [nativeLanguage, setNativeLanguage] = useState<'pt-BR' | 'en'>(
     initialLanguage
   )
-  const [enabledVerbTenses, setEnabledVerbTenses] = useState<string[]>(
-    initialVerbTenses
-  )
+  const [enabledVerbTenses, setEnabledVerbTenses] =
+    useState<string[]>(initialVerbTenses)
   const [successMessage, setSuccessMessage] = useState('')
   const [errorMessage, setErrorMessage] = useState('')
 
   // Reset state when data loads or modal closes
   const resetForm = () => {
     setNativeLanguage(data?.profile?.nativeLanguage || 'pt-BR')
-    setEnabledVerbTenses(data?.profile?.enabledVerbTenses || [
-      'Indicativo.Presente',
-      'Indicativo.Passato Prossimo',
-      'Indicativo.Futuro Semplice',
-    ])
+    setEnabledVerbTenses(
+      data?.profile?.enabledVerbTenses || [
+        'Indicativo.Presente',
+        'Indicativo.Passato Prossimo',
+        'Indicativo.Futuro Semplice',
+      ]
+    )
     setSuccessMessage('')
     setErrorMessage('')
   }
@@ -179,10 +168,10 @@ export default function SettingsModal({ open, onClose }: SettingsModalProps) {
   }
 
   return (
-    <Dialog 
-      open={open} 
-      onClose={handleClose} 
-      maxWidth='sm' 
+    <Dialog
+      open={open}
+      onClose={handleClose}
+      maxWidth='sm'
       fullWidth
       sx={{ zIndex: 1300 }}
     >
@@ -233,13 +222,19 @@ export default function SettingsModal({ open, onClose }: SettingsModalProps) {
                   <FormControlLabel
                     value='pt-BR'
                     control={<Radio size='small' sx={{ py: 0.5 }} />}
-                    label={<Typography sx={{ fontSize: '16px' }}>Português (Brasil)</Typography>}
+                    label={
+                      <Typography sx={{ fontSize: '16px' }}>
+                        Português (Brasil)
+                      </Typography>
+                    }
                     sx={{ mb: 0, my: 0.25 }}
                   />
                   <FormControlLabel
                     value='en'
                     control={<Radio size='small' sx={{ py: 0.5 }} />}
-                    label={<Typography sx={{ fontSize: '16px' }}>English</Typography>}
+                    label={
+                      <Typography sx={{ fontSize: '16px' }}>English</Typography>
+                    }
                     sx={{ mb: 0, my: 0.25 }}
                   />
                 </RadioGroup>
@@ -326,7 +321,10 @@ export default function SettingsModal({ open, onClose }: SettingsModalProps) {
                                   />
                                 }
                                 label={
-                                  <Typography variant='body2' sx={{ fontSize: '14px' }}>
+                                  <Typography
+                                    variant='body2'
+                                    sx={{ fontSize: '14px' }}
+                                  >
                                     {tense}
                                   </Typography>
                                 }
@@ -342,13 +340,19 @@ export default function SettingsModal({ open, onClose }: SettingsModalProps) {
               </FormControl>
 
               {successMessage && (
-                <Alert severity='success' sx={{ mt: 1.5, py: 0.5, fontSize: '14px' }}>
+                <Alert
+                  severity='success'
+                  sx={{ mt: 1.5, py: 0.5, fontSize: '14px' }}
+                >
                   {successMessage}
                 </Alert>
               )}
 
               {errorMessage && (
-                <Alert severity='error' sx={{ mt: 1.5, py: 0.5, fontSize: '14px' }}>
+                <Alert
+                  severity='error'
+                  sx={{ mt: 1.5, py: 0.5, fontSize: '14px' }}
+                >
                   {errorMessage}
                 </Alert>
               )}
@@ -358,9 +362,9 @@ export default function SettingsModal({ open, onClose }: SettingsModalProps) {
       </DialogContent>
       <Divider />
       <DialogActions sx={{ px: 2, py: 1.5 }}>
-        <Button 
-          onClick={handleClose} 
-          variant='outlined' 
+        <Button
+          onClick={handleClose}
+          variant='outlined'
           disabled={isUpdating}
           size='small'
         >
