@@ -6,6 +6,9 @@ import React, {
   useMemo,
   useTransition,
 } from 'react'
+
+import RefreshIcon from '@mui/icons-material/Refresh'
+import TranslateIcon from '@mui/icons-material/Translate'
 import {
   Container,
   Typography,
@@ -28,8 +31,7 @@ import {
   MenuItem,
 } from '@mui/material'
 import { styled } from '@mui/material/styles'
-import TranslateIcon from '@mui/icons-material/Translate'
-import RefreshIcon from '@mui/icons-material/Refresh'
+
 import {
   useGetAdjectivesForPracticeQuery,
   useGetAdjectiveStatisticsQuery,
