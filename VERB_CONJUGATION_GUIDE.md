@@ -185,7 +185,7 @@ Click the expand button to see the full conjugation details for any verb.
 
 ## Sample Files
 
-A sample conjugation file is provided in the `sample-conjugations` directory:
+A sample conjugation file is provided in the `data/samples/conjugations` directory:
 
 - `aiutare.json` - Complete conjugation for the verb "aiutare" (to help)
 

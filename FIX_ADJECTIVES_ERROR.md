@@ -40,7 +40,7 @@ yarn dev
 
 1. Navigate to: http://localhost:3000/admin
 2. Click the **"Manage Adjectives"** tab (5th tab)
-3. Upload the `sample-adjectives.json` file
+3. Upload the `data/samples/adjectives.json` file
 4. Verify the import works!
 
 ## 🎯 Expected Result

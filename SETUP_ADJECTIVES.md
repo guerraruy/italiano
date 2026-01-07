@@ -72,7 +72,7 @@ Once you've completed the setup:
 
 1. Navigate to http://localhost:3000/admin
 2. Click on the **"Manage Adjectives"** tab (5th tab)
-3. Test the import feature with `sample-adjectives.json`
+3. Test the import feature with `data/samples/adjectives.json`
 
 ## What Was Implemented
 
@@ -85,7 +85,7 @@ Once you've completed the setup:
 
 ## Files Ready to Use
 
-- `sample-adjectives.json` - 10 sample adjectives for testing
+- `data/samples/adjectives.json` - 10 sample adjectives for testing
 - `ADJECTIVES_FEATURE_SUMMARY.md` - Complete documentation
 
 The feature is fully implemented and just needs the Prisma client to be regenerated!

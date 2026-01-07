@@ -43,7 +43,7 @@ The "Words Translations" page has been successfully renamed to "Nouns Translatio
 ### ✅ 6. Documentation
 
 - `NOUN_IMPORT_GUIDE.md` - Complete usage guide
-- `sample-nouns.json` - Example import file
+- `data/samples/nouns.json` - Example import file
 - `NOUNS_FEATURE_SUMMARY.md` - Technical documentation
 
 ## 🚀 How to Use
@@ -74,7 +74,7 @@ yarn dev
 ### Step 4: Import Nouns
 
 1. Click **"Choose JSON File"**
-2. Select `sample-nouns.json` or your own JSON file
+2. Select `data/samples/nouns.json` or your own JSON file
 3. Click **"Import Nouns"**
 4. If conflicts appear, resolve them by choosing "Keep Existing" or "Replace with New"
 5. Click **"Continue Import"**
@@ -111,7 +111,7 @@ yarn dev
 
 - ✨ `/app/api/admin/nouns/import/route.ts` - API endpoint
 - ✨ `/app/components/AdminPanel/internals/ManageNouns.tsx` - UI component
-- ✨ `/sample-nouns.json` - Sample data
+- ✨ `/data/samples/nouns.json` - Sample data
 - ✨ `/NOUN_IMPORT_GUIDE.md` - User guide
 - ✨ `/NOUNS_FEATURE_SUMMARY.md` - Technical docs
 - ✨ `/NOUNS_FEATURE_SUMMARY.md` - This file
@@ -170,7 +170,7 @@ yarn dev
    - Choose whether to keep or replace for each noun
 
 4. **Sample Data Included**
-   - `sample-nouns.json` contains 5 example nouns
+   - `data/samples/nouns.json` contains 5 example nouns
    - Use it to test the import functionality
    - Follow the same format for your own imports
 
@@ -203,7 +203,7 @@ When a noun already exists in the database:
 ## 📚 Additional Resources
 
 - **Usage Guide**: See `NOUN_IMPORT_GUIDE.md`
-- **Sample Data**: See `sample-nouns.json`
+- **Sample Data**: See `data/samples/nouns.json`
 - **Technical Details**: See `NOUNS_FEATURE_SUMMARY.md`
 
 ## ✅ All Tasks Completed

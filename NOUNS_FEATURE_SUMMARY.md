@@ -74,7 +74,7 @@ Updated `/app/components/AdminPanel/AdminPanel.tsx`:
 
 ### 7. Documentation & Sample Files
 Created:
-- `sample-nouns.json` - Example import file with 5 sample nouns
+- `data/samples/nouns.json` - Example import file with 5 sample nouns
 - `NOUN_IMPORT_GUIDE.md` - Comprehensive guide for importing nouns
 
 ## JSON Import Format
@@ -139,7 +139,7 @@ The import expects JSON files in this format:
 
 3. **Test the Feature:**
    - Log in as admin
-   - Try importing the `sample-nouns.json` file
+   - Try importing the `data/samples/nouns.json` file
    - Test conflict resolution by re-importing the same file
 
 ## Technical Architecture
@@ -211,7 +211,7 @@ Potential improvements for the feature:
 ### New Files:
 - `/app/api/admin/nouns/import/route.ts`
 - `/app/components/AdminPanel/internals/ManageNouns.tsx`
-- `/sample-nouns.json`
+- `/data/samples/nouns.json`
 - `/NOUN_IMPORT_GUIDE.md`
 - `/NOUNS_FEATURE_SUMMARY.md` (this file)
 
@@ -239,7 +239,7 @@ Potential improvements for the feature:
 
 For questions or issues:
 1. Check the `NOUN_IMPORT_GUIDE.md` for usage instructions
-2. Review the sample file `sample-nouns.json` for format reference
+2. Review the sample file `data/samples/nouns.json` for format reference
 3. Ensure you're logged in as an admin user
 4. Check browser console for client-side errors
 5. Check server logs for API errors

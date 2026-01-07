@@ -64,7 +64,7 @@ The import file must be a valid JSON file with the following structure:
 
 2. **Prepare Your JSON File**
    - Create or update a JSON file following the format above
-   - A sample file is included: `sample-verbs.json`
+   - A sample file is included: `data/samples/verbs.json`
 
 3. **Upload the File**
    - Click "Choose JSON File" button

@@ -18,7 +18,7 @@ yarn dev
 
 1. Open: http://localhost:3000/admin
 2. Click the **"Manage Adjectives"** tab (5th tab)
-3. Click "Choose JSON File" and select `sample-adjectives.json`
+3. Click "Choose JSON File" and select `data/samples/adjectives.json`
 4. Click "Import Adjectives"
 5. You should see: "Successfully imported 10 new adjectives"
 
@@ -41,7 +41,7 @@ Is now **completely resolved**! The Prisma client now knows about `prisma.adject
 
 ## Files Available
 
-- `sample-adjectives.json` - 10 test adjectives
+- `data/samples/adjectives.json` - 10 test adjectives
 - `ADJECTIVES_FEATURE_SUMMARY.md` - Complete documentation
 - All components and API routes are ready
 
