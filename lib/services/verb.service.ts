@@ -25,6 +25,7 @@ export class VerbService extends BaseService {
 
   /**
    * Get all verbs
+   * @returns List of all verbs ordered by Italian name
    */
   async getAllVerbs(): Promise<Verb[]> {
     try {
@@ -36,6 +37,8 @@ export class VerbService extends BaseService {
 
   /**
    * Get verbs with conjugations
+   * @param options - Pagination options (skip, take)
+   * @returns List of verbs with their conjugations
    */
   async getVerbsWithConjugations(options?: { skip?: number; take?: number }) {
     try {
@@ -47,6 +50,8 @@ export class VerbService extends BaseService {
 
   /**
    * Get verb by ID
+   * @param verbId - The ID of the verb to retrieve
+   * @returns The verb if found, null otherwise
    */
   async getVerbById(verbId: string): Promise<Verb | null> {
     try {
@@ -58,6 +63,10 @@ export class VerbService extends BaseService {
 
   /**
    * Update verb
+   * @param verbId - The ID of the verb to update
+   * @param input - The update data
+   * @returns The updated verb
+   * @throws Error if verb not found or Italian name conflict
    */
   async updateVerb(verbId: string, input: UpdateVerbInput): Promise<Verb> {
     try {
@@ -137,6 +146,9 @@ export class VerbService extends BaseService {
 
   /**
    * Delete conjugation
+   * @param conjugationId - The ID of the conjugation to delete
+   * @returns Void
+   * @throws Error if conjugation not found
    */
   async deleteConjugation(conjugationId: string): Promise<void> {
     try {

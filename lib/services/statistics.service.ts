@@ -15,6 +15,11 @@ export class StatisticsService extends BaseService {
 
   // ===== Verb Statistics =====
 
+  /**
+   * Get verb statistics for a user
+   * @param userId - The ID of the user
+   * @returns List of verb statistics
+   */
   async getVerbStatistics(userId: string) {
     try {
       return await statisticsRepository.findVerbStatisticsByUserId(userId)
@@ -23,6 +28,13 @@ export class StatisticsService extends BaseService {
     }
   }
 
+  /**
+   * Update verb statistic
+   * @param userId - The ID of the user
+   * @param verbId - The ID of the verb
+   * @param correct - Whether the answer was correct
+   * @returns The updated statistic
+   */
   async updateVerbStatistic(userId: string, verbId: string, correct: boolean) {
     try {
       this.logOperation('updateVerbStatistic', { userId, verbId, correct })
@@ -40,6 +52,12 @@ export class StatisticsService extends BaseService {
     }
   }
 
+  /**
+   * Reset verb statistics
+   * @param userId - The ID of the user
+   * @param verbId - The ID of the verb
+   * @returns Void
+   */
   async resetVerbStatistics(userId: string, verbId: string): Promise<void> {
     try {
       this.logOperation('resetVerbStatistics', { userId, verbId })
@@ -51,6 +69,11 @@ export class StatisticsService extends BaseService {
 
   // ===== Noun Statistics =====
 
+  /**
+   * Get noun statistics for a user
+   * @param userId - The ID of the user
+   * @returns List of noun statistics
+   */
   async getNounStatistics(userId: string) {
     try {
       return await statisticsRepository.findNounStatisticsByUserId(userId)
@@ -59,6 +82,13 @@ export class StatisticsService extends BaseService {
     }
   }
 
+  /**
+   * Update noun statistic
+   * @param userId - The ID of the user
+   * @param nounId - The ID of the noun
+   * @param correct - Whether the answer was correct
+   * @returns The updated statistic
+   */
   async updateNounStatistic(userId: string, nounId: string, correct: boolean) {
     try {
       this.logOperation('updateNounStatistic', { userId, nounId, correct })
@@ -76,6 +106,12 @@ export class StatisticsService extends BaseService {
     }
   }
 
+  /**
+   * Reset noun statistics
+   * @param userId - The ID of the user
+   * @param nounId - The ID of the noun
+   * @returns Void
+   */
   async resetNounStatistics(userId: string, nounId: string): Promise<void> {
     try {
       this.logOperation('resetNounStatistics', { userId, nounId })
@@ -87,6 +123,11 @@ export class StatisticsService extends BaseService {
 
   // ===== Adjective Statistics =====
 
+  /**
+   * Get adjective statistics for a user
+   * @param userId - The ID of the user
+   * @returns List of adjective statistics
+   */
   async getAdjectiveStatistics(userId: string) {
     try {
       return await statisticsRepository.findAdjectiveStatisticsByUserId(userId)
@@ -95,6 +136,13 @@ export class StatisticsService extends BaseService {
     }
   }
 
+  /**
+   * Update adjective statistic
+   * @param userId - The ID of the user
+   * @param adjectiveId - The ID of the adjective
+   * @param correct - Whether the answer was correct
+   * @returns The updated statistic
+   */
   async updateAdjectiveStatistic(
     userId: string,
     adjectiveId: string,
@@ -120,6 +168,12 @@ export class StatisticsService extends BaseService {
     }
   }
 
+  /**
+   * Reset adjective statistics
+   * @param userId - The ID of the user
+   * @param adjectiveId - The ID of the adjective
+   * @returns Void
+   */
   async resetAdjectiveStatistics(
     userId: string,
     adjectiveId: string
@@ -184,6 +238,12 @@ export class StatisticsService extends BaseService {
     }
   }
 
+  /**
+   * Reset conjugation statistics
+   * @param userId - The ID of the user
+   * @param verbId - The ID of the verb
+   * @returns Void
+   */
   async resetConjugationStatistics(
     userId: string,
     verbId: string

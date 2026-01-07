@@ -94,6 +94,9 @@ export class AdjectiveService extends BaseService {
 
   /**
    * Delete adjective
+   * @param adjectiveId - The ID of the adjective to delete
+   * @returns Void
+   * @throws Error if adjective not found
    */
   async deleteAdjective(adjectiveId: string): Promise<void> {
     try {

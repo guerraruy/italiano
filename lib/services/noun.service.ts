@@ -29,6 +29,7 @@ export class NounService extends BaseService {
 
   /**
    * Get all nouns
+   * @returns List of all nouns ordered by Italian name
    */
   async getAllNouns(): Promise<Noun[]> {
     try {
@@ -51,6 +52,10 @@ export class NounService extends BaseService {
 
   /**
    * Update noun
+   * @param nounId - The ID of the noun to update
+   * @param input - The update data
+   * @returns The updated noun
+   * @throws Error if noun not found or Italian name conflict
    */
   async updateNoun(nounId: string, input: UpdateNounInput): Promise<Noun> {
     try {

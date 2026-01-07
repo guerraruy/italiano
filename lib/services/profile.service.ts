@@ -33,6 +33,9 @@ export class ProfileService extends BaseService {
 
   /**
    * Update user profile
+   * @param userId - The ID of the user
+   * @param input - The update data
+   * @returns The updated user profile
    */
   async updateProfile(
     userId: string,

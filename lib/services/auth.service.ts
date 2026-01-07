@@ -145,6 +145,10 @@ export class AuthService extends BaseService {
 
   /**
    * Change user password
+   * @param userId - ID of the user
+   * @param input - Current and new passwords
+   * @returns Void
+   * @throws Error if user not found or current password is incorrect
    */
   async changePassword(
     userId: string,

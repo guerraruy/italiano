@@ -17,6 +17,8 @@ export class UserService extends BaseService {
 
   /**
    * Get user by ID
+   * @param userId - The ID of the user
+   * @returns The user if found, null otherwise
    */
   async getUserById(userId: string): Promise<User | null> {
     try {
@@ -28,6 +30,8 @@ export class UserService extends BaseService {
 
   /**
    * Get user with profile
+   * @param userId - The ID of the user
+   * @returns The user with profile if found, null otherwise
    */
   async getUserWithProfile(userId: string) {
     try {
@@ -63,6 +67,8 @@ export class UserService extends BaseService {
 
   /**
    * Delete user
+   * @param userId - The ID of the user to delete
+   * @returns Void
    */
   async deleteUser(userId: string): Promise<void> {
     try {
