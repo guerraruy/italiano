@@ -1,9 +1,7 @@
-import bcrypt from 'bcryptjs'
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 
-import { generateAccessToken } from '@/lib/auth'
-import { prisma } from '@/lib/prisma'
+import { authService } from '@/lib/services'
 import { registerSchema } from '@/lib/validation/auth'
 
 export async function POST(request: NextRequest) {
@@ -12,51 +10,16 @@ export async function POST(request: NextRequest) {
 
     // Validate input
     const validatedData = registerSchema.parse(body)
-    const { username, email, password, name } = validatedData
 
-    // Check if user already exists
-    const existingUser = await prisma.user.findFirst({
-      where: {
-        OR: [{ username }, { email }],
-      },
-    })
-
-    if (existingUser) {
-      return NextResponse.json(
-        { error: 'Username or email already exists' },
-        { status: 409 }
-      )
-    }
-
-    // Hash password
-    const hashedPassword = await bcrypt.hash(password, 10)
-
-    // Create user
-    const user = await prisma.user.create({
-      data: {
-        username,
-        email,
-        password: hashedPassword,
-        name: name || null,
-      },
-      select: {
-        id: true,
-        username: true,
-        email: true,
-        name: true,
-        admin: true,
-        createdAt: true,
-      },
-    })
-
-    // Generate JWT token
-    const token = generateAccessToken(user.id)
+    // Use auth service for registration
+    const result = await authService.register(validatedData)
 
     return NextResponse.json(
       {
         message: 'User created successfully',
-        user,
-        token,
+        user: result.user,
+        token: result.accessToken,
+        refreshToken: result.refreshToken,
       },
       { status: 201 }
     )
@@ -66,6 +29,15 @@ export async function POST(request: NextRequest) {
         { error: 'Validation failed', details: error.issues },
         { status: 400 }
       )
+    }
+
+    if (error instanceof Error) {
+      if (
+        error.message === 'Username already exists' ||
+        error.message === 'Email already exists'
+      ) {
+        return NextResponse.json({ error: error.message }, { status: 409 })
+      }
     }
 
     return NextResponse.json(

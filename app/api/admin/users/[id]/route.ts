@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 
 import { withAdmin } from '@/lib/auth'
-import { prisma } from '@/lib/prisma'
+import { userService } from '@/lib/services'
 import { updateUserSchema, userIdSchema } from '@/lib/validation/users'
 
 // DELETE: Remove a user (admin only)
@@ -25,9 +25,8 @@ export async function DELETE(
         )
       }
 
-      await prisma.user.delete({
-        where: { id },
-      })
+      // Use user service to delete user
+      await userService.deleteUser(id)
 
       return NextResponse.json({ message: 'User deleted successfully' })
     } catch (error) {
@@ -72,20 +71,19 @@ export async function PATCH(
       const validatedData = updateUserSchema.parse(body)
       const { admin } = validatedData
 
-      const updatedUser = await prisma.user.update({
-        where: { id },
-        data: { admin },
-        select: {
-          id: true,
-          username: true,
-          email: true,
-          name: true,
-          admin: true,
-          createdAt: true,
+      // Use user service to update admin status
+      const updatedUser = await userService.updateAdminStatus(id, admin)
+
+      return NextResponse.json({
+        user: {
+          id: updatedUser.id,
+          username: updatedUser.username,
+          email: updatedUser.email,
+          name: updatedUser.name,
+          admin: updatedUser.admin,
+          createdAt: updatedUser.createdAt,
         },
       })
-
-      return NextResponse.json({ user: updatedUser })
     } catch (error) {
       if (error instanceof z.ZodError) {
         return NextResponse.json(

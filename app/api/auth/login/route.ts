@@ -1,9 +1,7 @@
-import bcrypt from 'bcryptjs'
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 
-import { generateAccessToken, sanitizeUser } from '@/lib/auth'
-import { prisma } from '@/lib/prisma'
+import { authService } from '@/lib/services'
 import { loginSchema } from '@/lib/validation/auth'
 
 export async function POST(request: NextRequest) {
@@ -12,43 +10,15 @@ export async function POST(request: NextRequest) {
 
     // Validate input
     const validatedData = loginSchema.parse(body)
-    const { username, password } = validatedData
-
-    // Find user by username or email
-    const user = await prisma.user.findFirst({
-      where: {
-        OR: [{ username }, { email: username }],
-      },
-    })
-
-    if (!user) {
-      return NextResponse.json(
-        { error: 'Invalid credentials' },
-        { status: 401 }
-      )
-    }
-
-    // Verify password
-    const isValidPassword = await bcrypt.compare(password, user.password)
-
-    if (!isValidPassword) {
-      return NextResponse.json(
-        { error: 'Invalid credentials' },
-        { status: 401 }
-      )
-    }
-
-    // Generate JWT token
-    const token = generateAccessToken(user.id)
-
-    // Return user data (excluding password)
-    const userWithoutPassword = sanitizeUser(user)
+    // Use auth service for login
+    const result = await authService.login(validatedData)
 
     return NextResponse.json(
       {
         message: 'Login successful',
-        user: userWithoutPassword,
-        token,
+        user: result.user,
+        token: result.accessToken,
+        refreshToken: result.refreshToken,
       },
       { status: 200 }
     )
@@ -57,6 +27,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { error: 'Validation failed', details: error.issues },
         { status: 400 }
+      )
+    }
+
+    if (error instanceof Error && error.message === 'Invalid credentials') {
+      return NextResponse.json(
+        { error: 'Invalid credentials' },
+        { status: 401 }
       )
     }
 

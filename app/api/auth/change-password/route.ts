@@ -1,9 +1,8 @@
-import bcrypt from 'bcryptjs'
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 
 import { withAuth } from '@/lib/auth'
-import { prisma } from '@/lib/prisma'
+import { authService } from '@/lib/services'
 import { changePasswordSchema } from '@/lib/validation/auth'
 
 export const POST = withAuth(async (request: NextRequest, userId: string) => {
@@ -12,35 +11,9 @@ export const POST = withAuth(async (request: NextRequest, userId: string) => {
 
     // Validate input
     const validatedData = changePasswordSchema.parse(body)
-    const { currentPassword, newPassword } = validatedData
 
-    // Find user
-    const user = await prisma.user.findUnique({
-      where: { id: userId },
-    })
-
-    if (!user) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 })
-    }
-
-    // Verify current password
-    const isValidPassword = await bcrypt.compare(currentPassword, user.password)
-
-    if (!isValidPassword) {
-      return NextResponse.json(
-        { error: 'Current password is incorrect' },
-        { status: 401 }
-      )
-    }
-
-    // Hash new password
-    const hashedPassword = await bcrypt.hash(newPassword, 10)
-
-    // Update password
-    await prisma.user.update({
-      where: { id: user.id },
-      data: { password: hashedPassword },
-    })
+    // Use auth service to change password
+    await authService.changePassword(userId, validatedData)
 
     return NextResponse.json({
       success: true,
@@ -52,6 +25,18 @@ export const POST = withAuth(async (request: NextRequest, userId: string) => {
         { error: 'Validation failed', details: error.issues },
         { status: 400 }
       )
+    }
+
+    if (error instanceof Error) {
+      if (error.message === 'User not found') {
+        return NextResponse.json({ error: 'User not found' }, { status: 404 })
+      }
+      if (error.message === 'Current password is incorrect') {
+        return NextResponse.json(
+          { error: 'Current password is incorrect' },
+          { status: 401 }
+        )
+      }
     }
 
     return NextResponse.json(

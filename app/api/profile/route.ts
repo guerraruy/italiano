@@ -2,31 +2,14 @@ import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 
 import { withAuth } from '@/lib/auth'
-import { prisma } from '@/lib/prisma'
+import { profileService } from '@/lib/services'
 import { updateProfileSchema } from '@/lib/validation/profile'
 
 // GET /api/profile - Get user profile
 export const GET = withAuth(async (request: NextRequest, userId: string) => {
   try {
-    // Get or create user profile
-    let profile = await prisma.userProfile.findUnique({
-      where: { userId },
-    })
-
-    // If profile doesn't exist, create it with default values
-    if (!profile) {
-      profile = await prisma.userProfile.create({
-        data: {
-          userId,
-          nativeLanguage: 'pt-BR',
-          enabledVerbTenses: [
-            'Indicativo.Presente',
-            'Indicativo.Passato Prossimo',
-            'Indicativo.Futuro Semplice',
-          ],
-        },
-      })
-    }
+    // Use profile service to get or create profile
+    const profile = await profileService.getProfile(userId)
 
     return NextResponse.json({ profile }, { status: 200 })
   } catch (error) {
@@ -44,40 +27,9 @@ export const PATCH = withAuth(async (request: NextRequest, userId: string) => {
 
     // Validate input
     const validatedData = updateProfileSchema.parse(body)
-    const { nativeLanguage, enabledVerbTenses } = validatedData
 
-    // Get or create profile
-    let profile = await prisma.userProfile.findUnique({
-      where: { userId },
-    })
-
-    if (!profile) {
-      // Create profile if it doesn't exist
-      profile = await prisma.userProfile.create({
-        data: {
-          userId,
-          nativeLanguage: nativeLanguage || 'pt-BR',
-          enabledVerbTenses: enabledVerbTenses || [
-            'Indicativo.Presente',
-            'Indicativo.Passato Prossimo',
-            'Indicativo.Futuro Semplice',
-          ],
-        },
-      })
-    } else {
-      // Update existing profile
-      const updateData: {
-        nativeLanguage?: string
-        enabledVerbTenses?: string[]
-      } = {}
-      if (nativeLanguage) updateData.nativeLanguage = nativeLanguage
-      if (enabledVerbTenses) updateData.enabledVerbTenses = enabledVerbTenses
-
-      profile = await prisma.userProfile.update({
-        where: { userId },
-        data: updateData,
-      })
-    }
+    // Use profile service to update profile
+    const profile = await profileService.updateProfile(userId, validatedData)
 
     return NextResponse.json(
       {
