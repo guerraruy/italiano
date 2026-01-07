@@ -11,9 +11,9 @@ import {
 } from '@mui/material'
 import { styled } from '@mui/material/styles'
 
+import { PageHeader } from '../components/PageHeader'
 import { ResetStatisticsDialog } from './internals/components/AdjectiveItem/internals'
 import { AdjectivesList } from './internals/components/AdjectivesList'
-import { PageHeader } from './internals/components/PageHeader'
 import { useAdjectivesPractice } from './internals/hooks/useAdjectivesPractice'
 
 const PageContainer = styled(Container)(({ theme }) => ({
@@ -66,7 +66,7 @@ export default function AdjectivesTranslationsPage() {
   if (isLoading) {
     return (
       <PageContainer maxWidth='lg'>
-        <PageHeader />
+        <PageHeader title='Adjectives Translations' />
         <ContentPaper elevation={3}>
           <Box
             display='flex'
@@ -84,7 +84,7 @@ export default function AdjectivesTranslationsPage() {
   if (error) {
     return (
       <PageContainer maxWidth='lg'>
-        <PageHeader />
+        <PageHeader title='Adjectives Translations' />
         <ContentPaper elevation={3}>
           <Alert severity='error'>
             Error loading adjectives. Please try again later.
@@ -96,7 +96,7 @@ export default function AdjectivesTranslationsPage() {
 
   return (
     <PageContainer maxWidth='lg'>
-      <PageHeader />
+      <PageHeader title='Adjectives Translations' />
 
       <ContentPaper elevation={3}>
         <Typography

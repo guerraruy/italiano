@@ -1,9 +1,10 @@
 'use client'
 import { useState, useEffect } from 'react'
 
-import { Box, Typography, Alert, Tabs, Tab } from '@mui/material'
+import { Box, Alert, Tabs, Tab } from '@mui/material'
 import { useRouter } from 'next/navigation'
 
+import { PageHeader } from '@/app/components/PageHeader'
 import { useAuth } from '@/app/contexts/AuthContext'
 
 import {
@@ -44,9 +45,7 @@ export default function AdminPanel() {
 
   return (
     <Box sx={{ maxWidth: 1200, mx: 'auto', p: 3 }}>
-      <Typography variant='h4' sx={{ mb: 3 }}>
-        Administration Panel
-      </Typography>
+      <PageHeader title='Administration Panel' />
 
       {error && (
         <Alert severity='error' sx={{ mb: 2 }} onClose={() => setError(null)}>

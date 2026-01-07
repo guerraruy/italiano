@@ -12,11 +12,11 @@ import {
 import { styled } from '@mui/material/styles'
 
 import {
-  PageHeader,
   VerbFilters,
   ConjugationForm,
   ResetStatisticsDialog,
 } from './internals/components'
+import { PageHeader } from '../components/PageHeader'
 import { useVerbConjugationPractice } from './internals/hooks/useVerbConjugationPractice'
 
 const PageContainer = styled(Container)(({ theme }) => ({
@@ -60,7 +60,7 @@ export default function VerbTensesPage() {
   if (isLoading) {
     return (
       <PageContainer maxWidth='lg'>
-        <PageHeader />
+        <PageHeader title='Verb Tenses' />
         <ContentPaper elevation={3}>
           <Box
             display='flex'
@@ -78,7 +78,7 @@ export default function VerbTensesPage() {
   if (error) {
     return (
       <PageContainer maxWidth='lg'>
-        <PageHeader />
+        <PageHeader title='Verb Tenses' />
         <ContentPaper elevation={3}>
           <Alert severity='error'>
             Error loading verbs. Please try again later.
@@ -90,7 +90,7 @@ export default function VerbTensesPage() {
 
   return (
     <PageContainer maxWidth='lg'>
-      <PageHeader />
+      <PageHeader title='Verb Tenses' />
 
       <ContentPaper elevation={3}>
         <Typography

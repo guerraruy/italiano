@@ -11,7 +11,7 @@ import {
 } from '@mui/material'
 import { styled } from '@mui/material/styles'
 
-import { PageHeader } from './internals/components/PageHeader'
+import { PageHeader } from '../components/PageHeader'
 import { ResetStatisticsDialog } from './internals/components/VerbItem/internals'
 import { VerbsList } from './internals/components/VerbsList'
 import { useVerbsPractice } from './internals/hooks/useVerbsPractice'
@@ -59,7 +59,7 @@ export default function VerbsTranslationsPage() {
   if (isLoading) {
     return (
       <PageContainer maxWidth='lg'>
-        <PageHeader />
+        <PageHeader title='Verbs Translations' />
         <ContentPaper elevation={3}>
           <Box
             display='flex'
@@ -77,7 +77,7 @@ export default function VerbsTranslationsPage() {
   if (error) {
     return (
       <PageContainer maxWidth='lg'>
-        <PageHeader />
+        <PageHeader title='Verbs Translations' />
         <ContentPaper elevation={3}>
           <Alert severity='error'>
             Error loading verbs. Please try again later.
@@ -89,7 +89,7 @@ export default function VerbsTranslationsPage() {
 
   return (
     <PageContainer maxWidth='lg'>
-      <PageHeader />
+      <PageHeader title='Verbs Translations' />
 
       <ContentPaper elevation={3}>
         <Typography

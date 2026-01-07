@@ -11,9 +11,9 @@ import {
 } from '@mui/material'
 import { styled } from '@mui/material/styles'
 
+import { PageHeader } from '../components/PageHeader'
 import { ResetStatisticsDialog } from './internals/components/NounItem/internals'
 import { NounsList } from './internals/components/NounsList'
-import { PageHeader } from './internals/components/PageHeader'
 import { useNounsPractice } from './internals/hooks/useNounsPractice'
 
 const PageContainer = styled(Container)(({ theme }) => ({
@@ -58,7 +58,7 @@ export default function NounsTranslationsPage() {
   if (isLoading) {
     return (
       <PageContainer maxWidth='lg'>
-        <PageHeader />
+        <PageHeader title='Nouns Translations' />
         <ContentPaper elevation={3}>
           <Box
             display='flex'
@@ -76,7 +76,7 @@ export default function NounsTranslationsPage() {
   if (error) {
     return (
       <PageContainer maxWidth='lg'>
-        <PageHeader />
+        <PageHeader title='Nouns Translations' />
         <ContentPaper elevation={3}>
           <Alert severity='error'>
             Error loading nouns. Please try again later.
@@ -88,7 +88,7 @@ export default function NounsTranslationsPage() {
 
   return (
     <PageContainer maxWidth='lg'>
-      <PageHeader />
+      <PageHeader title='Nouns Translations' />
 
       <ContentPaper elevation={3}>
         <Typography
