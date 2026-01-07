@@ -1,9 +1,10 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
 import { Prisma } from '@prisma/client'
-import { withAdmin } from '@/lib/auth'
-import { importConjugationsSchema } from '@/lib/validation/verbs'
+import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
+
+import { withAdmin } from '@/lib/auth'
+import { prisma } from '@/lib/prisma'
+import { importConjugationsSchema } from '@/lib/validation/verbs'
 
 interface ConjugationData {
   [mood: string]: {
@@ -60,7 +61,9 @@ export async function POST(request: NextRequest) {
       )
 
       // Check for missing verbs
-      const missingVerbs = verbNames.filter((name) => !existingVerbMap.has(name))
+      const missingVerbs = verbNames.filter(
+        (name) => !existingVerbMap.has(name)
+      )
       if (missingVerbs.length > 0) {
         return NextResponse.json(
           {

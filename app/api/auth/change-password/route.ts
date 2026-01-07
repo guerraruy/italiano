@@ -1,9 +1,10 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
 import bcrypt from 'bcryptjs'
-import { withAuth } from '@/lib/auth'
-import { changePasswordSchema } from '@/lib/validation/auth'
+import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
+
+import { withAuth } from '@/lib/auth'
+import { prisma } from '@/lib/prisma'
+import { changePasswordSchema } from '@/lib/validation/auth'
 
 export const POST = withAuth(async (request: NextRequest, userId: string) => {
   try {
@@ -59,4 +60,3 @@ export const POST = withAuth(async (request: NextRequest, userId: string) => {
     )
   }
 })
-

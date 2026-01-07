@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
-import { withAuth } from '@/lib/auth'
-import { updateNounStatisticSchema } from '@/lib/validation/nouns'
 import { z } from 'zod'
+
+import { withAuth } from '@/lib/auth'
+import { prisma } from '@/lib/prisma'
+import { updateNounStatisticSchema } from '@/lib/validation/nouns'
 
 // GET /api/nouns/statistics - Get all noun statistics for the logged-in user
 export const GET = withAuth(async (request: NextRequest, userId: string) => {
@@ -20,14 +21,20 @@ export const GET = withAuth(async (request: NextRequest, userId: string) => {
     })
 
     // Return statistics as a map for easy lookup
-    const statsMap = statistics.reduce((acc, stat) => {
-      acc[stat.nounId] = {
-        correctAttempts: stat.correctAttempts,
-        wrongAttempts: stat.wrongAttempts,
-        lastPracticed: stat.lastPracticed,
-      }
-      return acc
-    }, {} as Record<string, { correctAttempts: number; wrongAttempts: number; lastPracticed: Date }>)
+    const statsMap = statistics.reduce(
+      (acc, stat) => {
+        acc[stat.nounId] = {
+          correctAttempts: stat.correctAttempts,
+          wrongAttempts: stat.wrongAttempts,
+          lastPracticed: stat.lastPracticed,
+        }
+        return acc
+      },
+      {} as Record<
+        string,
+        { correctAttempts: number; wrongAttempts: number; lastPracticed: Date }
+      >
+    )
 
     return NextResponse.json({ statistics: statsMap }, { status: 200 })
   } catch (error) {

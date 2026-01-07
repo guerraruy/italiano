@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
-import { withAdmin } from '@/lib/auth'
-import { updateVerbSchema, verbIdSchema } from '@/lib/validation/verbs'
 import { z } from 'zod'
+
+import { withAdmin } from '@/lib/auth'
+import { prisma } from '@/lib/prisma'
+import { updateVerbSchema, verbIdSchema } from '@/lib/validation/verbs'
 
 // PATCH /api/admin/verbs/[verbId] - Update a verb
 export async function PATCH(

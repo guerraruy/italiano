@@ -1,9 +1,10 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
 import { Prisma } from '@prisma/client'
-import { withAdmin } from '@/lib/auth'
-import { updateAdjectiveSchema } from '@/lib/validation/adjectives'
+import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
+
+import { withAdmin } from '@/lib/auth'
+import { prisma } from '@/lib/prisma'
+import { updateAdjectiveSchema } from '@/lib/validation/adjectives'
 
 // PATCH endpoint to update an adjective
 export async function PATCH(

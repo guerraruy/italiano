@@ -1,9 +1,10 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
 import { Prisma } from '@prisma/client'
-import { withAdmin } from '@/lib/auth'
-import { updateNounSchema } from '@/lib/validation/nouns'
+import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
+
+import { withAdmin } from '@/lib/auth'
+import { prisma } from '@/lib/prisma'
+import { updateNounSchema } from '@/lib/validation/nouns'
 
 // PATCH /api/admin/nouns/[nounId] - Update a noun
 export async function PATCH(

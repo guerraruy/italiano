@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
-import { withAuth } from '@/lib/auth'
-import { nounIdSchema } from '@/lib/validation/nouns'
 import { z } from 'zod'
+
+import { withAuth } from '@/lib/auth'
+import { prisma } from '@/lib/prisma'
+import { nounIdSchema } from '@/lib/validation/nouns'
 
 // DELETE /api/nouns/statistics/[nounId] - Reset noun statistics for a specific noun
 export async function DELETE(

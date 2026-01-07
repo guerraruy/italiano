@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
-import { withAuth } from '@/lib/auth'
-import { verbIdSchema } from '@/lib/validation/verbs'
 import { z } from 'zod'
+
+import { withAuth } from '@/lib/auth'
+import { prisma } from '@/lib/prisma'
+import { verbIdSchema } from '@/lib/validation/verbs'
 
 // DELETE /api/verbs/conjugations/statistics/[verbId] - Reset conjugation statistics for a verb
 export async function DELETE(
@@ -11,7 +12,7 @@ export async function DELETE(
 ) {
   return withAuth(async (request: NextRequest, userId: string) => {
     try {
-      const { verbId} = await context.params
+      const { verbId } = await context.params
 
       // Validate verbId
       verbIdSchema.parse({ verbId })

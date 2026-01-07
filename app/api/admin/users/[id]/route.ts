@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
-import { withAdmin } from '@/lib/auth'
-import { updateUserSchema, userIdSchema } from '@/lib/validation/users'
 import { z } from 'zod'
+
+import { withAdmin } from '@/lib/auth'
+import { prisma } from '@/lib/prisma'
+import { updateUserSchema, userIdSchema } from '@/lib/validation/users'
 
 // DELETE: Remove a user (admin only)
 export async function DELETE(

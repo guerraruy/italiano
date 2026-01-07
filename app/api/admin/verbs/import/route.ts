@@ -1,9 +1,10 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
 import { Verb } from '@prisma/client'
-import { withAdmin } from '@/lib/auth'
-import { importVerbsSchema } from '@/lib/validation/verbs'
+import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
+
+import { withAdmin } from '@/lib/auth'
+import { prisma } from '@/lib/prisma'
+import { importVerbsSchema } from '@/lib/validation/verbs'
 
 interface VerbData {
   regular: boolean

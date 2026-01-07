@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
+
 import { withAdmin } from '@/lib/auth'
+import { prisma } from '@/lib/prisma'
 
 // GET: List all users (admin only)
 export const GET = withAdmin(async (request: NextRequest, userId: string) => {

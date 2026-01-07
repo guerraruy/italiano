@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
-import { withAuth } from '@/lib/auth'
-import { adjectiveIdSchema } from '@/lib/validation/adjectives'
 import { z } from 'zod'
+
+import { withAuth } from '@/lib/auth'
+import { prisma } from '@/lib/prisma'
+import { adjectiveIdSchema } from '@/lib/validation/adjectives'
 
 // DELETE /api/adjectives/statistics/[adjectiveId] - Reset adjective statistics
 export async function DELETE(

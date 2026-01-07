@@ -1,9 +1,10 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
 import bcrypt from 'bcryptjs'
-import { generateAccessToken, sanitizeUser } from '@/lib/auth'
-import { loginSchema } from '@/lib/validation/auth'
+import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
+
+import { generateAccessToken, sanitizeUser } from '@/lib/auth'
+import { prisma } from '@/lib/prisma'
+import { loginSchema } from '@/lib/validation/auth'
 
 export async function POST(request: NextRequest) {
   try {

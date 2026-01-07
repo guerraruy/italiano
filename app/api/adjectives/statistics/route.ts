@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
-import { withAuth } from '@/lib/auth'
-import { updateAdjectiveStatisticSchema } from '@/lib/validation/adjectives'
 import { z } from 'zod'
+
+import { withAuth } from '@/lib/auth'
+import { prisma } from '@/lib/prisma'
+import { updateAdjectiveStatisticSchema } from '@/lib/validation/adjectives'
 
 // GET /api/adjectives/statistics - Get all adjective statistics for the logged-in user
 export const GET = withAuth(async (request: NextRequest, userId: string) => {

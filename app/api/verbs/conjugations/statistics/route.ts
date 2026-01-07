@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
-import { withAuth } from '@/lib/auth'
-import { updateConjugationStatisticSchema } from '@/lib/validation/verbs'
 import { z } from 'zod'
+
+import { withAuth } from '@/lib/auth'
+import { prisma } from '@/lib/prisma'
+import { updateConjugationStatisticSchema } from '@/lib/validation/verbs'
 
 // GET /api/verbs/conjugations/statistics - Get all conjugation statistics for the logged-in user
 export const GET = withAuth(async (request: NextRequest, userId: string) => {

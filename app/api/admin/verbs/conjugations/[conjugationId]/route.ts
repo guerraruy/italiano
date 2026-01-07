@@ -1,9 +1,10 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
 import { Prisma } from '@prisma/client'
-import { withAdmin } from '@/lib/auth'
-import { updateConjugationSchema } from '@/lib/validation/verbs'
+import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
+
+import { withAdmin } from '@/lib/auth'
+import { prisma } from '@/lib/prisma'
+import { updateConjugationSchema } from '@/lib/validation/verbs'
 
 interface ConjugationData {
   [mood: string]: {

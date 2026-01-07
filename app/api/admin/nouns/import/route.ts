@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
-import { withAdmin } from '@/lib/auth'
-import { importNounsSchema } from '@/lib/validation/nouns'
 import { z } from 'zod'
+
+import { withAdmin } from '@/lib/auth'
+import { prisma } from '@/lib/prisma'
+import { importNounsSchema } from '@/lib/validation/nouns'
 
 interface NounTranslations {
   it: string

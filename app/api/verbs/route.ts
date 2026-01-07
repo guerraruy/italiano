@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
+
 import { withAuth } from '@/lib/auth'
+import { prisma } from '@/lib/prisma'
 
 // GET /api/verbs - Get all verbs for translation practice
 export const GET = withAuth(async (request: NextRequest, userId: string) => {
