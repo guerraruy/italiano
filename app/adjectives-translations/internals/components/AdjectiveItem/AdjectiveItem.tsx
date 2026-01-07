@@ -7,41 +7,14 @@ import {
   InputAdornment,
   Typography,
 } from '@mui/material'
-import { styled } from '@mui/material/styles'
 import ClearIcon from '@mui/icons-material/Clear'
 import LightbulbOutlinedIcon from '@mui/icons-material/LightbulbOutlined'
 import DeleteSweepIcon from '@mui/icons-material/DeleteSweep'
-import { ListItem } from '@mui/material'
-import { Statistics } from '../../components/Statistics'
 
-const AdjectiveListItem = styled(ListItem)(({ theme }) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  gap: theme.spacing(2),
-  padding: theme.spacing(3),
-  borderBottom: `1px solid ${theme.palette.divider}`,
-  '&:last-child': {
-    borderBottom: 'none',
-  },
-  [theme.breakpoints.up('md')]: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-}))
+import { Statistics } from '@/app/components/Statistics'
 
-const AdjectiveInfo = styled(Box)(({ theme }) => ({
-  display: 'flex',
-  alignItems: 'center',
-  gap: theme.spacing(2),
-  minWidth: '200px',
-}))
-
-interface InputValues {
-  masculineSingular: string
-  masculinePlural: string
-  feminineSingular: string
-  femininePlural: string
-}
+import { AdjectiveListItem, AdjectiveInfo } from './styled'
+import { InputValues } from '../../types'
 
 interface ValidationState {
   masculineSingular: 'correct' | 'incorrect' | null
@@ -61,31 +34,32 @@ interface AdjectiveItemProps {
     translation: string
   }
   index: number
-  inputValues: InputValues
+  inputValues: InputValues[string]
   validationState: ValidationState
   statistics: { correct: number; wrong: number }
   onInputChange: (
     adjectiveId: string,
-    field: keyof InputValues,
+    field: keyof InputValues[string],
     value: string
   ) => void
   onValidation: (
     adjectiveId: string,
-    field: keyof InputValues,
+    field: keyof InputValues[string],
     correctAnswer: string
   ) => void
-  onClearInput: (adjectiveId: string, field?: keyof InputValues) => void
+  onClearInput: (adjectiveId: string, field?: keyof InputValues[string]) => void
   onShowAnswer: (adjectiveId: string) => void
   onResetStatistics: (adjectiveId: string) => void
   onKeyDown: (
     e: React.KeyboardEvent,
     adjectiveId: string,
-    field: keyof InputValues,
+    field: keyof InputValues[string],
     index: number
   ) => void
-  inputRefs: React.MutableRefObject<{
-    [key: string]: HTMLInputElement | null
-  }>
+  setInputRef: (
+    adjectiveId: string,
+    field: keyof InputValues[string]
+  ) => (el: HTMLInputElement | null) => void
 }
 
 const AdjectiveItem = ({
@@ -100,43 +74,30 @@ const AdjectiveItem = ({
   onShowAnswer,
   onResetStatistics,
   onKeyDown,
-  inputRefs,
+  setInputRef,
 }: AdjectiveItemProps) => {
-  const setInputRef = useCallback(
-    (key: string, el: HTMLInputElement | null) => {
-      // Modifying ref.current is the correct way to use refs in React
-      inputRefs.current[key] = el
-    },
-    // Refs are stable and don't need to be in dependency arrays
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
-  )
-
-  const getInputStyle = (field: keyof InputValues) => {
-    if (validationState[field] === 'correct') {
-      return {
-        backgroundColor: '#c8e6c9',
-        '& .MuiOutlinedInput-root': {
+  const getInputStyle = useCallback(
+    (field: keyof InputValues[string]) => {
+      if (validationState[field] === 'correct') {
+        return {
           backgroundColor: '#c8e6c9',
-        },
+          '& .MuiOutlinedInput-root': {
+            backgroundColor: '#c8e6c9',
+          },
+        }
       }
-    }
-    if (validationState[field] === 'incorrect') {
-      return {
-        backgroundColor: '#ffcdd2',
-        '& .MuiOutlinedInput-root': {
+      if (validationState[field] === 'incorrect') {
+        return {
           backgroundColor: '#ffcdd2',
-        },
+          '& .MuiOutlinedInput-root': {
+            backgroundColor: '#ffcdd2',
+          },
+        }
       }
-    }
-    return {}
-  }
-
-  const allCorrect =
-    validationState.masculineSingular === 'correct' &&
-    validationState.masculinePlural === 'correct' &&
-    validationState.feminineSingular === 'correct' &&
-    validationState.femininePlural === 'correct'
+      return {}
+    },
+    [validationState]
+  )
 
   return (
     <AdjectiveListItem>
@@ -148,9 +109,6 @@ const AdjectiveItem = ({
         >
           {adjective.translation}
         </Typography>
-        {/* {allCorrect && (
-          <CheckIcon sx={{ color: 'success.main', fontSize: 28 }} />
-        )} */}
       </AdjectiveInfo>
 
       <Box
@@ -247,9 +205,7 @@ const AdjectiveItem = ({
               }
               sx={getInputStyle('masculineSingular')}
               autoComplete='off'
-              inputRef={(el) =>
-                setInputRef(`${adjective.id}-masculineSingular`, el)
-              }
+              inputRef={setInputRef(adjective.id, 'masculineSingular')}
               slotProps={{
                 input: {
                   endAdornment: (
@@ -291,9 +247,7 @@ const AdjectiveItem = ({
               }
               sx={getInputStyle('masculinePlural')}
               autoComplete='off'
-              inputRef={(el) =>
-                setInputRef(`${adjective.id}-masculinePlural`, el)
-              }
+              inputRef={setInputRef(adjective.id, 'masculinePlural')}
               slotProps={{
                 input: {
                   endAdornment: (
@@ -346,9 +300,7 @@ const AdjectiveItem = ({
               }
               sx={getInputStyle('feminineSingular')}
               autoComplete='off'
-              inputRef={(el) =>
-                setInputRef(`${adjective.id}-feminineSingular`, el)
-              }
+              inputRef={setInputRef(adjective.id, 'feminineSingular')}
               slotProps={{
                 input: {
                   endAdornment: (
@@ -390,9 +342,7 @@ const AdjectiveItem = ({
               }
               sx={getInputStyle('femininePlural')}
               autoComplete='off'
-              inputRef={(el) =>
-                setInputRef(`${adjective.id}-femininePlural`, el)
-              }
+              inputRef={setInputRef(adjective.id, 'femininePlural')}
               slotProps={{
                 input: {
                   endAdornment: (
@@ -476,27 +426,5 @@ const AdjectiveItem = ({
   )
 }
 
-// Use React.memo with custom comparison to prevent unnecessary re-renders
-export const MemoizedAdjectiveItem = React.memo(AdjectiveItem, (prev, next) => {
-  // Only re-render if relevant props have changed
-  return (
-    prev.adjective.id === next.adjective.id &&
-    prev.inputValues.masculineSingular === next.inputValues.masculineSingular &&
-    prev.inputValues.masculinePlural === next.inputValues.masculinePlural &&
-    prev.inputValues.feminineSingular === next.inputValues.feminineSingular &&
-    prev.inputValues.femininePlural === next.inputValues.femininePlural &&
-    prev.validationState.masculineSingular ===
-      next.validationState.masculineSingular &&
-    prev.validationState.masculinePlural ===
-      next.validationState.masculinePlural &&
-    prev.validationState.feminineSingular ===
-      next.validationState.feminineSingular &&
-    prev.validationState.femininePlural ===
-      next.validationState.femininePlural &&
-    prev.statistics.correct === next.statistics.correct &&
-    prev.statistics.wrong === next.statistics.wrong &&
-    prev.index === next.index
-  )
-})
+export default React.memo(AdjectiveItem)
 
-MemoizedAdjectiveItem.displayName = 'MemoizedAdjectiveItem'
