@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { z } from 'zod'
 
 import { withAdmin } from '@/lib/auth'
+import { handleApiError } from '@/lib/errors'
 import { verbService } from '@/lib/services'
 import { updateVerbSchema, verbIdSchema } from '@/lib/validation/verbs'
 
@@ -10,7 +10,7 @@ export async function PATCH(
   request: NextRequest,
   context: { params: Promise<{ verbId: string }> }
 ) {
-  return withAdmin(async (request: NextRequest, userId: string) => {
+  return withAdmin(async () => {
     try {
       const { verbId } = await context.params
 
@@ -30,29 +30,7 @@ export async function PATCH(
         verb: updatedVerb,
       })
     } catch (error) {
-      if (error instanceof z.ZodError) {
-        return NextResponse.json(
-          { error: 'Validation failed', details: error.issues },
-          { status: 400 }
-        )
-      }
-
-      if (error instanceof Error) {
-        if (error.message === 'Verb not found') {
-          return NextResponse.json({ error: 'Verb not found' }, { status: 404 })
-        }
-        if (error.message === 'A verb with this Italian name already exists') {
-          return NextResponse.json(
-            { error: 'A verb with this Italian name already exists' },
-            { status: 409 }
-          )
-        }
-      }
-
-      return NextResponse.json(
-        { error: 'Failed to update verb' },
-        { status: 500 }
-      )
+      return handleApiError(error)
     }
   })(request)
 }
@@ -62,7 +40,7 @@ export async function DELETE(
   request: NextRequest,
   context: { params: Promise<{ verbId: string }> }
 ) {
-  return withAdmin(async (request: NextRequest, userId: string) => {
+  return withAdmin(async () => {
     try {
       const { verbId } = await context.params
 
@@ -76,21 +54,7 @@ export async function DELETE(
         message: 'Verb deleted successfully',
       })
     } catch (error) {
-      if (error instanceof z.ZodError) {
-        return NextResponse.json(
-          { error: 'Validation failed', details: error.issues },
-          { status: 400 }
-        )
-      }
-
-      if (error instanceof Error && error.message === 'Verb not found') {
-        return NextResponse.json({ error: 'Verb not found' }, { status: 404 })
-      }
-
-      return NextResponse.json(
-        { error: 'Failed to delete verb' },
-        { status: 500 }
-      )
+      return handleApiError(error)
     }
   })(request)
 }

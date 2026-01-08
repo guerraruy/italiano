@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { z } from 'zod'
 
 import { withAdmin } from '@/lib/auth'
+import { handleApiError, ValidationError } from '@/lib/errors'
 import { adjectiveService } from '@/lib/services'
 import { updateAdjectiveSchema } from '@/lib/validation/adjectives'
 
@@ -10,15 +10,12 @@ export async function PATCH(
   request: NextRequest,
   context: { params: Promise<{ adjectiveId: string }> }
 ) {
-  return withAdmin(async (request: NextRequest, userId: string) => {
+  return withAdmin(async () => {
     try {
       const { adjectiveId } = await context.params
 
       if (!adjectiveId) {
-        return NextResponse.json(
-          { error: 'Adjective ID is required' },
-          { status: 400 }
-        )
+        throw new ValidationError('Adjective ID is required')
       }
 
       const body = await request.json()
@@ -37,34 +34,7 @@ export async function PATCH(
         adjective: updatedAdjective,
       })
     } catch (error) {
-      if (error instanceof z.ZodError) {
-        return NextResponse.json(
-          { error: 'Validation failed', details: error.issues },
-          { status: 400 }
-        )
-      }
-
-      if (error instanceof Error) {
-        if (error.message === 'Adjective not found') {
-          return NextResponse.json(
-            { error: 'Adjective not found' },
-            { status: 404 }
-          )
-        }
-        if (
-          error.message === 'An adjective with this Italian name already exists'
-        ) {
-          return NextResponse.json(
-            { error: 'An adjective with this Italian name already exists' },
-            { status: 409 }
-          )
-        }
-      }
-
-      return NextResponse.json(
-        { error: 'Failed to update adjective' },
-        { status: 500 }
-      )
+      return handleApiError(error)
     }
   })(request)
 }
@@ -74,15 +44,12 @@ export async function DELETE(
   request: NextRequest,
   context: { params: Promise<{ adjectiveId: string }> }
 ) {
-  return withAdmin(async (request: NextRequest, userId: string) => {
+  return withAdmin(async () => {
     try {
       const { adjectiveId } = await context.params
 
       if (!adjectiveId) {
-        return NextResponse.json(
-          { error: 'Adjective ID is required' },
-          { status: 400 }
-        )
+        throw new ValidationError('Adjective ID is required')
       }
 
       // Use adjective service to delete adjective
@@ -92,17 +59,7 @@ export async function DELETE(
         message: 'Adjective deleted successfully',
       })
     } catch (error) {
-      if (error instanceof Error && error.message === 'Adjective not found') {
-        return NextResponse.json(
-          { error: 'Adjective not found' },
-          { status: 404 }
-        )
-      }
-
-      return NextResponse.json(
-        { error: 'Failed to delete adjective' },
-        { status: 500 }
-      )
+      return handleApiError(error)
     }
   })(request)
 }

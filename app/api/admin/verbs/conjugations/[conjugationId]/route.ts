@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { z } from 'zod'
 
 import { withAdmin } from '@/lib/auth'
+import { handleApiError, ValidationError } from '@/lib/errors'
 import { verbService } from '@/lib/services'
 import { updateConjugationSchema } from '@/lib/validation/verbs'
 
@@ -10,15 +10,12 @@ export async function PATCH(
   request: NextRequest,
   context: { params: Promise<{ conjugationId: string }> }
 ) {
-  return withAdmin(async (request: NextRequest, userId: string) => {
+  return withAdmin(async () => {
     try {
       const { conjugationId } = await context.params
 
       if (!conjugationId) {
-        return NextResponse.json(
-          { error: 'Conjugation ID is required' },
-          { status: 400 }
-        )
+        throw new ValidationError('Conjugation ID is required')
       }
 
       const body = await request.json()
@@ -38,24 +35,7 @@ export async function PATCH(
         conjugation: updated,
       })
     } catch (error) {
-      if (error instanceof z.ZodError) {
-        return NextResponse.json(
-          { error: 'Validation failed', details: error.issues },
-          { status: 400 }
-        )
-      }
-
-      if (error instanceof Error && error.message === 'Conjugation not found') {
-        return NextResponse.json(
-          { error: 'Conjugation not found' },
-          { status: 404 }
-        )
-      }
-
-      return NextResponse.json(
-        { error: 'Failed to update conjugation' },
-        { status: 500 }
-      )
+      return handleApiError(error)
     }
   })(request)
 }
@@ -65,15 +45,12 @@ export async function DELETE(
   request: NextRequest,
   context: { params: Promise<{ conjugationId: string }> }
 ) {
-  return withAdmin(async (request: NextRequest, userId: string) => {
+  return withAdmin(async () => {
     try {
       const { conjugationId } = await context.params
 
       if (!conjugationId) {
-        return NextResponse.json(
-          { error: 'Conjugation ID is required' },
-          { status: 400 }
-        )
+        throw new ValidationError('Conjugation ID is required')
       }
 
       // Use verb service to delete conjugation
@@ -83,17 +60,7 @@ export async function DELETE(
         message: 'Conjugation deleted successfully',
       })
     } catch (error) {
-      if (error instanceof Error && error.message === 'Conjugation not found') {
-        return NextResponse.json(
-          { error: 'Conjugation not found' },
-          { status: 404 }
-        )
-      }
-
-      return NextResponse.json(
-        { error: 'Failed to delete conjugation' },
-        { status: 500 }
-      )
+      return handleApiError(error)
     }
   })(request)
 }

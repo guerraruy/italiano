@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { z } from 'zod'
 
 import { withAuth } from '@/lib/auth'
-import { statisticsService, adjectiveService } from '@/lib/services'
+import { handleApiError, NotFoundError } from '@/lib/errors'
+import { adjectiveService, statisticsService } from '@/lib/services'
 import { updateAdjectiveStatisticSchema } from '@/lib/validation/adjectives'
 
 // GET /api/adjectives/statistics - Get all adjective statistics for the logged-in user
@@ -29,10 +29,7 @@ export const GET = withAuth(async (request: NextRequest, userId: string) => {
 
     return NextResponse.json({ statistics: statsMap }, { status: 200 })
   } catch (error) {
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    )
+    return handleApiError(error)
   }
 })
 
@@ -49,10 +46,7 @@ export const POST = withAuth(async (request: NextRequest, userId: string) => {
     const adjective = await adjectiveService.getAdjectiveById(adjectiveId)
 
     if (!adjective) {
-      return NextResponse.json(
-        { error: 'Adjective not found' },
-        { status: 404 }
-      )
+      throw new NotFoundError('Adjective')
     }
 
     // Use statistics service to update adjective statistic
@@ -70,16 +64,6 @@ export const POST = withAuth(async (request: NextRequest, userId: string) => {
       { status: 200 }
     )
   } catch (error) {
-    if (error instanceof z.ZodError) {
-      return NextResponse.json(
-        { error: 'Validation failed', details: error.issues },
-        { status: 400 }
-      )
-    }
-
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    )
+    return handleApiError(error)
   }
 })

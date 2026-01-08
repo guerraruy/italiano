@@ -1,9 +1,9 @@
 import { Prisma } from '@prisma/client'
 import { NextRequest, NextResponse } from 'next/server'
-import { z } from 'zod'
 
 import { withAdmin } from '@/lib/auth'
-import { verbRepository, conjugationRepository } from '@/lib/repositories'
+import { ConflictError, handleApiError, ValidationError } from '@/lib/errors'
+import { conjugationRepository, verbRepository } from '@/lib/repositories'
 import { importConjugationsSchema } from '@/lib/validation/verbs'
 
 interface ConjugationData {
@@ -35,8 +35,7 @@ type VerbWithConjugations = {
 }
 
 export async function POST(request: NextRequest) {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  return withAdmin(async (request: NextRequest, _userId: string) => {
+  return withAdmin(async () => {
     try {
       const body = await request.json()
 
@@ -77,9 +76,12 @@ export async function POST(request: NextRequest) {
         (name) => !existingVerbMap.has(name)
       )
       if (missingVerbs.length > 0) {
+        const error = new ValidationError(
+          'Some verbs do not exist in the database'
+        )
         return NextResponse.json(
           {
-            error: 'Some verbs do not exist in the database',
+            ...error.toJSON(),
             missingVerbs,
           },
           { status: 400 }
@@ -131,10 +133,13 @@ export async function POST(request: NextRequest) {
 
       // If there are unresolved conflicts, return them for user decision
       if (conflicts.length > 0) {
+        const error = new ConflictError(
+          'Conflicts detected. Please resolve before importing.'
+        )
         return NextResponse.json(
           {
+            ...error.toJSON(),
             conflicts,
-            message: 'Conflicts detected. Please resolve before importing.',
           },
           { status: 409 }
         )
@@ -171,35 +176,21 @@ export async function POST(request: NextRequest) {
         message: `Successfully imported ${created} new conjugations and updated ${updated} existing conjugations.`,
       })
     } catch (error) {
-      if (error instanceof z.ZodError) {
-        return NextResponse.json(
-          { error: 'Validation failed', details: error.issues },
-          { status: 400 }
-        )
-      }
-
-      return NextResponse.json(
-        { error: 'Failed to import conjugations' },
-        { status: 500 }
-      )
+      return handleApiError(error)
     }
   })(request)
 }
 
 // GET endpoint to fetch all verb conjugations
 export async function GET(request: NextRequest) {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  return withAdmin(async (_request: NextRequest, _userId: string) => {
+  return withAdmin(async () => {
     try {
       // Use conjugation repository to get all conjugations with verbs
       const conjugations = await conjugationRepository.findAllWithVerbs()
 
       return NextResponse.json({ conjugations })
-    } catch {
-      return NextResponse.json(
-        { error: 'Failed to fetch conjugations' },
-        { status: 500 }
-      )
+    } catch (error) {
+      return handleApiError(error)
     }
   })(request)
 }

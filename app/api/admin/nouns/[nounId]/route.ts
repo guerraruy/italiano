@@ -1,23 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server'
+
 import { withAdmin } from '@/lib/auth'
+import { handleApiError, ValidationError } from '@/lib/errors'
 import { nounService } from '@/lib/services'
 import { updateNounSchema } from '@/lib/validation/nouns'
-import { z } from 'zod'
 
 // PATCH /api/admin/nouns/[nounId] - Update a noun
 export async function PATCH(
   request: NextRequest,
   context: { params: Promise<{ nounId: string }> }
 ) {
-  return withAdmin(async (request: NextRequest, userId: string) => {
+  return withAdmin(async () => {
     try {
       const { nounId } = await context.params
 
       if (!nounId) {
-        return NextResponse.json(
-          { error: 'Noun ID is required' },
-          { status: 400 }
-        )
+        throw new ValidationError('Noun ID is required')
       }
 
       const body = await request.json()
@@ -33,29 +31,7 @@ export async function PATCH(
         noun: updatedNoun,
       })
     } catch (error) {
-      if (error instanceof z.ZodError) {
-        return NextResponse.json(
-          { error: 'Validation failed', details: error.issues },
-          { status: 400 }
-        )
-      }
-
-      if (error instanceof Error) {
-        if (error.message === 'Noun not found') {
-          return NextResponse.json({ error: 'Noun not found' }, { status: 404 })
-        }
-        if (error.message === 'A noun with this Italian name already exists') {
-          return NextResponse.json(
-            { error: 'A noun with this Italian name already exists' },
-            { status: 409 }
-          )
-        }
-      }
-
-      return NextResponse.json(
-        { error: 'Failed to update noun' },
-        { status: 500 }
-      )
+      return handleApiError(error)
     }
   })(request)
 }
@@ -65,15 +41,12 @@ export async function DELETE(
   request: NextRequest,
   context: { params: Promise<{ nounId: string }> }
 ) {
-  return withAdmin(async (request: NextRequest, userId: string) => {
+  return withAdmin(async () => {
     try {
       const { nounId } = await context.params
 
       if (!nounId) {
-        return NextResponse.json(
-          { error: 'Noun ID is required' },
-          { status: 400 }
-        )
+        throw new ValidationError('Noun ID is required')
       }
 
       // Use noun service to delete noun
@@ -83,14 +56,7 @@ export async function DELETE(
         message: 'Noun deleted successfully',
       })
     } catch (error) {
-      if (error instanceof Error && error.message === 'Noun not found') {
-        return NextResponse.json({ error: 'Noun not found' }, { status: 404 })
-      }
-
-      return NextResponse.json(
-        { error: 'Failed to delete noun' },
-        { status: 500 }
-      )
+      return handleApiError(error)
     }
   })(request)
 }

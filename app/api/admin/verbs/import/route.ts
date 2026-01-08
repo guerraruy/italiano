@@ -1,10 +1,11 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { withAdmin } from '@/lib/auth'
-import { verbService } from '@/lib/services'
-import { verbRepository } from '@/lib/repositories'
-import { importVerbsSchema } from '@/lib/validation/verbs'
-import { z } from 'zod'
 import type { Verb } from '@prisma/client'
+import { NextRequest, NextResponse } from 'next/server'
+
+import { withAdmin } from '@/lib/auth'
+import { ConflictError, handleApiError } from '@/lib/errors'
+import { verbRepository } from '@/lib/repositories'
+import { verbService } from '@/lib/services'
+import { importVerbsSchema } from '@/lib/validation/verbs'
 
 interface VerbData {
   regular: boolean
@@ -25,7 +26,7 @@ interface ConflictVerb {
 }
 
 export async function POST(request: NextRequest) {
-  return withAdmin(async (request: NextRequest, userId: string) => {
+  return withAdmin(async () => {
     try {
       const body = await request.json()
 
@@ -91,10 +92,13 @@ export async function POST(request: NextRequest) {
 
       // If there are unresolved conflicts, return them for user decision
       if (conflicts.length > 0) {
+        const error = new ConflictError(
+          'Conflicts detected. Please resolve before importing.'
+        )
         return NextResponse.json(
           {
+            ...error.toJSON(),
             conflicts,
-            message: 'Conflicts detected. Please resolve before importing.',
           },
           { status: 409 }
         )
@@ -128,34 +132,21 @@ export async function POST(request: NextRequest) {
         message: `Successfully imported ${created} new verbs and updated ${updated} existing verbs.`,
       })
     } catch (error) {
-      if (error instanceof z.ZodError) {
-        return NextResponse.json(
-          { error: 'Validation failed', details: error.issues },
-          { status: 400 }
-        )
-      }
-
-      return NextResponse.json(
-        { error: 'Failed to import verbs' },
-        { status: 500 }
-      )
+      return handleApiError(error)
     }
   })(request)
 }
 
 // GET endpoint to fetch all verbs
 export async function GET(request: NextRequest) {
-  return withAdmin(async (request: NextRequest, userId: string) => {
+  return withAdmin(async () => {
     try {
       // Use verb service to get all verbs
       const verbs = await verbService.getAllVerbs()
 
       return NextResponse.json({ verbs })
     } catch (error) {
-      return NextResponse.json(
-        { error: 'Failed to fetch verbs' },
-        { status: 500 }
-      )
+      return handleApiError(error)
     }
   })(request)
 }

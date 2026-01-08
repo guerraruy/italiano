@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { z } from 'zod'
 
 import { withAdmin } from '@/lib/auth'
+import { handleApiError, ValidationError } from '@/lib/errors'
 import { userService } from '@/lib/services'
 import { updateUserSchema, userIdSchema } from '@/lib/validation/users'
 
@@ -10,7 +10,7 @@ export async function DELETE(
   request: NextRequest,
   context: { params: Promise<{ id: string }> }
 ) {
-  return withAdmin(async (request: NextRequest, userId: string) => {
+  return withAdmin(async (_request: NextRequest, userId: string) => {
     try {
       const { id } = await context.params
 
@@ -19,10 +19,7 @@ export async function DELETE(
 
       // Prevent admin from deleting themselves
       if (id === userId) {
-        return NextResponse.json(
-          { error: 'Cannot delete your own account' },
-          { status: 400 }
-        )
+        throw new ValidationError('Cannot delete your own account')
       }
 
       // Use user service to delete user
@@ -30,17 +27,7 @@ export async function DELETE(
 
       return NextResponse.json({ message: 'User deleted successfully' })
     } catch (error) {
-      if (error instanceof z.ZodError) {
-        return NextResponse.json(
-          { error: 'Validation failed', details: error.issues },
-          { status: 400 }
-        )
-      }
-
-      return NextResponse.json(
-        { error: 'Failed to delete user' },
-        { status: 500 }
-      )
+      return handleApiError(error)
     }
   })(request)
 }
@@ -50,7 +37,7 @@ export async function PATCH(
   request: NextRequest,
   context: { params: Promise<{ id: string }> }
 ) {
-  return withAdmin(async (request: NextRequest, userId: string) => {
+  return withAdmin(async (_request: NextRequest, userId: string) => {
     try {
       const { id } = await context.params
 
@@ -59,10 +46,7 @@ export async function PATCH(
 
       // Prevent admin from removing their own admin status
       if (id === userId) {
-        return NextResponse.json(
-          { error: 'Cannot modify your own admin status' },
-          { status: 400 }
-        )
+        throw new ValidationError('Cannot modify your own admin status')
       }
 
       const body = await request.json()
@@ -85,17 +69,7 @@ export async function PATCH(
         },
       })
     } catch (error) {
-      if (error instanceof z.ZodError) {
-        return NextResponse.json(
-          { error: 'Validation failed', details: error.issues },
-          { status: 400 }
-        )
-      }
-
-      return NextResponse.json(
-        { error: 'Failed to update user' },
-        { status: 500 }
-      )
+      return handleApiError(error)
     }
   })(request)
 }

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { z } from 'zod'
 
 import { withAdmin } from '@/lib/auth'
+import { ConflictError, handleApiError } from '@/lib/errors'
 import { nounRepository } from '@/lib/repositories'
 import { nounService } from '@/lib/services'
 import { importNounsSchema } from '@/lib/validation/nouns'
@@ -28,7 +28,7 @@ interface ConflictNoun {
 }
 
 export async function POST(request: NextRequest) {
-  return withAdmin(async (request: NextRequest, userId: string) => {
+  return withAdmin(async () => {
     try {
       const body = await request.json()
 
@@ -97,11 +97,12 @@ export async function POST(request: NextRequest) {
         }
       }
 
-      // If there are conflicts and no resolutions provided, return 409
+      // If there are conflicts and no resolutions provided, throw conflict error
       if (conflicts.length > 0 && !resolveConflicts) {
+        const error = new ConflictError('Conflicts found')
         return NextResponse.json(
           {
-            error: 'Conflicts found',
+            ...error.toJSON(),
             conflicts,
           },
           { status: 409 }
@@ -133,34 +134,21 @@ export async function POST(request: NextRequest) {
         updated,
       })
     } catch (error) {
-      if (error instanceof z.ZodError) {
-        return NextResponse.json(
-          { error: 'Validation failed', details: error.issues },
-          { status: 400 }
-        )
-      }
-
-      return NextResponse.json(
-        { error: 'Failed to import nouns' },
-        { status: 500 }
-      )
+      return handleApiError(error)
     }
   })(request)
 }
 
 // GET endpoint to fetch all nouns
 export async function GET(request: NextRequest) {
-  return withAdmin(async (request: NextRequest, userId: string) => {
+  return withAdmin(async () => {
     try {
       // Use noun service to get all nouns
       const nouns = await nounService.getAllNouns()
 
       return NextResponse.json({ nouns })
     } catch (error) {
-      return NextResponse.json(
-        { error: 'Failed to fetch nouns' },
-        { status: 500 }
-      )
+      return handleApiError(error)
     }
   })(request)
 }

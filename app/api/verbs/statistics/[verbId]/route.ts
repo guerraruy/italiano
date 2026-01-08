@@ -1,15 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server'
+
 import { withAuth } from '@/lib/auth'
+import { handleApiError, NotFoundError } from '@/lib/errors'
 import { statisticsService, verbService } from '@/lib/services'
 import { verbIdSchema } from '@/lib/validation/verbs'
-import { z } from 'zod'
 
 // DELETE /api/verbs/statistics/[verbId] - Reset verb statistics for a specific verb
 export async function DELETE(
   request: NextRequest,
   context: { params: Promise<{ verbId: string }> }
 ) {
-  return withAuth(async (request: NextRequest, userId: string) => {
+  return withAuth(async (_request: NextRequest, userId: string) => {
     try {
       const { verbId } = await context.params
 
@@ -20,7 +21,7 @@ export async function DELETE(
       const verb = await verbService.getVerbById(verbId)
 
       if (!verb) {
-        return NextResponse.json({ error: 'Verb not found' }, { status: 404 })
+        throw new NotFoundError('Verb')
       }
 
       // Use statistics service to reset verb statistics
@@ -33,17 +34,7 @@ export async function DELETE(
         { status: 200 }
       )
     } catch (error) {
-      if (error instanceof z.ZodError) {
-        return NextResponse.json(
-          { error: 'Validation failed', details: error.issues },
-          { status: 400 }
-        )
-      }
-
-      return NextResponse.json(
-        { error: 'Internal server error' },
-        { status: 500 }
-      )
+      return handleApiError(error)
     }
   })(request)
 }

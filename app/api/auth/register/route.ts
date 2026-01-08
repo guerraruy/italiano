@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { z } from 'zod'
 
+import { handleApiError } from '@/lib/errors'
 import { authService } from '@/lib/services'
 import { registerSchema } from '@/lib/validation/auth'
 
@@ -24,25 +24,6 @@ export async function POST(request: NextRequest) {
       { status: 201 }
     )
   } catch (error) {
-    if (error instanceof z.ZodError) {
-      return NextResponse.json(
-        { error: 'Validation failed', details: error.issues },
-        { status: 400 }
-      )
-    }
-
-    if (error instanceof Error) {
-      if (
-        error.message === 'Username already exists' ||
-        error.message === 'Email already exists'
-      ) {
-        return NextResponse.json({ error: error.message }, { status: 409 })
-      }
-    }
-
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    )
+    return handleApiError(error)
   }
 }

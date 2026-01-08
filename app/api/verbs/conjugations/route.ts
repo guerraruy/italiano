@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 
 import { withAuth } from '@/lib/auth'
-import { verbService, profileService } from '@/lib/services'
+import { handleApiError } from '@/lib/errors'
+import { profileService, verbService } from '@/lib/services'
 
 // GET /api/verbs/conjugations - Get verbs with their conjugations for practice
 export const GET = withAuth(async (request: NextRequest, userId: string) => {
@@ -42,10 +43,7 @@ export const GET = withAuth(async (request: NextRequest, userId: string) => {
       }))
 
     return NextResponse.json({ verbs }, { status: 200 })
-  } catch {
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    )
+  } catch (error) {
+    return handleApiError(error)
   }
 })

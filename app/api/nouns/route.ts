@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 
 import { withAuth } from '@/lib/auth'
+import { handleApiError } from '@/lib/errors'
 import { nounService } from '@/lib/services'
 
 // GET /api/nouns - Get all nouns for practice
@@ -25,9 +26,6 @@ export const GET = withAuth(async (request: NextRequest, userId: string) => {
 
     return NextResponse.json({ nouns }, { status: 200 })
   } catch (error) {
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    )
+    return handleApiError(error)
   }
 })

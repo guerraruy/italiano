@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
+
 import { withAuth } from '@/lib/auth'
+import { handleApiError, NotFoundError } from '@/lib/errors'
 import { statisticsService, verbService } from '@/lib/services'
 import { updateConjugationStatisticSchema } from '@/lib/validation/verbs'
-import { z } from 'zod'
 
 // GET /api/verbs/conjugations/statistics - Get all conjugation statistics for the logged-in user
-export const GET = withAuth(async (request: NextRequest, userId: string) => {
+export const GET = withAuth(async (_request: NextRequest, userId: string) => {
   try {
     // Use statistics service to get conjugation statistics
     const statistics = await statisticsService.getConjugationStatistics(userId)
@@ -28,10 +29,7 @@ export const GET = withAuth(async (request: NextRequest, userId: string) => {
 
     return NextResponse.json({ statistics: statsMap }, { status: 200 })
   } catch (error) {
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    )
+    return handleApiError(error)
   }
 })
 
@@ -48,7 +46,7 @@ export const POST = withAuth(async (request: NextRequest, userId: string) => {
     const verb = await verbService.getVerbById(verbId)
 
     if (!verb) {
-      return NextResponse.json({ error: 'Verb not found' }, { status: 404 })
+      throw new NotFoundError('Verb')
     }
 
     // Use statistics service to update conjugation statistic
@@ -69,16 +67,6 @@ export const POST = withAuth(async (request: NextRequest, userId: string) => {
       { status: 200 }
     )
   } catch (error) {
-    if (error instanceof z.ZodError) {
-      return NextResponse.json(
-        { error: 'Validation failed', details: error.issues },
-        { status: 400 }
-      )
-    }
-
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    )
+    return handleApiError(error)
   }
 })

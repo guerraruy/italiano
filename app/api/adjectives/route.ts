@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 
 import { withAuth } from '@/lib/auth'
-import { adjectiveService } from '@/lib/services'
-import { profileService } from '@/lib/services'
+import { handleApiError } from '@/lib/errors'
+import { adjectiveService, profileService } from '@/lib/services'
 
 interface AdjectiveGenderForms {
   singolare: {
@@ -49,10 +49,6 @@ export const GET = withAuth(async (request: NextRequest, userId: string) => {
 
     return NextResponse.json({ adjectives }, { status: 200 })
   } catch (error) {
-    console.error('Error in GET /api/adjectives:', error)
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    )
+    return handleApiError(error)
   }
 })

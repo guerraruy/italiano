@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { z } from 'zod'
 
+import { handleApiError } from '@/lib/errors'
 import { authService } from '@/lib/services'
 import { loginSchema } from '@/lib/validation/auth'
 
@@ -23,23 +23,6 @@ export async function POST(request: NextRequest) {
       { status: 200 }
     )
   } catch (error) {
-    if (error instanceof z.ZodError) {
-      return NextResponse.json(
-        { error: 'Validation failed', details: error.issues },
-        { status: 400 }
-      )
-    }
-
-    if (error instanceof Error && error.message === 'Invalid credentials') {
-      return NextResponse.json(
-        { error: 'Invalid credentials' },
-        { status: 401 }
-      )
-    }
-
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    )
+    return handleApiError(error)
   }
 }
