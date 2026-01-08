@@ -159,8 +159,35 @@ describe('ConjugationsList', () => {
   const mockOnError = jest.fn()
   const mockOnSuccess = jest.fn()
 
+  // Suppress console errors for RTK Query act() warnings in tests
+  const originalError = console.error
+
+  beforeAll(() => {
+    console.error = (...args: unknown[]) => {
+      // Suppress RTK Query act() warnings - these are false positives in our tests
+      if (
+        typeof args[0] === 'string' &&
+        (args[0].includes('not wrapped in act(...)') ||
+          args[0].includes('An unhandled error occurred'))
+      ) {
+        return
+      }
+      originalError.call(console, ...args)
+    }
+  })
+
+  afterAll(() => {
+    console.error = originalError
+  })
+
   beforeEach(() => {
     jest.clearAllMocks()
+    // Reset fetch mock
+    ;(global.fetch as jest.Mock).mockReset()
+  })
+
+  afterEach(() => {
+    jest.clearAllTimers()
   })
 
   describe('Loading State', () => {

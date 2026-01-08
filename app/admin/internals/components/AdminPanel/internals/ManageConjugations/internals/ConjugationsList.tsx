@@ -42,7 +42,7 @@ import {
   VerbConjugation,
 } from '@/app/store/api'
 
-import { EditConjugationDialog, DeleteConjugationDialog } from './'
+import { EditConjugationDialog, DeleteConjugationDialog, ImportConjugations } from './'
 
 interface ConjugationsListProps {
   onError: (message: string) => void
@@ -189,12 +189,15 @@ export default function ConjugationsList({
               mb: 2,
             }}
           >
-            <Typography variant='h6'>
-              Current Conjugations in Database ({filteredConjugations.length}
-              {deferredFilterText &&
-                ` of ${conjugationsData?.conjugations?.length || 0}`}
-              )
-            </Typography>
+            <Box display='flex' alignItems='center' gap={1}>
+              <Typography variant='h6'>
+                Current Conjugations in Database ({filteredConjugations.length}
+                {deferredFilterText &&
+                  ` of ${conjugationsData?.conjugations?.length || 0}`}
+                )
+              </Typography>
+              <ImportConjugations onError={onError} onSuccess={onSuccess} />
+            </Box>
             <TextField
               size='small'
               placeholder='Filter by verb name...'

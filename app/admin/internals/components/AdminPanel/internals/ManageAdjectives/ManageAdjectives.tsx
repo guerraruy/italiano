@@ -1,5 +1,5 @@
 'use client'
-import { ImportAdjectives, AdjectivesList } from './internals'
+import { AdjectivesList } from './internals'
 
 interface ManageAdjectivesProps {
   onError: (message: string) => void
@@ -7,11 +7,6 @@ interface ManageAdjectivesProps {
 }
 
 export default function ManageAdjectives({ onError, onSuccess }: ManageAdjectivesProps) {
-  return (
-    <>
-      <ImportAdjectives onError={onError} onSuccess={onSuccess} />
-      <AdjectivesList onError={onError} onSuccess={onSuccess} />
-    </>
-  )
+  return <AdjectivesList onError={onError} onSuccess={onSuccess} />
 }
 

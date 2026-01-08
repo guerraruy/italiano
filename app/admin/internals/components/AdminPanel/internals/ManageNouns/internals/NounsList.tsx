@@ -33,7 +33,7 @@ import {
   type ImportedNoun,
 } from '@/app/store/api'
 
-import { EditNounDialog, DeleteNounDialog } from './'
+import { EditNounDialog, DeleteNounDialog, ImportNouns } from './'
 
 interface NounsListProps {
   onError: (message: string) => void
@@ -111,10 +111,13 @@ export default function NounsList({ onError, onSuccess }: NounsListProps) {
               mb: 2,
             }}
           >
-            <Typography variant='h6'>
-              Current Nouns in Database ({filteredNouns.length}
-              {deferredFilterText && ` of ${nounsData?.nouns?.length || 0}`})
-            </Typography>
+            <Box display='flex' alignItems='center' gap={1}>
+              <Typography variant='h6'>
+                Current Nouns in Database ({filteredNouns.length}
+                {deferredFilterText && ` of ${nounsData?.nouns?.length || 0}`})
+              </Typography>
+              <ImportNouns onError={onError} onSuccess={onSuccess} />
+            </Box>
             <TextField
               size='small'
               placeholder='Filter by Italian name...'

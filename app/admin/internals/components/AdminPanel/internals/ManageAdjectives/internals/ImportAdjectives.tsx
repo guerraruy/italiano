@@ -10,8 +10,6 @@ import {
 } from '@mui/icons-material'
 import {
   Box,
-  Card,
-  CardContent,
   Typography,
   Dialog,
   DialogTitle,
@@ -23,6 +21,7 @@ import {
   IconButton,
   Chip,
   CircularProgress,
+  Tooltip,
 } from '@mui/material'
 
 import { ConflictAdjective, useImportAdjectivesMutation } from '@/app/store/api'
@@ -50,6 +49,7 @@ export default function ImportAdjectives({
   const [showAdjectiveConflictDialog, setShowAdjectiveConflictDialog] =
     useState(false)
   const [showFormatInfoDialog, setShowFormatInfoDialog] = useState(false)
+  const [showImportDialog, setShowImportDialog] = useState(false)
 
   const handleAdjectiveFileUpload = (
     event: React.ChangeEvent<HTMLInputElement>
@@ -128,21 +128,40 @@ export default function ImportAdjectives({
 
   return (
     <>
-      {/* Import Section */}
-      <Card sx={{ mb: 3 }}>
-        <CardContent>
-          <Box display='flex' alignItems='center' gap={1}>
-            <Typography variant='h6'>Import Adjectives from JSON</Typography>
-            <IconButton
-              size='small'
-              onClick={() => setShowFormatInfoDialog(true)}
-              color='primary'
-            >
-              <InfoOutlined />
-            </IconButton>
-          </Box>
+      {/* Import Icon */}
+      <Tooltip title='Import Adjectives from JSON'>
+        <IconButton
+          color='primary'
+          onClick={() => setShowImportDialog(true)}
+          disabled={importingAdjectives}
+        >
+          <CloudUpload />
+        </IconButton>
+      </Tooltip>
 
-          <Stack direction='row' spacing={2} alignItems='center' sx={{ mt: 2 }}>
+      {/* Import Dialog */}
+      <Dialog
+        open={showImportDialog}
+        onClose={() => setShowImportDialog(false)}
+        maxWidth='sm'
+        fullWidth
+      >
+        <DialogTitle>
+          <Box display='flex' alignItems='center' gap={1}>
+            Import Adjectives from JSON
+            <Tooltip title='View JSON Format Information'>
+              <IconButton
+                size='small'
+                onClick={() => setShowFormatInfoDialog(true)}
+                color='primary'
+              >
+                <InfoOutlined />
+              </IconButton>
+            </Tooltip>
+          </Box>
+        </DialogTitle>
+        <DialogContent>
+          <Stack direction='row' spacing={2} alignItems='center' sx={{ mt: 1 }}>
             <Button
               component='label'
               variant='outlined'
@@ -173,24 +192,32 @@ export default function ImportAdjectives({
                 Preview: {Object.keys(JSON.parse(adjectiveJsonContent)).length}{' '}
                 adjectives ready to import
               </Typography>
-              <Button
-                variant='contained'
-                onClick={handleImportAdjectives}
-                disabled={importingAdjectives}
-                startIcon={
-                  importingAdjectives ? (
-                    <CircularProgress size={20} />
-                  ) : (
-                    <CloudUpload />
-                  )
-                }
-              >
-                {importingAdjectives ? 'Importing...' : 'Import Adjectives'}
-              </Button>
             </Box>
           )}
-        </CardContent>
-      </Card>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setShowImportDialog(false)}>Cancel</Button>
+          {adjectiveJsonContent && (
+            <Button
+              variant='contained'
+              onClick={() => {
+                handleImportAdjectives()
+                setShowImportDialog(false)
+              }}
+              disabled={importingAdjectives}
+              startIcon={
+                importingAdjectives ? (
+                  <CircularProgress size={20} />
+                ) : (
+                  <CloudUpload />
+                )
+              }
+            >
+              {importingAdjectives ? 'Importing...' : 'Import Adjectives'}
+            </Button>
+          )}
+        </DialogActions>
+      </Dialog>
 
       {/* Adjective Conflict Resolution Dialog */}
       <Dialog

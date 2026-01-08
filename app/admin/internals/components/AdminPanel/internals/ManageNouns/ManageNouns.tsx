@@ -1,5 +1,5 @@
 'use client'
-import { ImportNouns, NounsList } from './internals'
+import { NounsList } from './internals'
 
 interface ManageNounsProps {
   onError: (message: string) => void
@@ -7,10 +7,5 @@ interface ManageNounsProps {
 }
 
 export default function ManageNouns({ onError, onSuccess }: ManageNounsProps) {
-  return (
-    <>
-      <ImportNouns onError={onError} onSuccess={onSuccess} />
-      <NounsList onError={onError} onSuccess={onSuccess} />
-    </>
-  )
+  return <NounsList onError={onError} onSuccess={onSuccess} />
 }

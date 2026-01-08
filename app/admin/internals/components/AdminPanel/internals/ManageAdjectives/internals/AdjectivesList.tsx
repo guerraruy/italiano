@@ -27,7 +27,7 @@ import {
   TablePagination,
 } from '@mui/material'
 
-import { EditAdjectiveDialog, DeleteAdjectiveDialog } from './'
+import { EditAdjectiveDialog, DeleteAdjectiveDialog, ImportAdjectives } from './'
 import {
   AdjectiveGenderForms,
   ImportedAdjective,
@@ -116,12 +116,15 @@ export default function AdjectivesList({
               mb: 2,
             }}
           >
-            <Typography variant='h6'>
-              Current Adjectives in Database ({filteredAdjectives.length}
-              {deferredFilterText &&
-                ` of ${adjectivesData?.adjectives?.length || 0}`}
-              )
-            </Typography>
+            <Box display='flex' alignItems='center' gap={1}>
+              <Typography variant='h6'>
+                Current Adjectives in Database ({filteredAdjectives.length}
+                {deferredFilterText &&
+                  ` of ${adjectivesData?.adjectives?.length || 0}`}
+                )
+              </Typography>
+              <ImportAdjectives onError={onError} onSuccess={onSuccess} />
+            </Box>
             <TextField
               size='small'
               placeholder='Filter by Italian name...'

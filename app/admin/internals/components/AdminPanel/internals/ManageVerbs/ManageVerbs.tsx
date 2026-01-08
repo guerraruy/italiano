@@ -1,5 +1,5 @@
 'use client'
-import { ImportVerbs, VerbsList } from './internals'
+import { VerbsList } from './internals'
 
 interface ManageVerbsProps {
   onError: (message: string) => void
@@ -7,11 +7,6 @@ interface ManageVerbsProps {
 }
 
 export default function ManageVerbs({ onError, onSuccess }: ManageVerbsProps) {
-  return (
-    <>
-      <ImportVerbs onError={onError} onSuccess={onSuccess} />
-      <VerbsList onError={onError} onSuccess={onSuccess} />
-    </>
-  )
+  return <VerbsList onError={onError} onSuccess={onSuccess} />
 }
 

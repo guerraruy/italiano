@@ -35,41 +35,81 @@ describe('ImportAdjectives', () => {
     ])
   })
 
-  it('renders correctly', () => {
+  it('renders correctly', async () => {
     render(<ImportAdjectives onError={mockOnError} onSuccess={mockOnSuccess} />)
 
-    expect(screen.getByText('Import Adjectives from JSON')).toBeInTheDocument()
-    expect(screen.getByText('Choose JSON File')).toBeInTheDocument()
-    // Info button
-    expect(screen.getByTestId('InfoOutlinedIcon')).toBeInTheDocument()
+    // Initially shows only the upload icon button
+    const uploadButton = screen.getByRole('button', {
+      name: /Import Adjectives from JSON/i,
+    })
+    expect(uploadButton).toBeInTheDocument()
+
+    // Click to open the dialog
+    fireEvent.click(uploadButton)
+
+    // Now the dialog content should be visible
+    await waitFor(() => {
+      expect(screen.getByText('Import Adjectives from JSON')).toBeInTheDocument()
+      expect(screen.getByText('Choose JSON File')).toBeInTheDocument()
+      expect(screen.getByTestId('InfoOutlinedIcon')).toBeInTheDocument()
+    })
   })
 
-  it('opens format info dialog', () => {
+  it('opens format info dialog', async () => {
     render(<ImportAdjectives onError={mockOnError} onSuccess={mockOnSuccess} />)
 
+    // First open the import dialog
+    const uploadButton = screen.getByRole('button', {
+      name: /Import Adjectives from JSON/i,
+    })
+    fireEvent.click(uploadButton)
+
+    // Wait for dialog to open and find the info button
+    await waitFor(() => {
+      expect(screen.getByTestId('InfoOutlinedIcon')).toBeInTheDocument()
+    })
+
+    // Click the info button
     fireEvent.click(screen.getByTestId('InfoOutlinedIcon'))
 
-    expect(screen.getByText('JSON Format Information')).toBeInTheDocument()
-    expect(
-      screen.getByText(/Upload a JSON file with Italian adjectives/i)
-    ).toBeInTheDocument()
+    await waitFor(() => {
+      expect(screen.getByText('JSON Format Information')).toBeInTheDocument()
+      expect(
+        screen.getByText(/Upload a JSON file with Italian adjectives/i)
+      ).toBeInTheDocument()
+    })
 
-    fireEvent.click(screen.getByText('Close'))
-    expect(screen.queryByText('JSON Format Information')).not.toBeVisible()
+    // Close the format info dialog
+    const closeButtons = screen.getAllByText('Close')
+    fireEvent.click(closeButtons[0])
+
+    await waitFor(() => {
+      expect(screen.queryByText('JSON Format Information')).not.toBeInTheDocument()
+    })
   })
 
   it('handles invalid JSON file upload', async () => {
     render(<ImportAdjectives onError={mockOnError} onSuccess={mockOnSuccess} />)
 
+    // Open the import dialog
+    const uploadButton = screen.getByRole('button', {
+      name: /Import Adjectives from JSON/i,
+    })
+    fireEvent.click(uploadButton)
+
+    // Wait for dialog to open
+    await waitFor(() => {
+      expect(screen.getByText('Choose JSON File')).toBeInTheDocument()
+    })
+
     const file = new File(['invalid json'], 'test.json', {
       type: 'application/json',
     })
 
-    const fileInput = screen.getByLabelText(/choose json file/i)
+    // Find the hidden file input
+    const fileInput = screen.getByRole('button', { name: /Choose JSON File/i }).querySelector('input[type="file"]') as HTMLInputElement
 
-    await waitFor(() => {
-      fireEvent.change(fileInput, { target: { files: [file] } })
-    })
+    fireEvent.change(fileInput, { target: { files: [file] } })
 
     await waitFor(() => {
       expect(mockOnError).toHaveBeenCalledWith(
@@ -82,6 +122,17 @@ describe('ImportAdjectives', () => {
     mockUnwrap.mockResolvedValue({ message: 'Import successful' })
 
     render(<ImportAdjectives onError={mockOnError} onSuccess={mockOnSuccess} />)
+
+    // Open the import dialog
+    const uploadButton = screen.getByRole('button', {
+      name: /Import Adjectives from JSON/i,
+    })
+    fireEvent.click(uploadButton)
+
+    // Wait for dialog to open
+    await waitFor(() => {
+      expect(screen.getByText('Choose JSON File')).toBeInTheDocument()
+    })
 
     const validJson = JSON.stringify({
       bello: {
@@ -99,7 +150,8 @@ describe('ImportAdjectives', () => {
       type: 'application/json',
     })
 
-    const fileInput = screen.getByLabelText(/choose json file/i)
+    // Find the hidden file input
+    const fileInput = screen.getByRole('button', { name: /Choose JSON File/i }).querySelector('input[type="file"]') as HTMLInputElement
     fireEvent.change(fileInput, { target: { files: [file] } })
 
     await waitFor(() => {
@@ -165,41 +217,56 @@ describe('ImportAdjectives', () => {
 
     render(<ImportAdjectives onError={mockOnError} onSuccess={mockOnSuccess} />)
 
+    // Open the import dialog
+    const uploadButton = screen.getByRole('button', {
+      name: /Import Adjectives from JSON/i,
+    })
+    fireEvent.click(uploadButton)
+
+    // Wait for dialog to open
+    await waitFor(() => {
+      expect(screen.getByText('Choose JSON File')).toBeInTheDocument()
+    })
+
     // Load file
     const validJson = JSON.stringify({ bello: conflicts[0].new })
     const file = new File([validJson], 'adjectives.json', {
       type: 'application/json',
     })
-    const fileInput = screen.getByLabelText(/choose json file/i)
+    
+    // Find the hidden file input
+    const fileInput = screen.getByRole('button', { name: /Choose JSON File/i }).querySelector('input[type="file"]') as HTMLInputElement
     fireEvent.change(fileInput, { target: { files: [file] } })
 
+    // Wait for file to be loaded
+    await waitFor(() => {
+      expect(mockOnSuccess).toHaveBeenCalledWith(
+        'JSON file loaded successfully. Click "Import Adjectives" to proceed.'
+      )
+    })
+
     // Click import
-    const importButton = await screen.findByRole('button', {
+    const importButton = screen.getByRole('button', {
       name: /import adjectives/i,
     })
     fireEvent.click(importButton)
 
-    // Expect dialog to open
+    // Expect conflict dialog to open
     await waitFor(() => {
       expect(screen.getByText(/Resolve Conflicts/i)).toBeInTheDocument()
     })
 
     // Check conflict details
-    const dialog = screen.getByRole('dialog')
+    const dialogs = screen.getAllByRole('dialog')
+    const conflictDialog = dialogs.find(dialog => within(dialog).queryByText(/Resolve Conflicts/i))
+    
+    expect(conflictDialog).toBeTruthy()
 
-    const existingDataHeaders = within(dialog).getAllByRole('heading', {
-      name: /Existing Data/i,
-    })
-    expect(existingDataHeaders).toHaveLength(1)
-    expect(existingDataHeaders[0]).toBeInTheDocument()
+    const existingDataText = within(conflictDialog!).getByText('Existing Data')
+    expect(existingDataText).toBeInTheDocument()
 
-    // Also check for New Data header
-    // In the component: <Typography variant='subtitle2' color='secondary' gutterBottom>New Data</Typography>
-    // Note: variant subtitle2 usually renders as h6.
-    // Let's verify if New Data is also a heading.
-    // Based on previous logs, Existing Data was h6. New Data uses same variant.
-    // So we can look for it by role or text.
-    expect(within(dialog).getByText('New Data')).toBeInTheDocument()
+    const newDataText = within(conflictDialog!).getByText('New Data')
+    expect(newDataText).toBeInTheDocument()
 
     // Resolve conflict
     const replaceButton = screen.getByRole('button', {

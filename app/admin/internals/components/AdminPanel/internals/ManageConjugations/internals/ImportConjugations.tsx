@@ -11,8 +11,6 @@ import {
 } from '@mui/icons-material'
 import {
   Box,
-  Card,
-  CardContent,
   Typography,
   Button,
   Stack,
@@ -27,6 +25,7 @@ import {
   List,
   ListItem,
   ListItemText,
+  Tooltip,
 } from '@mui/material'
 
 import {
@@ -64,6 +63,7 @@ export default function ImportConjugations({
   const [showConjugationConflictDialog, setShowConjugationConflictDialog] =
     useState(false)
   const [showFormatInfoDialog, setShowFormatInfoDialog] = useState(false)
+  const [showImportDialog, setShowImportDialog] = useState(false)
 
   const handleConjugationFileUpload = async (
     event: React.ChangeEvent<HTMLInputElement>
@@ -193,23 +193,40 @@ export default function ImportConjugations({
 
   return (
     <>
-      {/* Import Section */}
-      <Card sx={{ mb: 3 }}>
-        <CardContent>
-          <Box display='flex' alignItems='center' gap={1}>
-            <Typography variant='h6'>
-              Import Verb Conjugations from JSON Files
-            </Typography>
-            <IconButton
-              size='small'
-              onClick={() => setShowFormatInfoDialog(true)}
-              color='primary'
-            >
-              <InfoOutlined />
-            </IconButton>
-          </Box>
+      {/* Import Icon */}
+      <Tooltip title='Import Conjugations from JSON'>
+        <IconButton
+          color='primary'
+          onClick={() => setShowImportDialog(true)}
+          disabled={importingConjugations}
+        >
+          <CloudUpload />
+        </IconButton>
+      </Tooltip>
 
-          <Stack direction='row' spacing={2} alignItems='center' sx={{ mt: 2 }}>
+      {/* Import Dialog */}
+      <Dialog
+        open={showImportDialog}
+        onClose={() => setShowImportDialog(false)}
+        maxWidth='sm'
+        fullWidth
+      >
+        <DialogTitle>
+          <Box display='flex' alignItems='center' gap={1}>
+            Import Verb Conjugations from JSON Files
+            <Tooltip title='View JSON Format Information'>
+              <IconButton
+                size='small'
+                onClick={() => setShowFormatInfoDialog(true)}
+                color='primary'
+              >
+                <InfoOutlined />
+              </IconButton>
+            </Tooltip>
+          </Box>
+        </DialogTitle>
+        <DialogContent>
+          <Stack direction='row' spacing={2} alignItems='center' sx={{ mt: 1 }}>
             <Button
               component='label'
               variant='outlined'
@@ -236,7 +253,7 @@ export default function ImportConjugations({
           </Stack>
 
           {selectedFiles.length > 0 && (
-            <Box sx={{ mb: 2 }}>
+            <Box sx={{ mt: 2 }}>
               <Typography variant='subtitle2' gutterBottom>
                 Selected Files:
               </Typography>
@@ -261,24 +278,32 @@ export default function ImportConjugations({
                   </ListItem>
                 ))}
               </List>
-              <Button
-                variant='contained'
-                onClick={handleImportConjugations}
-                disabled={importingConjugations}
-                startIcon={
-                  importingConjugations ? (
-                    <CircularProgress size={20} />
-                  ) : (
-                    <CloudUpload />
-                  )
-                }
-              >
-                {importingConjugations ? 'Importing...' : 'Import Conjugations'}
-              </Button>
             </Box>
           )}
-        </CardContent>
-      </Card>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setShowImportDialog(false)}>Cancel</Button>
+          {selectedFiles.length > 0 && (
+            <Button
+              variant='contained'
+              onClick={() => {
+                handleImportConjugations()
+                setShowImportDialog(false)
+              }}
+              disabled={importingConjugations}
+              startIcon={
+                importingConjugations ? (
+                  <CircularProgress size={20} />
+                ) : (
+                  <CloudUpload />
+                )
+              }
+            >
+              {importingConjugations ? 'Importing...' : 'Import Conjugations'}
+            </Button>
+          )}
+        </DialogActions>
+      </Dialog>
 
       {/* Conjugation Conflict Resolution Dialog */}
       <Dialog

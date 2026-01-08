@@ -30,7 +30,7 @@ import {
 
 import { ImportedVerb, useGetVerbsQuery } from '@/app/store/api'
 
-import { EditVerbDialog, DeleteVerbDialog } from './'
+import { EditVerbDialog, DeleteVerbDialog, ImportVerbs } from './'
 
 interface VerbsListProps {
   onError: (message: string) => void
@@ -108,10 +108,13 @@ export default function VerbsList({ onError, onSuccess }: VerbsListProps) {
               mb: 2,
             }}
           >
-            <Typography variant='h6'>
-              Current Verbs in Database ({filteredVerbs.length}
-              {deferredFilterText && ` of ${verbsData?.verbs?.length || 0}`})
-            </Typography>
+            <Box display='flex' alignItems='center' gap={1}>
+              <Typography variant='h6'>
+                Current Verbs in Database ({filteredVerbs.length}
+                {deferredFilterText && ` of ${verbsData?.verbs?.length || 0}`})
+              </Typography>
+              <ImportVerbs onError={onError} onSuccess={onSuccess} />
+            </Box>
             <TextField
               size='small'
               placeholder='Filter by Italian name...'

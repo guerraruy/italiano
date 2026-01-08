@@ -7,23 +7,6 @@ import ManageConjugations from './ManageConjugations'
 
 // Mock child components
 jest.mock('./internals', () => ({
-  ImportConjugations: ({
-    onError,
-    onSuccess,
-  }: {
-    onError: (msg: string) => void
-    onSuccess: (msg: string) => void
-  }) => (
-    <div data-testid='import-conjugations'>
-      Import Conjugations
-      <button onClick={() => onError('Import Error')}>
-        Trigger Import Error
-      </button>
-      <button onClick={() => onSuccess('Import Success')}>
-        Trigger Import Success
-      </button>
-    </div>
-  ),
   ConjugationsList: ({
     onError,
     onSuccess,
@@ -49,27 +32,12 @@ describe('ManageConjugations', () => {
     jest.clearAllMocks()
   })
 
-  it('renders child components', () => {
+  it('renders ConjugationsList component', () => {
     render(
       <ManageConjugations onError={mockOnError} onSuccess={mockOnSuccess} />
     )
 
-    expect(screen.getByTestId('import-conjugations')).toBeInTheDocument()
     expect(screen.getByTestId('conjugations-list')).toBeInTheDocument()
-  })
-
-  it('passes onError and onSuccess to ImportConjugations', () => {
-    render(
-      <ManageConjugations onError={mockOnError} onSuccess={mockOnSuccess} />
-    )
-
-    const importErrorBtn = screen.getByText('Trigger Import Error')
-    fireEvent.click(importErrorBtn)
-    expect(mockOnError).toHaveBeenCalledWith('Import Error')
-
-    const importSuccessBtn = screen.getByText('Trigger Import Success')
-    fireEvent.click(importSuccessBtn)
-    expect(mockOnSuccess).toHaveBeenCalledWith('Import Success')
   })
 
   it('passes onError and onSuccess to ConjugationsList', () => {

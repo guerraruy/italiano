@@ -10,8 +10,6 @@ import {
 } from '@mui/icons-material'
 import {
   Box,
-  Card,
-  CardContent,
   Typography,
   Dialog,
   DialogTitle,
@@ -23,6 +21,7 @@ import {
   IconButton,
   Chip,
   CircularProgress,
+  Tooltip,
 } from '@mui/material'
 
 import { useImportNounsMutation, type ConflictNoun } from '@/app/store/api'
@@ -42,6 +41,7 @@ export default function ImportNouns({ onError, onSuccess }: ImportNounsProps) {
   }>({})
   const [showNounConflictDialog, setShowNounConflictDialog] = useState(false)
   const [showFormatInfoDialog, setShowFormatInfoDialog] = useState(false)
+  const [showImportDialog, setShowImportDialog] = useState(false)
 
   const handleNounFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
@@ -118,21 +118,40 @@ export default function ImportNouns({ onError, onSuccess }: ImportNounsProps) {
 
   return (
     <>
-      {/* Import Section */}
-      <Card sx={{ mb: 3 }}>
-        <CardContent>
-          <Box display='flex' alignItems='center' gap={1}>
-            <Typography variant='h6'>Import Nouns from JSON</Typography>
-            <IconButton
-              size='small'
-              onClick={() => setShowFormatInfoDialog(true)}
-              color='primary'
-            >
-              <InfoOutlined />
-            </IconButton>
-          </Box>
+      {/* Import Icon */}
+      <Tooltip title='Import Nouns from JSON'>
+        <IconButton
+          color='primary'
+          onClick={() => setShowImportDialog(true)}
+          disabled={importingNouns}
+        >
+          <CloudUpload />
+        </IconButton>
+      </Tooltip>
 
-          <Stack direction='row' spacing={2} alignItems='center' sx={{ mt: 2 }}>
+      {/* Import Dialog */}
+      <Dialog
+        open={showImportDialog}
+        onClose={() => setShowImportDialog(false)}
+        maxWidth='sm'
+        fullWidth
+      >
+        <DialogTitle>
+          <Box display='flex' alignItems='center' gap={1}>
+            Import Nouns from JSON
+            <Tooltip title='View JSON Format Information'>
+              <IconButton
+                size='small'
+                onClick={() => setShowFormatInfoDialog(true)}
+                color='primary'
+              >
+                <InfoOutlined />
+              </IconButton>
+            </Tooltip>
+          </Box>
+        </DialogTitle>
+        <DialogContent>
+          <Stack direction='row' spacing={2} alignItems='center' sx={{ mt: 1 }}>
             <Button
               component='label'
               variant='outlined'
@@ -163,24 +182,32 @@ export default function ImportNouns({ onError, onSuccess }: ImportNounsProps) {
                 Preview: {Object.keys(JSON.parse(nounJsonContent)).length} nouns
                 ready to import
               </Typography>
-              <Button
-                variant='contained'
-                onClick={handleImportNouns}
-                disabled={importingNouns}
-                startIcon={
-                  importingNouns ? (
-                    <CircularProgress size={20} />
-                  ) : (
-                    <CloudUpload />
-                  )
-                }
-              >
-                {importingNouns ? 'Importing...' : 'Import Nouns'}
-              </Button>
             </Box>
           )}
-        </CardContent>
-      </Card>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setShowImportDialog(false)}>Cancel</Button>
+          {nounJsonContent && (
+            <Button
+              variant='contained'
+              onClick={() => {
+                handleImportNouns()
+                setShowImportDialog(false)
+              }}
+              disabled={importingNouns}
+              startIcon={
+                importingNouns ? (
+                  <CircularProgress size={20} />
+                ) : (
+                  <CloudUpload />
+                )
+              }
+            >
+              {importingNouns ? 'Importing...' : 'Import Nouns'}
+            </Button>
+          )}
+        </DialogActions>
+      </Dialog>
 
       {/* Noun Conflict Resolution Dialog */}
       <Dialog

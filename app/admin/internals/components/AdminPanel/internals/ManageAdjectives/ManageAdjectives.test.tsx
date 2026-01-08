@@ -7,23 +7,6 @@ import ManageAdjectives from './ManageAdjectives'
 
 // Mock child components
 jest.mock('./internals', () => ({
-  ImportAdjectives: ({
-    onError,
-    onSuccess,
-  }: {
-    onError: (msg: string) => void
-    onSuccess: (msg: string) => void
-  }) => (
-    <div data-testid='import-adjectives'>
-      Import Adjectives
-      <button onClick={() => onError('Import Error')}>
-        Trigger Import Error
-      </button>
-      <button onClick={() => onSuccess('Import Success')}>
-        Trigger Import Success
-      </button>
-    </div>
-  ),
   AdjectivesList: ({
     onError,
     onSuccess,
@@ -49,23 +32,10 @@ describe('ManageAdjectives', () => {
     jest.clearAllMocks()
   })
 
-  it('renders child components', () => {
+  it('renders AdjectivesList component', () => {
     render(<ManageAdjectives onError={mockOnError} onSuccess={mockOnSuccess} />)
 
-    expect(screen.getByTestId('import-adjectives')).toBeInTheDocument()
     expect(screen.getByTestId('adjectives-list')).toBeInTheDocument()
-  })
-
-  it('passes onError and onSuccess to ImportAdjectives', () => {
-    render(<ManageAdjectives onError={mockOnError} onSuccess={mockOnSuccess} />)
-
-    const importErrorBtn = screen.getByText('Trigger Import Error')
-    fireEvent.click(importErrorBtn)
-    expect(mockOnError).toHaveBeenCalledWith('Import Error')
-
-    const importSuccessBtn = screen.getByText('Trigger Import Success')
-    fireEvent.click(importSuccessBtn)
-    expect(mockOnSuccess).toHaveBeenCalledWith('Import Success')
   })
 
   it('passes onError and onSuccess to AdjectivesList', () => {

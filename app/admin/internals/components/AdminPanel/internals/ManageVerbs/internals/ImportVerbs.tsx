@@ -10,8 +10,6 @@ import {
 } from '@mui/icons-material'
 import {
   Box,
-  Card,
-  CardContent,
   Typography,
   Button,
   Stack,
@@ -23,6 +21,7 @@ import {
   DialogActions,
   Paper,
   IconButton,
+  Tooltip,
 } from '@mui/material'
 
 import { ConflictVerb, useImportVerbsMutation } from '@/app/store/api'
@@ -42,6 +41,7 @@ export default function ImportVerbs({ onError, onSuccess }: ImportVerbsProps) {
   }>({})
   const [showVerbConflictDialog, setShowVerbConflictDialog] = useState(false)
   const [showFormatInfoDialog, setShowFormatInfoDialog] = useState(false)
+  const [showImportDialog, setShowImportDialog] = useState(false)
 
   const handleVerbFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
@@ -118,21 +118,40 @@ export default function ImportVerbs({ onError, onSuccess }: ImportVerbsProps) {
 
   return (
     <>
-      {/* Import Section */}
-      <Card sx={{ mb: 3 }}>
-        <CardContent>
-          <Box display='flex' alignItems='center' gap={1}>
-            <Typography variant='h6'>Import Verbs from JSON</Typography>
-            <IconButton
-              size='small'
-              onClick={() => setShowFormatInfoDialog(true)}
-              color='primary'
-            >
-              <InfoOutlined />
-            </IconButton>
-          </Box>
+      {/* Import Icon */}
+      <Tooltip title='Import Verbs from JSON'>
+        <IconButton
+          color='primary'
+          onClick={() => setShowImportDialog(true)}
+          disabled={importingVerbs}
+        >
+          <CloudUpload />
+        </IconButton>
+      </Tooltip>
 
-          <Stack direction='row' spacing={2} alignItems='center' sx={{ mt: 2 }}>
+      {/* Import Dialog */}
+      <Dialog
+        open={showImportDialog}
+        onClose={() => setShowImportDialog(false)}
+        maxWidth='sm'
+        fullWidth
+      >
+        <DialogTitle>
+          <Box display='flex' alignItems='center' gap={1}>
+            Import Verbs from JSON
+            <Tooltip title='View JSON Format Information'>
+              <IconButton
+                size='small'
+                onClick={() => setShowFormatInfoDialog(true)}
+                color='primary'
+              >
+                <InfoOutlined />
+              </IconButton>
+            </Tooltip>
+          </Box>
+        </DialogTitle>
+        <DialogContent>
+          <Stack direction='row' spacing={2} alignItems='center' sx={{ mt: 1 }}>
             <Button
               component='label'
               variant='outlined'
@@ -163,24 +182,32 @@ export default function ImportVerbs({ onError, onSuccess }: ImportVerbsProps) {
                 Preview: {Object.keys(JSON.parse(verbJsonContent)).length} verbs
                 ready to import
               </Typography>
-              <Button
-                variant='contained'
-                onClick={handleImportVerbs}
-                disabled={importingVerbs}
-                startIcon={
-                  importingVerbs ? (
-                    <CircularProgress size={20} />
-                  ) : (
-                    <CloudUpload />
-                  )
-                }
-              >
-                {importingVerbs ? 'Importing...' : 'Import Verbs'}
-              </Button>
             </Box>
           )}
-        </CardContent>
-      </Card>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setShowImportDialog(false)}>Cancel</Button>
+          {verbJsonContent && (
+            <Button
+              variant='contained'
+              onClick={() => {
+                handleImportVerbs()
+                setShowImportDialog(false)
+              }}
+              disabled={importingVerbs}
+              startIcon={
+                importingVerbs ? (
+                  <CircularProgress size={20} />
+                ) : (
+                  <CloudUpload />
+                )
+              }
+            >
+              {importingVerbs ? 'Importing...' : 'Import Verbs'}
+            </Button>
+          )}
+        </DialogActions>
+      </Dialog>
 
       {/* Verb Conflict Resolution Dialog */}
       <Dialog

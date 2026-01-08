@@ -13,31 +13,27 @@ jest.mock('@/app/store/api', () => ({
 }))
 
 // Mock dialog components
-jest.mock('./', () => ({
-  EditAdjectiveDialog: ({
-    open,
-    onClose,
-  }: {
-    open: boolean
-    onClose: () => void
-  }) =>
-    open ? (
-      <div data-testid='edit-dialog'>
-        Edit Dialog <button onClick={onClose}>Close</button>
-      </div>
-    ) : null,
-  DeleteAdjectiveDialog: ({
-    open,
-    onClose,
-  }: {
-    open: boolean
-    onClose: () => void
-  }) =>
-    open ? (
-      <div data-testid='delete-dialog'>
-        Delete Dialog <button onClick={onClose}>Close</button>
-      </div>
-    ) : null,
+jest.mock('./EditAdjectiveDialog', () => ({
+  __esModule: true,
+  default: ({ open, onClose }: { open: boolean; onClose: () => void }) => (
+    <div data-testid='edit-dialog' data-open={open}>
+      <button onClick={onClose}>Close Edit</button>
+    </div>
+  ),
+}))
+
+jest.mock('./DeleteAdjectiveDialog', () => ({
+  __esModule: true,
+  default: ({ open, onClose }: { open: boolean; onClose: () => void }) => (
+    <div data-testid='delete-dialog' data-open={open}>
+      <button onClick={onClose}>Close Delete</button>
+    </div>
+  ),
+}))
+
+jest.mock('./ImportAdjectives', () => ({
+  __esModule: true,
+  default: () => <div data-testid='import-adjectives'>Import Adjectives</div>,
 }))
 
 const mockAdjectives = [
@@ -190,7 +186,8 @@ describe('AdjectivesList', () => {
     const editButtons = screen.getAllByTestId('EditOutlinedIcon')
     fireEvent.click(editButtons[0].closest('button')!)
 
-    expect(screen.getByTestId('edit-dialog')).toBeInTheDocument()
+    const dialog = screen.getByTestId('edit-dialog')
+    expect(dialog).toHaveAttribute('data-open', 'true')
   })
 
   it('opens delete dialog', () => {
@@ -204,6 +201,7 @@ describe('AdjectivesList', () => {
     const deleteButtons = screen.getAllByTestId('DeleteOutlinedIcon')
     fireEvent.click(deleteButtons[0].closest('button')!)
 
-    expect(screen.getByTestId('delete-dialog')).toBeInTheDocument()
+    const dialog = screen.getByTestId('delete-dialog')
+    expect(dialog).toHaveAttribute('data-open', 'true')
   })
 })
