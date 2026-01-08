@@ -11,6 +11,13 @@ import type { User } from '@prisma/client'
 import { compare, hash } from 'bcryptjs'
 
 import { generateAccessToken, generateRefreshToken } from '@/lib/auth'
+import {
+  InvalidCredentialsError,
+  InvalidPasswordError,
+  UserNotFoundError,
+  DuplicateUsernameError,
+  DuplicateEmailError,
+} from '@/lib/errors'
 import { userRepository, profileRepository } from '@/lib/repositories'
 
 import { BaseService } from './base.service'
@@ -56,14 +63,14 @@ export class AuthService extends BaseService {
       const user = await userRepository.findByUsername(input.username)
 
       if (!user) {
-        throw new Error('Invalid credentials')
+        throw new InvalidCredentialsError()
       }
 
       // Verify password
       const isPasswordValid = await compare(input.password, user.password)
 
       if (!isPasswordValid) {
-        throw new Error('Invalid credentials')
+        throw new InvalidCredentialsError()
       }
 
       // Generate tokens
@@ -96,13 +103,13 @@ export class AuthService extends BaseService {
       // Check if username already exists
       const existingUser = await userRepository.findByUsername(input.username)
       if (existingUser) {
-        throw new Error('Username already exists')
+        throw new DuplicateUsernameError()
       }
 
       // Check if email already exists
       const existingEmail = await userRepository.findByEmail(input.email)
       if (existingEmail) {
-        throw new Error('Email already exists')
+        throw new DuplicateEmailError()
       }
 
       // Hash password
@@ -161,7 +168,7 @@ export class AuthService extends BaseService {
       const user = await userRepository.findById(userId)
 
       if (!user) {
-        throw new Error('User not found')
+        throw new UserNotFoundError()
       }
 
       // Verify current password
@@ -171,7 +178,7 @@ export class AuthService extends BaseService {
       )
 
       if (!isPasswordValid) {
-        throw new Error('Current password is incorrect')
+        throw new InvalidPasswordError()
       }
 
       // Hash new password

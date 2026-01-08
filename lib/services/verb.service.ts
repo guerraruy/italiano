@@ -6,6 +6,7 @@
 
 import type { Verb, Prisma } from '@prisma/client'
 
+import { NotFoundError, DuplicateResourceError } from '@/lib/errors'
 import { verbRepository, conjugationRepository } from '@/lib/repositories'
 
 import { BaseService } from './base.service'
@@ -75,14 +76,17 @@ export class VerbService extends BaseService {
       // Check if verb exists
       const existing = await verbRepository.findById(verbId)
       if (!existing) {
-        throw new Error('Verb not found')
+        throw new NotFoundError('Verb')
       }
 
       // Check for Italian name conflict (if name changed)
       if (input.italian !== existing.italian) {
         const conflict = await verbRepository.findByItalian(input.italian)
         if (conflict) {
-          throw new Error('A verb with this Italian name already exists')
+          throw new DuplicateResourceError(
+            'italian',
+            'A verb with this Italian name already exists'
+          )
         }
       }
 
@@ -109,7 +113,7 @@ export class VerbService extends BaseService {
       // Check if verb exists
       const verb = await verbRepository.findById(verbId)
       if (!verb) {
-        throw new Error('Verb not found')
+        throw new NotFoundError('Verb')
       }
 
       // Delete verb (will cascade delete statistics and conjugations)
@@ -132,7 +136,7 @@ export class VerbService extends BaseService {
       // Check if conjugation exists
       const existing = await conjugationRepository.findById(conjugationId)
       if (!existing) {
-        throw new Error('Conjugation not found')
+        throw new NotFoundError('Conjugation')
       }
 
       // Update conjugation
@@ -157,7 +161,7 @@ export class VerbService extends BaseService {
       // Check if conjugation exists
       const conjugation = await conjugationRepository.findById(conjugationId)
       if (!conjugation) {
-        throw new Error('Conjugation not found')
+        throw new NotFoundError('Conjugation')
       }
 
       // Delete conjugation

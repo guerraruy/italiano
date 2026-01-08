@@ -6,6 +6,7 @@
 
 import type { Adjective, Prisma } from '@prisma/client'
 
+import { NotFoundError, DuplicateResourceError } from '@/lib/errors'
 import { adjectiveRepository } from '@/lib/repositories'
 
 import { BaseService } from './base.service'
@@ -67,14 +68,17 @@ export class AdjectiveService extends BaseService {
       // Check if adjective exists
       const existing = await adjectiveRepository.findById(adjectiveId)
       if (!existing) {
-        throw new Error('Adjective not found')
+        throw new NotFoundError('Adjective')
       }
 
       // Check for Italian name conflict (if name changed)
       if (input.italian !== existing.italian) {
         const conflict = await adjectiveRepository.findByItalian(input.italian)
         if (conflict) {
-          throw new Error('An adjective with this Italian name already exists')
+          throw new DuplicateResourceError(
+            'italian',
+            'An adjective with this Italian name already exists'
+          )
         }
       }
 
@@ -105,7 +109,7 @@ export class AdjectiveService extends BaseService {
       // Check if adjective exists
       const adjective = await adjectiveRepository.findById(adjectiveId)
       if (!adjective) {
-        throw new Error('Adjective not found')
+        throw new NotFoundError('Adjective')
       }
 
       // Delete adjective (will cascade delete statistics)

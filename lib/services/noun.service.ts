@@ -6,6 +6,7 @@
 
 import type { Noun, Prisma } from '@prisma/client'
 
+import { NotFoundError, DuplicateResourceError } from '@/lib/errors'
 import { nounRepository } from '@/lib/repositories'
 
 import { BaseService } from './base.service'
@@ -64,14 +65,17 @@ export class NounService extends BaseService {
       // Check if noun exists
       const existing = await nounRepository.findById(nounId)
       if (!existing) {
-        throw new Error('Noun not found')
+        throw new NotFoundError('Noun')
       }
 
       // Check for Italian name conflict (if name changed)
       if (input.italian !== existing.italian) {
         const conflict = await nounRepository.findByItalian(input.italian)
         if (conflict) {
-          throw new Error('A noun with this Italian name already exists')
+          throw new DuplicateResourceError(
+            'italian',
+            'A noun with this Italian name already exists'
+          )
         }
       }
 
@@ -96,7 +100,7 @@ export class NounService extends BaseService {
       // Check if noun exists
       const noun = await nounRepository.findById(nounId)
       if (!noun) {
-        throw new Error('Noun not found')
+        throw new NotFoundError('Noun')
       }
 
       // Delete noun (will cascade delete statistics)
