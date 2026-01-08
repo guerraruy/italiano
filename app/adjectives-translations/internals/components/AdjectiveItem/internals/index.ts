@@ -1,3 +1,6 @@
 export { default as FilterControls } from './FilterControls'
 export type { SortOption, DisplayCount } from './FilterControls'
 export { default as ResetStatisticsDialog } from './ResetStatisticsDialog'
+export { default as AdjectiveInputField } from './AdjectiveInputField'
+export { default as GenderInputColumn } from './GenderInputColumn'
+export { default as AdjectiveActions } from './AdjectiveActions'
