@@ -59,14 +59,14 @@ export default function VerbTensesPage() {
 
   if (isLoading) {
     return (
-      <PageContainer maxWidth='lg'>
-        <PageHeader title='Verb Tenses' />
+      <PageContainer maxWidth="lg">
+        <PageHeader title="Verb Tenses" />
         <ContentPaper elevation={3}>
           <Box
-            display='flex'
-            justifyContent='center'
-            alignItems='center'
-            minHeight='400px'
+            display="flex"
+            justifyContent="center"
+            alignItems="center"
+            minHeight="400px"
           >
             <CircularProgress />
           </Box>
@@ -77,10 +77,10 @@ export default function VerbTensesPage() {
 
   if (error) {
     return (
-      <PageContainer maxWidth='lg'>
-        <PageHeader title='Verb Tenses' />
+      <PageContainer maxWidth="lg">
+        <PageHeader title="Verb Tenses" />
         <ContentPaper elevation={3}>
-          <Alert severity='error'>
+          <Alert severity="error">
             Error loading verbs. Please try again later.
           </Alert>
         </ContentPaper>
@@ -89,13 +89,13 @@ export default function VerbTensesPage() {
   }
 
   return (
-    <PageContainer maxWidth='lg'>
-      <PageHeader title='Verb Tenses' />
+    <PageContainer maxWidth="lg">
+      <PageHeader title="Verb Tenses" />
 
       <ContentPaper elevation={3}>
         <Typography
-          variant='h6'
-          color='text.secondary'
+          variant="h6"
+          color="text.secondary"
           gutterBottom
           sx={{ mb: 3 }}
         >

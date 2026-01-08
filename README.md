@@ -34,6 +34,7 @@ DATABASE_URL="postgresql://USER:PASSWORD@HOST:PORT/DATABASE?schema=public"
 ```
 
 Example:
+
 ```env
 DATABASE_URL="postgresql://postgres:password@localhost:5432/italiano?schema=public"
 ```
@@ -110,13 +111,13 @@ npx prisma db pull
 This project uses Material-UI with @emotion for styling. You can create styled components like this:
 
 ```tsx
-import { styled } from '@mui/material/styles';
-import { Box } from '@mui/material';
+import { styled } from '@mui/material/styles'
+import { Box } from '@mui/material'
 
 const StyledBox = styled(Box)(({ theme }) => ({
   padding: theme.spacing(2),
   backgroundColor: theme.palette.primary.main,
-}));
+}))
 ```
 
 ## Learn More
@@ -131,4 +132,3 @@ const StyledBox = styled(Box)(({ theme }) => ({
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new).
 
 Check out the [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-

@@ -18,6 +18,7 @@ nvm use 22.12.0
 ```
 
 If you don't have nvm installed:
+
 - **macOS/Linux**: https://github.com/nvm-sh/nvm#installing-and-updating
 - Or download Node.js directly from: https://nodejs.org/
 
@@ -57,6 +58,7 @@ Then the adjectives feature will work perfectly!
 ## 📝 What's Already Done
 
 All the code is complete and ready:
+
 - ✅ Database schema updated
 - ✅ API endpoints created
 - ✅ Admin UI components built
@@ -72,6 +74,7 @@ The feature will continue to show errors until you update Node.js. There's no wo
 ---
 
 **Quick Command Reference:**
+
 ```bash
 # Check your current Node version
 node --version
@@ -85,4 +88,3 @@ npx prisma generate && npx prisma db push
 # Restart
 yarn dev
 ```
-

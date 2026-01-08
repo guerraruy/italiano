@@ -27,7 +27,7 @@ interface StatisticsProps {
 export const Statistics: React.FC<StatisticsProps> = ({ correct, wrong }) => {
   return (
     <StatisticsBox>
-      <Tooltip title='Correct attempts' placement='top' arrow>
+      <Tooltip title="Correct attempts" placement="top" arrow>
         <Box
           sx={{
             display: 'flex',
@@ -36,12 +36,12 @@ export const Statistics: React.FC<StatisticsProps> = ({ correct, wrong }) => {
           }}
         >
           <CheckIcon sx={{ fontSize: 16 }} />
-          <Typography variant='caption' fontWeight='bold'>
+          <Typography variant="caption" fontWeight="bold">
             {correct}
           </Typography>
         </Box>
       </Tooltip>
-      <Tooltip title='Wrong attempts' placement='bottom' arrow>
+      <Tooltip title="Wrong attempts" placement="bottom" arrow>
         <Box
           sx={{
             display: 'flex',
@@ -50,7 +50,7 @@ export const Statistics: React.FC<StatisticsProps> = ({ correct, wrong }) => {
           }}
         >
           <CloseIcon sx={{ fontSize: 16 }} />
-          <Typography variant='caption' fontWeight='bold'>
+          <Typography variant="caption" fontWeight="bold">
             {wrong}
           </Typography>
         </Box>

@@ -49,7 +49,9 @@ describe('ImportAdjectives', () => {
 
     // Now the dialog content should be visible
     await waitFor(() => {
-      expect(screen.getByText('Import Adjectives from JSON')).toBeInTheDocument()
+      expect(
+        screen.getByText('Import Adjectives from JSON')
+      ).toBeInTheDocument()
       expect(screen.getByText('Choose JSON File')).toBeInTheDocument()
       expect(screen.getByTestId('InfoOutlinedIcon')).toBeInTheDocument()
     })
@@ -86,7 +88,9 @@ describe('ImportAdjectives', () => {
     fireEvent.click(firstCloseButton)
 
     await waitFor(() => {
-      expect(screen.queryByText('JSON Format Information')).not.toBeInTheDocument()
+      expect(
+        screen.queryByText('JSON Format Information')
+      ).not.toBeInTheDocument()
     })
   })
 
@@ -109,7 +113,9 @@ describe('ImportAdjectives', () => {
     })
 
     // Find the hidden file input
-    const fileInput = screen.getByRole('button', { name: /Choose JSON File/i }).querySelector('input[type="file"]') as HTMLInputElement
+    const fileInput = screen
+      .getByRole('button', { name: /Choose JSON File/i })
+      .querySelector('input[type="file"]') as HTMLInputElement
 
     fireEvent.change(fileInput, { target: { files: [file] } })
 
@@ -153,7 +159,9 @@ describe('ImportAdjectives', () => {
     })
 
     // Find the hidden file input
-    const fileInput = screen.getByRole('button', { name: /Choose JSON File/i }).querySelector('input[type="file"]') as HTMLInputElement
+    const fileInput = screen
+      .getByRole('button', { name: /Choose JSON File/i })
+      .querySelector('input[type="file"]') as HTMLInputElement
     fireEvent.change(fileInput, { target: { files: [file] } })
 
     await waitFor(() => {
@@ -237,9 +245,11 @@ describe('ImportAdjectives', () => {
     const file = new File([validJson], 'adjectives.json', {
       type: 'application/json',
     })
-    
+
     // Find the hidden file input
-    const fileInput = screen.getByRole('button', { name: /Choose JSON File/i }).querySelector('input[type="file"]') as HTMLInputElement
+    const fileInput = screen
+      .getByRole('button', { name: /Choose JSON File/i })
+      .querySelector('input[type="file"]') as HTMLInputElement
     fireEvent.change(fileInput, { target: { files: [file] } })
 
     // Wait for file to be loaded
@@ -262,8 +272,10 @@ describe('ImportAdjectives', () => {
 
     // Check conflict details
     const dialogs = screen.getAllByRole('dialog')
-    const conflictDialog = dialogs.find(dialog => within(dialog).queryByText(/Resolve Conflicts/i))
-    
+    const conflictDialog = dialogs.find((dialog) =>
+      within(dialog).queryByText(/Resolve Conflicts/i)
+    )
+
     expect(conflictDialog).toBeTruthy()
 
     const existingDataText = within(conflictDialog!).getByText('Existing Data')

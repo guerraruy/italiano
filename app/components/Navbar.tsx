@@ -87,7 +87,7 @@ export default function Navbar() {
   }
 
   const drawer = (
-    <Box sx={{ width: 250 }} role='presentation'>
+    <Box sx={{ width: 250 }} role="presentation">
       <List>
         {menuItems.map((item) => (
           <ListItem key={item.text} disablePadding>
@@ -119,7 +119,7 @@ export default function Navbar() {
               >
                 <AdminPanelSettingsIcon />
               </ListItemIcon>
-              <ListItemText primary='Admin Panel' />
+              <ListItemText primary="Admin Panel" />
             </ListItemButton>
           </ListItem>
         )}
@@ -134,19 +134,19 @@ export default function Navbar() {
   return (
     <>
       <AppBar
-        position='sticky'
+        position="sticky"
         elevation={2}
         sx={{
           zIndex: (theme) => theme.zIndex.modal + 1,
         }}
       >
-        <Container maxWidth='xl'>
+        <Container maxWidth="xl">
           <Toolbar disableGutters>
             {showMobileMenu && (
               <IconButton
-                color='inherit'
-                aria-label='open drawer'
-                edge='start'
+                color="inherit"
+                aria-label="open drawer"
+                edge="start"
                 onClick={handleDrawerToggle}
                 sx={{ mr: 2 }}
               >
@@ -155,9 +155,9 @@ export default function Navbar() {
             )}
 
             <Typography
-              variant='h6'
+              variant="h6"
               noWrap
-              component='div'
+              component="div"
               sx={{
                 flexGrow: showMobileMenu ? 1 : 0,
                 mr: 4,
@@ -216,7 +216,7 @@ export default function Navbar() {
       </AppBar>
 
       <Drawer
-        variant='temporary'
+        variant="temporary"
         open={mobileOpen}
         onClose={handleDrawerToggle}
         ModalProps={{

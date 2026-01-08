@@ -12,4 +12,3 @@ export default function ManageConjugations({
 }: ManageConjugationsProps) {
   return <ConjugationsList onError={onError} onSuccess={onSuccess} />
 }
-

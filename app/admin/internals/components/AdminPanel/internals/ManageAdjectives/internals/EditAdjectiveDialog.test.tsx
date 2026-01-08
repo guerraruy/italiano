@@ -108,7 +108,9 @@ describe('EditAdjectiveDialog', () => {
     // Change Masculine Singular Italian (index 0)
     const firstItalianInput = italianInputs[0]
     if (!firstItalianInput) throw new Error('Italian input not found')
-    fireEvent.change(firstItalianInput, { target: { value: 'nuovo_masc_sing' } })
+    fireEvent.change(firstItalianInput, {
+      target: { value: 'nuovo_masc_sing' },
+    })
     expect(firstItalianInput).toHaveValue('nuovo_masc_sing')
   })
 

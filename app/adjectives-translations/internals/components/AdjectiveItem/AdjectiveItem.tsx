@@ -1,4 +1,8 @@
 import React, { useCallback } from 'react'
+
+import ClearIcon from '@mui/icons-material/Clear'
+import DeleteSweepIcon from '@mui/icons-material/DeleteSweep'
+import LightbulbOutlinedIcon from '@mui/icons-material/LightbulbOutlined'
 import {
   Box,
   TextField,
@@ -7,9 +11,6 @@ import {
   InputAdornment,
   Typography,
 } from '@mui/material'
-import ClearIcon from '@mui/icons-material/Clear'
-import LightbulbOutlinedIcon from '@mui/icons-material/LightbulbOutlined'
-import DeleteSweepIcon from '@mui/icons-material/DeleteSweep'
 
 import { Statistics } from '@/app/components/Statistics'
 
@@ -103,8 +104,8 @@ const AdjectiveItem = ({
     <AdjectiveListItem>
       <AdjectiveInfo>
         <Typography
-          variant='body1'
-          fontWeight='bold'
+          variant="body1"
+          fontWeight="bold"
           sx={{ minWidth: '180px' }}
         >
           {adjective.translation}
@@ -128,40 +129,37 @@ const AdjectiveItem = ({
             justifyContent: 'space-between',
           }}
         >
-          <Statistics
-            correct={statistics.correct}
-            wrong={statistics.wrong}
-          />
+          <Statistics correct={statistics.correct} wrong={statistics.wrong} />
 
           <Box sx={{ display: 'flex', gap: 1 }}>
-            <Tooltip title='Show all answers'>
+            <Tooltip title="Show all answers">
               <IconButton
-                size='small'
+                size="small"
                 onClick={() => onShowAnswer(adjective.id)}
-                color='primary'
+                color="primary"
               >
                 <LightbulbOutlinedIcon />
               </IconButton>
             </Tooltip>
 
-            <Tooltip title='Clear all fields'>
+            <Tooltip title="Clear all fields">
               <IconButton
-                size='small'
+                size="small"
                 onClick={() => onClearInput(adjective.id)}
-                color='default'
+                color="default"
               >
                 <ClearIcon />
               </IconButton>
             </Tooltip>
 
-            <Tooltip title='Reset statistics'>
+            <Tooltip title="Reset statistics">
               <IconButton
-                size='small'
+                size="small"
                 onClick={() => onResetStatistics(adjective.id)}
-                color='default'
+                color="default"
                 disabled={statistics.correct === 0 && statistics.wrong === 0}
               >
-                <DeleteSweepIcon fontSize='small' />
+                <DeleteSweepIcon fontSize="small" />
               </IconButton>
             </Tooltip>
           </Box>
@@ -178,17 +176,17 @@ const AdjectiveItem = ({
           {/* Masculine Column */}
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
             <Typography
-              variant='subtitle2'
-              color='text.secondary'
+              variant="subtitle2"
+              color="text.secondary"
               sx={{ mb: -1 }}
             >
               Masculine
             </Typography>
             <TextField
               fullWidth
-              size='small'
-              label='Singular'
-              placeholder='Type the masculine singular form...'
+              size="small"
+              label="Singular"
+              placeholder="Type the masculine singular form..."
               value={inputValues.masculineSingular}
               onChange={(e) =>
                 onInputChange(adjective.id, 'masculineSingular', e.target.value)
@@ -204,21 +202,21 @@ const AdjectiveItem = ({
                 onKeyDown(e, adjective.id, 'masculineSingular', index)
               }
               sx={getInputStyle('masculineSingular')}
-              autoComplete='off'
+              autoComplete="off"
               inputRef={setInputRef(adjective.id, 'masculineSingular')}
               slotProps={{
                 input: {
                   endAdornment: (
-                    <InputAdornment position='end'>
-                      <Tooltip title='Clear field'>
+                    <InputAdornment position="end">
+                      <Tooltip title="Clear field">
                         <IconButton
-                          size='small'
+                          size="small"
                           onClick={() =>
                             onClearInput(adjective.id, 'masculineSingular')
                           }
-                          edge='end'
+                          edge="end"
                         >
-                          <ClearIcon fontSize='small' />
+                          <ClearIcon fontSize="small" />
                         </IconButton>
                       </Tooltip>
                     </InputAdornment>
@@ -228,9 +226,9 @@ const AdjectiveItem = ({
             />
             <TextField
               fullWidth
-              size='small'
-              label='Plural'
-              placeholder='Type the masculine plural form...'
+              size="small"
+              label="Plural"
+              placeholder="Type the masculine plural form..."
               value={inputValues.masculinePlural}
               onChange={(e) =>
                 onInputChange(adjective.id, 'masculinePlural', e.target.value)
@@ -246,21 +244,21 @@ const AdjectiveItem = ({
                 onKeyDown(e, adjective.id, 'masculinePlural', index)
               }
               sx={getInputStyle('masculinePlural')}
-              autoComplete='off'
+              autoComplete="off"
               inputRef={setInputRef(adjective.id, 'masculinePlural')}
               slotProps={{
                 input: {
                   endAdornment: (
-                    <InputAdornment position='end'>
-                      <Tooltip title='Clear field'>
+                    <InputAdornment position="end">
+                      <Tooltip title="Clear field">
                         <IconButton
-                          size='small'
+                          size="small"
                           onClick={() =>
                             onClearInput(adjective.id, 'masculinePlural')
                           }
-                          edge='end'
+                          edge="end"
                         >
-                          <ClearIcon fontSize='small' />
+                          <ClearIcon fontSize="small" />
                         </IconButton>
                       </Tooltip>
                     </InputAdornment>
@@ -273,17 +271,17 @@ const AdjectiveItem = ({
           {/* Feminine Column */}
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
             <Typography
-              variant='subtitle2'
-              color='text.secondary'
+              variant="subtitle2"
+              color="text.secondary"
               sx={{ mb: -1 }}
             >
               Feminine
             </Typography>
             <TextField
               fullWidth
-              size='small'
-              label='Singular'
-              placeholder='Type the feminine singular form...'
+              size="small"
+              label="Singular"
+              placeholder="Type the feminine singular form..."
               value={inputValues.feminineSingular}
               onChange={(e) =>
                 onInputChange(adjective.id, 'feminineSingular', e.target.value)
@@ -299,21 +297,21 @@ const AdjectiveItem = ({
                 onKeyDown(e, adjective.id, 'feminineSingular', index)
               }
               sx={getInputStyle('feminineSingular')}
-              autoComplete='off'
+              autoComplete="off"
               inputRef={setInputRef(adjective.id, 'feminineSingular')}
               slotProps={{
                 input: {
                   endAdornment: (
-                    <InputAdornment position='end'>
-                      <Tooltip title='Clear field'>
+                    <InputAdornment position="end">
+                      <Tooltip title="Clear field">
                         <IconButton
-                          size='small'
+                          size="small"
                           onClick={() =>
                             onClearInput(adjective.id, 'feminineSingular')
                           }
-                          edge='end'
+                          edge="end"
                         >
-                          <ClearIcon fontSize='small' />
+                          <ClearIcon fontSize="small" />
                         </IconButton>
                       </Tooltip>
                     </InputAdornment>
@@ -323,9 +321,9 @@ const AdjectiveItem = ({
             />
             <TextField
               fullWidth
-              size='small'
-              label='Plural'
-              placeholder='Type the feminine plural form...'
+              size="small"
+              label="Plural"
+              placeholder="Type the feminine plural form..."
               value={inputValues.femininePlural}
               onChange={(e) =>
                 onInputChange(adjective.id, 'femininePlural', e.target.value)
@@ -341,21 +339,21 @@ const AdjectiveItem = ({
                 onKeyDown(e, adjective.id, 'femininePlural', index)
               }
               sx={getInputStyle('femininePlural')}
-              autoComplete='off'
+              autoComplete="off"
               inputRef={setInputRef(adjective.id, 'femininePlural')}
               slotProps={{
                 input: {
                   endAdornment: (
-                    <InputAdornment position='end'>
-                      <Tooltip title='Clear field'>
+                    <InputAdornment position="end">
+                      <Tooltip title="Clear field">
                         <IconButton
-                          size='small'
+                          size="small"
                           onClick={() =>
                             onClearInput(adjective.id, 'femininePlural')
                           }
-                          edge='end'
+                          edge="end"
                         >
-                          <ClearIcon fontSize='small' />
+                          <ClearIcon fontSize="small" />
                         </IconButton>
                       </Tooltip>
                     </InputAdornment>
@@ -374,21 +372,21 @@ const AdjectiveItem = ({
           gap: 1,
         }}
       >
-        <Tooltip title='Show all answers'>
+        <Tooltip title="Show all answers">
           <IconButton
-            size='small'
+            size="small"
             onClick={() => onShowAnswer(adjective.id)}
-            color='primary'
+            color="primary"
           >
             <LightbulbOutlinedIcon />
           </IconButton>
         </Tooltip>
 
-        <Tooltip title='Clear all fields'>
+        <Tooltip title="Clear all fields">
           <IconButton
-            size='small'
+            size="small"
             onClick={() => onClearInput(adjective.id)}
-            color='default'
+            color="default"
           >
             <ClearIcon />
           </IconButton>
@@ -402,24 +400,21 @@ const AdjectiveItem = ({
           ml: 2,
         }}
       >
-        <Statistics
-          correct={statistics.correct}
-          wrong={statistics.wrong}
-        />
+        <Statistics correct={statistics.correct} wrong={statistics.wrong} />
       </Box>
 
       {/* Reset button - always at the end */}
-      <Tooltip title='Reset statistics'>
+      <Tooltip title="Reset statistics">
         <IconButton
-          size='small'
+          size="small"
           onClick={() => onResetStatistics(adjective.id)}
-          color='default'
+          color="default"
           disabled={statistics.correct === 0 && statistics.wrong === 0}
           sx={{
             display: { xs: 'none', md: 'inline-flex' },
           }}
         >
-          <DeleteSweepIcon fontSize='small' />
+          <DeleteSweepIcon fontSize="small" />
         </IconButton>
       </Tooltip>
     </AdjectiveListItem>
@@ -427,4 +422,3 @@ const AdjectiveItem = ({
 }
 
 export default React.memo(AdjectiveItem)
-

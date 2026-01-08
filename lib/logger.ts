@@ -1,6 +1,6 @@
 /**
  * Structured logging utility
- * 
+ *
  * Provides consistent logging across the application with:
  * - Log levels (debug, info, warn, error)
  * - Structured JSON output in production
@@ -206,7 +206,11 @@ export class PerformanceTimer {
   /**
    * Get elapsed time and log it
    */
-  end(logger: Logger | ChildLogger, message: string, context?: LogContext): number {
+  end(
+    logger: Logger | ChildLogger,
+    message: string,
+    context?: LogContext
+  ): number {
     const duration = this.elapsed()
     logger.info(message, { ...context, duration })
     return duration
@@ -222,4 +226,3 @@ export const logger = new Logger()
  * Type exports
  */
 export type { LogContext, ChildLogger }
-

@@ -62,13 +62,14 @@ class MockResponse {
 }
 
 // Mock fetch - prevents RTK Query from making real network requests
-global.fetch = jest.fn(() =>
-  Promise.resolve(new MockResponse())
-)
+global.fetch = jest.fn(() => Promise.resolve(new MockResponse()))
 
 // Mock Request for fetchBaseQuery
 global.Request = class MockRequest {
-  constructor(public input: any, public init?: any) {}
+  constructor(
+    public input: any,
+    public init?: any
+  ) {}
 } as any
 
 // Mock Response

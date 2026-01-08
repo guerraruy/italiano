@@ -48,21 +48,21 @@ interface VerbFiltersProps {
 const getVerbIcon = (regular: boolean, reflexive: boolean) => {
   if (reflexive) {
     return (
-      <Tooltip title='Reflexive'>
-        <AutorenewIcon color='secondary' fontSize='small' />
+      <Tooltip title="Reflexive">
+        <AutorenewIcon color="secondary" fontSize="small" />
       </Tooltip>
     )
   }
   if (regular) {
     return (
-      <Tooltip title='Regular'>
-        <RadioButtonCheckedIcon color='info' fontSize='small' />
+      <Tooltip title="Regular">
+        <RadioButtonCheckedIcon color="info" fontSize="small" />
       </Tooltip>
     )
   }
   return (
-    <Tooltip title='Irregular'>
-      <ShowChartIcon color='warning' fontSize='small' />
+    <Tooltip title="Irregular">
+      <ShowChartIcon color="warning" fontSize="small" />
     </Tooltip>
   )
 }
@@ -78,34 +78,34 @@ export const VerbFilters: React.FC<VerbFiltersProps> = ({
 }) => {
   return (
     <FilterBox>
-      <FormControl size='small' sx={{ minWidth: 150 }}>
-        <InputLabel id='verb-type-filter-label'>Verb Type</InputLabel>
+      <FormControl size="small" sx={{ minWidth: 150 }}>
+        <InputLabel id="verb-type-filter-label">Verb Type</InputLabel>
         <Select
-          labelId='verb-type-filter-label'
-          id='verb-type-filter'
+          labelId="verb-type-filter-label"
+          id="verb-type-filter"
           value={verbTypeFilter}
-          label='Verb Type'
+          label="Verb Type"
           onChange={(e) =>
             onVerbTypeFilterChange(e.target.value as VerbTypeFilter)
           }
         >
-          <MenuItem value='all'>All</MenuItem>
-          <MenuItem value='regular'>Regular</MenuItem>
-          <MenuItem value='irregular'>Irregular</MenuItem>
-          <MenuItem value='reflexive'>Reflexive</MenuItem>
+          <MenuItem value="all">All</MenuItem>
+          <MenuItem value="regular">Regular</MenuItem>
+          <MenuItem value="irregular">Irregular</MenuItem>
+          <MenuItem value="reflexive">Reflexive</MenuItem>
         </Select>
       </FormControl>
 
-      <FormControl size='small' sx={{ minWidth: 300 }}>
-        <InputLabel id='verb-select-label'>Select Verb</InputLabel>
+      <FormControl size="small" sx={{ minWidth: 300 }}>
+        <InputLabel id="verb-select-label">Select Verb</InputLabel>
         <Select
-          labelId='verb-select-label'
-          id='verb-select'
+          labelId="verb-select-label"
+          id="verb-select"
           value={selectedVerbId}
-          label='Select Verb'
+          label="Select Verb"
           onChange={(e) => onVerbSelection(e.target.value)}
         >
-          <MenuItem value=''>
+          <MenuItem value="">
             <em>Choose a verb</em>
           </MenuItem>
           {filteredVerbs.map((verb) => (
@@ -122,18 +122,17 @@ export const VerbFilters: React.FC<VerbFiltersProps> = ({
       </FormControl>
 
       {hasSelectedVerb && (
-        <Tooltip title='Reset all statistics for this verb'>
-          <IconButton size='small' onClick={onResetStatistics} color='default'>
+        <Tooltip title="Reset all statistics for this verb">
+          <IconButton size="small" onClick={onResetStatistics} color="default">
             <DeleteSweepIcon />
           </IconButton>
         </Tooltip>
       )}
 
-      <Typography variant='body2' color='text.secondary' sx={{ ml: 1 }}>
+      <Typography variant="body2" color="text.secondary" sx={{ ml: 1 }}>
         {filteredVerbs.length} verb{filteredVerbs.length !== 1 ? 's' : ''}{' '}
         available
       </Typography>
     </FilterBox>
   )
 }
-

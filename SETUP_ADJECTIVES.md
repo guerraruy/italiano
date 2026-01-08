@@ -21,17 +21,20 @@ You need to update your Node.js version and regenerate the Prisma client.
 1. **Update Node.js to version 22.12.0 or higher:**
 
    Using nvm (Node Version Manager):
+
    ```bash
    nvm install 22.12.0
    nvm use 22.12.0
    ```
 
 2. **Regenerate the Prisma client:**
+
    ```bash
    npx prisma generate
    ```
 
 3. **Push the schema to the database:**
+
    ```bash
    npx prisma db push
    ```
@@ -46,15 +49,19 @@ You need to update your Node.js version and regenerate the Prisma client.
 If you can't update Node.js right now, you can temporarily bypass the version check:
 
 1. **Regenerate the Prisma client (ignoring engine requirements):**
+
    ```bash
    yarn prisma generate --skip-engine
    ```
+
    OR
+
    ```bash
    yarn --ignore-engines prisma generate
    ```
 
 2. **Push the schema (ignoring engine requirements):**
+
    ```bash
    yarn --ignore-engines prisma db push
    ```
@@ -89,4 +96,3 @@ Once you've completed the setup:
 - `ADJECTIVES_FEATURE_SUMMARY.md` - Complete documentation
 
 The feature is fully implemented and just needs the Prisma client to be regenerated!
-

@@ -71,7 +71,7 @@ export const VerbsList: React.FC<VerbsListProps> = ({
 }) => {
   if (verbs.length === 0) {
     return (
-      <Alert severity='info'>
+      <Alert severity="info">
         No verbs available. Please ask your administrator to import verbs.
       </Alert>
     )
@@ -114,4 +114,3 @@ export const VerbsList: React.FC<VerbsListProps> = ({
     </>
   )
 }
-

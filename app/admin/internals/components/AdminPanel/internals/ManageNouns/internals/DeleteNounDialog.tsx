@@ -6,6 +6,7 @@ import {
   type ImportedNoun,
   type NounTranslations,
 } from '@/app/store/api'
+
 import DeleteConfirmationDialog from '../../shared/DeleteConfirmationDialog'
 
 interface DeleteNounDialogProps {
@@ -27,15 +28,15 @@ export default function DeleteNounDialog({
 
   const renderNounDetails = (noun: ImportedNoun) => (
     <>
-      <Typography variant='h6' gutterBottom>
+      <Typography variant="h6" gutterBottom>
         {noun.italian}
       </Typography>
-      <Typography variant='body2'>
+      <Typography variant="body2">
         <strong>Singular:</strong> {(noun.singolare as NounTranslations).it} /{' '}
         {(noun.singolare as NounTranslations).pt} /{' '}
         {(noun.singolare as NounTranslations).en}
       </Typography>
-      <Typography variant='body2'>
+      <Typography variant="body2">
         <strong>Plural:</strong> {(noun.plurale as NounTranslations).it} /{' '}
         {(noun.plurale as NounTranslations).pt} /{' '}
         {(noun.plurale as NounTranslations).en}
@@ -47,14 +48,14 @@ export default function DeleteNounDialog({
     <DeleteConfirmationDialog
       open={open}
       item={noun}
-      entityName='noun'
+      entityName="noun"
       onClose={onClose}
       onSuccess={onSuccess}
       onError={onError}
       deleteMutation={(id) => deleteNoun(id).unwrap()}
       isDeleting={deletingNoun}
       renderItemDetails={renderNounDetails}
-      warningMessage='This action cannot be undone. All associated statistics will also be deleted.'
+      warningMessage="This action cannot be undone. All associated statistics will also be deleted."
     />
   )
 }

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+
 import { withAuth } from '@/lib/auth'
 import { verbService, profileService } from '@/lib/services'
 
@@ -16,7 +17,8 @@ export const GET = withAuth(async (request: NextRequest, userId: string) => {
     const verbsForPractice = verbs.map((verb) => ({
       id: verb.id,
       italian: verb.italian,
-      translation: nativeLanguage === 'en' ? verb.tr_en || verb.tr_ptBR : verb.tr_ptBR,
+      translation:
+        nativeLanguage === 'en' ? verb.tr_en || verb.tr_ptBR : verb.tr_ptBR,
       regular: verb.regular,
       reflexive: verb.reflexive,
     }))

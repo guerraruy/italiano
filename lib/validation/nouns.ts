@@ -45,4 +45,3 @@ export type NounIdInput = z.infer<typeof nounIdSchema>
 export type ImportNounsInput = z.infer<typeof importNounsSchema>
 export type UpdateNounInput = z.infer<typeof updateNounSchema>
 export type UpdateNounStatisticInput = z.infer<typeof updateNounStatisticSchema>
-

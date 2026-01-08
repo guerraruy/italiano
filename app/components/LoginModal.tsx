@@ -101,13 +101,13 @@ export default function LoginModal() {
   }
 
   return (
-    <Dialog open={true} maxWidth='sm' fullWidth disableEscapeKeyDown>
+    <Dialog open={true} maxWidth="sm" fullWidth disableEscapeKeyDown>
       <DialogTitle>
         <Typography
-          variant='h5'
-          component='div'
-          fontWeight='bold'
-          textAlign='center'
+          variant="h5"
+          component="div"
+          fontWeight="bold"
+          textAlign="center"
         >
           {isRegisterMode ? 'Create Account' : 'Welcome to Italiano'}
         </Typography>
@@ -119,9 +119,9 @@ export default function LoginModal() {
             sx={{ display: 'flex', flexDirection: 'column', gap: 2.5, py: 2 }}
           >
             <Typography
-              variant='body1'
-              color='text.secondary'
-              textAlign='center'
+              variant="body1"
+              color="text.secondary"
+              textAlign="center"
             >
               {isRegisterMode
                 ? 'Create a new account to start learning'
@@ -129,14 +129,14 @@ export default function LoginModal() {
             </Typography>
 
             {error && (
-              <Alert severity='error' onClose={() => setError('')}>
+              <Alert severity="error" onClose={() => setError('')}>
                 {error}
               </Alert>
             )}
 
             <TextField
               label={isRegisterMode ? 'Username' : 'Username or Email'}
-              variant='outlined'
+              variant="outlined"
               fullWidth
               value={username}
               onChange={(e) => {
@@ -156,9 +156,9 @@ export default function LoginModal() {
             {isRegisterMode && (
               <>
                 <TextField
-                  label='Email'
-                  type='email'
-                  variant='outlined'
+                  label="Email"
+                  type="email"
+                  variant="outlined"
                   fullWidth
                   value={email}
                   onChange={(e) => {
@@ -170,8 +170,8 @@ export default function LoginModal() {
                 />
 
                 <TextField
-                  label='Name (optional)'
-                  variant='outlined'
+                  label="Name (optional)"
+                  variant="outlined"
                   fullWidth
                   value={name}
                   onChange={(e) => setName(e.target.value)}
@@ -181,9 +181,9 @@ export default function LoginModal() {
             )}
 
             <TextField
-              label='Password'
-              type='password'
-              variant='outlined'
+              label="Password"
+              type="password"
+              variant="outlined"
               fullWidth
               value={password}
               onChange={(e) => {
@@ -197,9 +197,9 @@ export default function LoginModal() {
 
             {isRegisterMode && (
               <TextField
-                label='Confirm Password'
-                type='password'
-                variant='outlined'
+                label="Confirm Password"
+                type="password"
+                variant="outlined"
                 fullWidth
                 value={confirmPassword}
                 onChange={(e) => {
@@ -215,10 +215,10 @@ export default function LoginModal() {
         <Divider />
         <DialogActions sx={{ flexDirection: 'column', px: 3, py: 2, gap: 1.5 }}>
           <Button
-            type='submit'
-            variant='contained'
+            type="submit"
+            variant="contained"
             fullWidth
-            size='large'
+            size="large"
             disabled={isLoading}
             startIcon={isLoading ? <CircularProgress size={20} /> : null}
           >
@@ -231,7 +231,7 @@ export default function LoginModal() {
 
           <Button
             onClick={toggleMode}
-            variant='text'
+            variant="text"
             fullWidth
             disabled={isLoading}
           >

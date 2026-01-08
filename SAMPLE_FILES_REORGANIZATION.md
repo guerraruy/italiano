@@ -10,11 +10,11 @@ All sample data files have been reorganized into a dedicated `data/samples/` dir
 
 **From root directory to organized structure:**
 
-| Old Location | New Location |
-|-------------|-------------|
-| `sample-verbs.json` | `data/samples/verbs.json` |
-| `sample-nouns.json` | `data/samples/nouns.json` |
-| `sample-adjectives.json` | `data/samples/adjectives.json` |
+| Old Location                       | New Location                             |
+| ---------------------------------- | ---------------------------------------- |
+| `sample-verbs.json`                | `data/samples/verbs.json`                |
+| `sample-nouns.json`                | `data/samples/nouns.json`                |
+| `sample-adjectives.json`           | `data/samples/adjectives.json`           |
 | `sample-conjugations/aiutare.json` | `data/samples/conjugations/aiutare.json` |
 
 ### Directory Structure
@@ -68,4 +68,3 @@ These sample files are designed to be manually imported through the admin panel:
 ## Date
 
 January 7, 2026
-

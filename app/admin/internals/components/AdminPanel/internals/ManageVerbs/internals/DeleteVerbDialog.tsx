@@ -2,6 +2,7 @@
 import { Box, Typography, Chip } from '@mui/material'
 
 import { ImportedVerb, useDeleteVerbMutation } from '@/app/store/api'
+
 import DeleteConfirmationDialog from '../../shared/DeleteConfirmationDialog'
 
 interface DeleteVerbDialogProps {
@@ -23,22 +24,22 @@ export default function DeleteVerbDialog({
 
   const renderVerbDetails = (verb: ImportedVerb) => (
     <>
-      <Typography variant='h6' gutterBottom>
+      <Typography variant="h6" gutterBottom>
         {verb.italian}
       </Typography>
-      <Typography variant='body2'>
+      <Typography variant="body2">
         <strong>Portuguese:</strong> {verb.tr_ptBR}
       </Typography>
-      <Typography variant='body2'>
+      <Typography variant="body2">
         <strong>English:</strong> {verb.tr_en || 'N/A'}
       </Typography>
       <Box sx={{ mt: 1, display: 'flex', gap: 1 }}>
         {verb.regular ? (
-          <Chip label='Regular' size='small' color='success' />
+          <Chip label="Regular" size="small" color="success" />
         ) : (
-          <Chip label='Irregular' size='small' color='warning' />
+          <Chip label="Irregular" size="small" color="warning" />
         )}
-        {verb.reflexive && <Chip label='Reflexive' size='small' color='info' />}
+        {verb.reflexive && <Chip label="Reflexive" size="small" color="info" />}
       </Box>
     </>
   )
@@ -47,14 +48,14 @@ export default function DeleteVerbDialog({
     <DeleteConfirmationDialog
       open={open}
       item={verb}
-      entityName='verb'
+      entityName="verb"
       onClose={onClose}
       onSuccess={onSuccess}
       onError={onError}
       deleteMutation={(id) => deleteVerb(id).unwrap()}
       isDeleting={deletingVerb}
       renderItemDetails={renderVerbDetails}
-      warningMessage='This action cannot be undone. All associated conjugations and statistics will also be deleted.'
+      warningMessage="This action cannot be undone. All associated conjugations and statistics will also be deleted."
     />
   )
 }

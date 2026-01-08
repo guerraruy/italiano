@@ -93,21 +93,21 @@ function EditFormContent({
       <DialogContent>
         <Stack spacing={3} sx={{ mt: 2 }}>
           <TextField
-            label='Italian (base form)'
+            label="Italian (base form)"
             value={editForm.italian}
             onChange={(e) => handleEditFormChange('italian', e.target.value)}
             fullWidth
-            size='small'
+            size="small"
           />
 
-          <Box display='flex' gap={3}>
+          <Box display="flex" gap={3}>
             <Box flex={1}>
-              <Typography variant='subtitle2' gutterBottom>
+              <Typography variant="subtitle2" gutterBottom>
                 Singular Forms
               </Typography>
               <Stack spacing={2}>
                 <TextField
-                  label='Italian'
+                  label="Italian"
                   value={editForm.singolare.it}
                   onChange={(e) =>
                     handleEditFormChange(
@@ -118,10 +118,10 @@ function EditFormContent({
                     )
                   }
                   fullWidth
-                  size='small'
+                  size="small"
                 />
                 <TextField
-                  label='Portuguese'
+                  label="Portuguese"
                   value={editForm.singolare.pt}
                   onChange={(e) =>
                     handleEditFormChange(
@@ -132,10 +132,10 @@ function EditFormContent({
                     )
                   }
                   fullWidth
-                  size='small'
+                  size="small"
                 />
                 <TextField
-                  label='English'
+                  label="English"
                   value={editForm.singolare.en}
                   onChange={(e) =>
                     handleEditFormChange(
@@ -146,42 +146,42 @@ function EditFormContent({
                     )
                   }
                   fullWidth
-                  size='small'
+                  size="small"
                 />
               </Stack>
             </Box>
 
             <Box flex={1}>
-              <Typography variant='subtitle2' gutterBottom>
+              <Typography variant="subtitle2" gutterBottom>
                 Plural Forms
               </Typography>
               <Stack spacing={2}>
                 <TextField
-                  label='Italian'
+                  label="Italian"
                   value={editForm.plurale.it}
                   onChange={(e) =>
                     handleEditFormChange('it', e.target.value, 'plurale', 'it')
                   }
                   fullWidth
-                  size='small'
+                  size="small"
                 />
                 <TextField
-                  label='Portuguese'
+                  label="Portuguese"
                   value={editForm.plurale.pt}
                   onChange={(e) =>
                     handleEditFormChange('pt', e.target.value, 'plurale', 'pt')
                   }
                   fullWidth
-                  size='small'
+                  size="small"
                 />
                 <TextField
-                  label='English'
+                  label="English"
                   value={editForm.plurale.en}
                   onChange={(e) =>
                     handleEditFormChange('en', e.target.value, 'plurale', 'en')
                   }
                   fullWidth
-                  size='small'
+                  size="small"
                 />
               </Stack>
             </Box>
@@ -194,7 +194,7 @@ function EditFormContent({
         </Button>
         <Button
           onClick={handleUpdateNoun}
-          variant='contained'
+          variant="contained"
           disabled={updatingNoun}
         >
           {updatingNoun ? 'Updating...' : 'Update'}
@@ -216,7 +216,7 @@ export default function EditNounDialog({
   }
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth='md' fullWidth>
+    <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
       <EditFormContent
         key={noun.id}
         noun={noun}

@@ -6,7 +6,9 @@ interface ManageAdjectivesProps {
   onSuccess: (message: string) => void
 }
 
-export default function ManageAdjectives({ onError, onSuccess }: ManageAdjectivesProps) {
+export default function ManageAdjectives({
+  onError,
+  onSuccess,
+}: ManageAdjectivesProps) {
   return <AdjectivesList onError={onError} onSuccess={onSuccess} />
 }
-

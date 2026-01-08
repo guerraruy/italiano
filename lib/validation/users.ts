@@ -14,4 +14,3 @@ export const updateUserSchema = z.object({
 
 export type UserIdInput = z.infer<typeof userIdSchema>
 export type UpdateUserInput = z.infer<typeof updateUserSchema>
-

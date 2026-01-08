@@ -122,6 +122,7 @@ The following moods are supported:
 ### Persons (Persone)
 
 For most tenses, the following persons are used:
+
 - `io` (I)
 - `tu` (you - informal)
 - `lui/lei` (he/she)
@@ -200,6 +201,7 @@ The following API endpoints are used (admin only):
 Returns all verb conjugations in the database.
 
 **Response:**
+
 ```json
 {
   "conjugations": [
@@ -224,6 +226,7 @@ Returns all verb conjugations in the database.
 Imports verb conjugations from JSON data.
 
 **Request Body:**
+
 ```json
 {
   "conjugations": {
@@ -238,6 +241,7 @@ Imports verb conjugations from JSON data.
 ```
 
 **Success Response (200):**
+
 ```json
 {
   "success": true,
@@ -248,6 +252,7 @@ Imports verb conjugations from JSON data.
 ```
 
 **Conflict Response (409):**
+
 ```json
 {
   "conflicts": [
@@ -262,6 +267,7 @@ Imports verb conjugations from JSON data.
 ```
 
 **Error Response (400):**
+
 ```json
 {
   "error": "Some verbs do not exist in the database",
@@ -293,7 +299,7 @@ CREATE TABLE "VerbConjugation" (
 CREATE UNIQUE INDEX "VerbConjugation_verbId_key" ON "VerbConjugation"("verbId");
 CREATE INDEX "VerbConjugation_verbId_idx" ON "VerbConjugation"("verbId");
 
-ALTER TABLE "VerbConjugation" ADD CONSTRAINT "VerbConjugation_verbId_fkey" 
+ALTER TABLE "VerbConjugation" ADD CONSTRAINT "VerbConjugation_verbId_fkey"
   FOREIGN KEY ("verbId") REFERENCES "Verb"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 ```
 
@@ -331,4 +337,3 @@ npx prisma db push
 ### Migration not applied
 
 **Solution:** Apply the migration manually using the SQL provided above, or fix the Prisma CLI compatibility issue and run `npx prisma migrate deploy`.
-

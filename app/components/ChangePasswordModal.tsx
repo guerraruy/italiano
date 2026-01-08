@@ -102,16 +102,16 @@ export default function ChangePasswordModal({
   }
 
   return (
-    <Dialog open={open} onClose={handleClose} maxWidth='sm' fullWidth>
+    <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
       <DialogTitle>
-        <Box display='flex' alignItems='center' justifyContent='space-between'>
-          <Typography variant='h6' component='div'>
+        <Box display="flex" alignItems="center" justifyContent="space-between">
+          <Typography variant="h6" component="div">
             Change Password
           </Typography>
           <IconButton
-            aria-label='close'
+            aria-label="close"
             onClick={handleClose}
-            size='small'
+            size="small"
             disabled={isLoading}
           >
             <CloseIcon />
@@ -124,24 +124,24 @@ export default function ChangePasswordModal({
           <Box
             sx={{ display: 'flex', flexDirection: 'column', gap: 2.5, py: 2 }}
           >
-            <Typography variant='body2' color='text.secondary'>
+            <Typography variant="body2" color="text.secondary">
               Please enter your current password and choose a new password.
             </Typography>
 
             {error && (
-              <Alert severity='error' onClose={() => setError('')}>
+              <Alert severity="error" onClose={() => setError('')}>
                 {error}
               </Alert>
             )}
 
             {success && (
-              <Alert severity='success'>Password changed successfully!</Alert>
+              <Alert severity="success">Password changed successfully!</Alert>
             )}
 
             <TextField
-              label='Current Password'
-              type='password'
-              variant='outlined'
+              label="Current Password"
+              type="password"
+              variant="outlined"
               fullWidth
               value={currentPassword}
               onChange={(e) => {
@@ -154,9 +154,9 @@ export default function ChangePasswordModal({
             />
 
             <TextField
-              label='New Password'
-              type='password'
-              variant='outlined'
+              label="New Password"
+              type="password"
+              variant="outlined"
               fullWidth
               value={newPassword}
               onChange={(e) => {
@@ -165,13 +165,13 @@ export default function ChangePasswordModal({
               }}
               required
               disabled={isLoading || success}
-              helperText='Minimum 6 characters'
+              helperText="Minimum 6 characters"
             />
 
             <TextField
-              label='Confirm New Password'
-              type='password'
-              variant='outlined'
+              label="Confirm New Password"
+              type="password"
+              variant="outlined"
               fullWidth
               value={confirmPassword}
               onChange={(e) => {
@@ -185,12 +185,12 @@ export default function ChangePasswordModal({
         </DialogContent>
         <Divider />
         <DialogActions sx={{ px: 3, py: 2 }}>
-          <Button onClick={handleClose} variant='outlined' disabled={isLoading}>
+          <Button onClick={handleClose} variant="outlined" disabled={isLoading}>
             Cancel
           </Button>
           <Button
-            type='submit'
-            variant='contained'
+            type="submit"
+            variant="contained"
             disabled={isLoading || success}
             startIcon={isLoading ? <CircularProgress size={20} /> : null}
           >

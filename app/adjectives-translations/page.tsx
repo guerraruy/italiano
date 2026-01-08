@@ -65,14 +65,14 @@ export default function AdjectivesTranslationsPage() {
 
   if (isLoading) {
     return (
-      <PageContainer maxWidth='lg'>
-        <PageHeader title='Adjectives Translations' />
+      <PageContainer maxWidth="lg">
+        <PageHeader title="Adjectives Translations" />
         <ContentPaper elevation={3}>
           <Box
-            display='flex'
-            justifyContent='center'
-            alignItems='center'
-            minHeight='400px'
+            display="flex"
+            justifyContent="center"
+            alignItems="center"
+            minHeight="400px"
           >
             <CircularProgress />
           </Box>
@@ -83,10 +83,10 @@ export default function AdjectivesTranslationsPage() {
 
   if (error) {
     return (
-      <PageContainer maxWidth='lg'>
-        <PageHeader title='Adjectives Translations' />
+      <PageContainer maxWidth="lg">
+        <PageHeader title="Adjectives Translations" />
         <ContentPaper elevation={3}>
-          <Alert severity='error'>
+          <Alert severity="error">
             Error loading adjectives. Please try again later.
           </Alert>
         </ContentPaper>
@@ -95,13 +95,13 @@ export default function AdjectivesTranslationsPage() {
   }
 
   return (
-    <PageContainer maxWidth='lg'>
-      <PageHeader title='Adjectives Translations' />
+    <PageContainer maxWidth="lg">
+      <PageHeader title="Adjectives Translations" />
 
       <ContentPaper elevation={3}>
         <Typography
-          variant='h6'
-          color='text.secondary'
+          variant="h6"
+          color="text.secondary"
           gutterBottom
           sx={{ mb: 3 }}
         >

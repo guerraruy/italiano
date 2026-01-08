@@ -36,6 +36,7 @@ DATABASE_URL="postgresql://your-user:your-password@your-endpoint.neon.tech/your-
 ```
 
 **Neon connection string example:**
+
 ```env
 DATABASE_URL="postgresql://myuser:mypassword@ep-cool-waterfall-123456.us-east-2.aws.neon.tech/neondb?sslmode=require"
 ```
@@ -49,6 +50,7 @@ npx prisma migrate dev --name add_user_authentication
 ```
 
 This command will:
+
 - Create tables in the Neon database
 - Add new fields to the User model
 - Generate the updated Prisma Client
@@ -100,11 +102,13 @@ prisma/
 ## 🎯 Features
 
 ### Login
+
 - Username or email
 - Password
 - Clear error messages
 
 ### Registration
+
 - Username (required, unique)
 - Email (required, unique)
 - Password (min 6 characters)
@@ -114,8 +118,8 @@ prisma/
 ## 🐛 Troubleshooting
 
 If you encounter connection errors:
+
 1. Verify that the Neon connection string is correct in `.env`
 2. Check if the Neon project is active
 3. Try regenerating credentials in the Neon dashboard
 4. Run `npx prisma generate` before `npx prisma migrate dev`
-

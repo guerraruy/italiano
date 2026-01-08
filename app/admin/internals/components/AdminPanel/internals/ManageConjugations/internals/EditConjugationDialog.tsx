@@ -89,14 +89,14 @@ function EditFormContent({
       <DialogTitle>Edit Conjugation for {conjugation.verb.italian}</DialogTitle>
       <DialogContent>
         <Box sx={{ mb: 2 }}>
-          <Alert severity='info' icon={<Info />}>
+          <Alert severity="info" icon={<Info />}>
             Edit the conjugation data in JSON format. Be careful with the
             structure to ensure all tenses and forms are correctly defined.
           </Alert>
         </Box>
 
         <TextField
-          label='Conjugation Data (JSON)'
+          label="Conjugation Data (JSON)"
           value={jsonContent}
           onChange={(e) => handleJsonChange(e.target.value)}
           multiline
@@ -118,7 +118,7 @@ function EditFormContent({
         </Button>
         <Button
           onClick={handleUpdateConjugation}
-          variant='contained'
+          variant="contained"
           disabled={updatingConjugation || !!jsonError}
         >
           {updatingConjugation ? 'Updating...' : 'Update'}
@@ -140,7 +140,7 @@ export default function EditConjugationDialog({
   }
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth='md' fullWidth>
+    <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
       <EditFormContent
         key={conjugation.id}
         conjugation={conjugation}

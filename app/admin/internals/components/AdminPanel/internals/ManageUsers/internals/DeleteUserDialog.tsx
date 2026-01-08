@@ -2,6 +2,7 @@
 import { Typography } from '@mui/material'
 
 import { useDeleteUserMutation, type UserData } from '@/app/store/api'
+
 import DeleteConfirmationDialog from '../../shared/DeleteConfirmationDialog'
 
 interface DeleteUserDialogProps {
@@ -23,14 +24,14 @@ export default function DeleteUserDialog({
 
   const renderUserDetails = (user: UserData) => (
     <>
-      <Typography variant='h6' gutterBottom>
+      <Typography variant="h6" gutterBottom>
         {user.username}
       </Typography>
-      <Typography variant='body2'>
+      <Typography variant="body2">
         <strong>Email:</strong> {user.email}
       </Typography>
       {user.name && (
-        <Typography variant='body2'>
+        <Typography variant="body2">
           <strong>Name:</strong> {user.name}
         </Typography>
       )}
@@ -41,7 +42,7 @@ export default function DeleteUserDialog({
     <DeleteConfirmationDialog
       open={open}
       item={user}
-      entityName='user'
+      entityName="user"
       onClose={onClose}
       onSuccess={onSuccess}
       onError={onError}
@@ -51,7 +52,7 @@ export default function DeleteUserDialog({
       }}
       isDeleting={deletingUser}
       renderItemDetails={renderUserDetails}
-      warningMessage='This action cannot be undone. All user data will be permanently removed.'
+      warningMessage="This action cannot be undone. All user data will be permanently removed."
     />
   )
 }

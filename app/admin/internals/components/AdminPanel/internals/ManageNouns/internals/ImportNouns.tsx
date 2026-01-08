@@ -119,9 +119,9 @@ export default function ImportNouns({ onError, onSuccess }: ImportNounsProps) {
   return (
     <>
       {/* Import Icon */}
-      <Tooltip title='Import Nouns from JSON'>
+      <Tooltip title="Import Nouns from JSON">
         <IconButton
-          color='primary'
+          color="primary"
           onClick={() => setShowImportDialog(true)}
           disabled={importingNouns}
         >
@@ -133,17 +133,17 @@ export default function ImportNouns({ onError, onSuccess }: ImportNounsProps) {
       <Dialog
         open={showImportDialog}
         onClose={() => setShowImportDialog(false)}
-        maxWidth='sm'
+        maxWidth="sm"
         fullWidth
       >
         <DialogTitle>
-          <Box display='flex' alignItems='center' gap={1}>
+          <Box display="flex" alignItems="center" gap={1}>
             Import Nouns from JSON
-            <Tooltip title='View JSON Format Information'>
+            <Tooltip title="View JSON Format Information">
               <IconButton
-                size='small'
+                size="small"
                 onClick={() => setShowFormatInfoDialog(true)}
-                color='primary'
+                color="primary"
               >
                 <InfoOutlined />
               </IconButton>
@@ -151,17 +151,17 @@ export default function ImportNouns({ onError, onSuccess }: ImportNounsProps) {
           </Box>
         </DialogTitle>
         <DialogContent>
-          <Stack direction='row' spacing={2} alignItems='center' sx={{ mt: 1 }}>
+          <Stack direction="row" spacing={2} alignItems="center" sx={{ mt: 1 }}>
             <Button
-              component='label'
-              variant='outlined'
+              component="label"
+              variant="outlined"
               startIcon={<CloudUpload />}
               disabled={importingNouns}
             >
               Choose JSON File
               <input
-                type='file'
-                accept='.json'
+                type="file"
+                accept=".json"
                 hidden
                 onChange={handleNounFileUpload}
               />
@@ -169,16 +169,16 @@ export default function ImportNouns({ onError, onSuccess }: ImportNounsProps) {
             {nounJsonContent && (
               <Chip
                 icon={<CheckCircle />}
-                label='File loaded'
-                color='success'
-                size='small'
+                label="File loaded"
+                color="success"
+                size="small"
               />
             )}
           </Stack>
 
           {nounJsonContent && (
             <Box sx={{ mt: 2 }}>
-              <Typography variant='body2' color='text.secondary' gutterBottom>
+              <Typography variant="body2" color="text.secondary" gutterBottom>
                 Preview: {Object.keys(JSON.parse(nounJsonContent)).length} nouns
                 ready to import
               </Typography>
@@ -189,7 +189,7 @@ export default function ImportNouns({ onError, onSuccess }: ImportNounsProps) {
           <Button onClick={() => setShowImportDialog(false)}>Cancel</Button>
           {nounJsonContent && (
             <Button
-              variant='contained'
+              variant="contained"
               onClick={() => {
                 handleImportNouns()
                 setShowImportDialog(false)
@@ -213,96 +213,96 @@ export default function ImportNouns({ onError, onSuccess }: ImportNounsProps) {
       <Dialog
         open={showNounConflictDialog}
         onClose={() => setShowNounConflictDialog(false)}
-        maxWidth='md'
+        maxWidth="md"
         fullWidth
       >
         <DialogTitle>
-          <Box display='flex' alignItems='center' gap={1}>
-            <Warning color='warning' />
+          <Box display="flex" alignItems="center" gap={1}>
+            <Warning color="warning" />
             Resolve Conflicts ({nounConflicts.length} nouns)
           </Box>
         </DialogTitle>
         <DialogContent>
-          <Typography variant='body2' color='text.secondary' sx={{ mb: 2 }}>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
             The following nouns already exist in the database. Choose whether to
             keep the existing data or replace it with the new data.
           </Typography>
 
           {nounConflicts.map((conflict) => (
             <Paper key={conflict.italian} sx={{ p: 2, mb: 2 }}>
-              <Typography variant='h6' gutterBottom>
+              <Typography variant="h6" gutterBottom>
                 {conflict.italian}
               </Typography>
 
-              <Stack direction='row' spacing={3} sx={{ mb: 2 }}>
+              <Stack direction="row" spacing={3} sx={{ mb: 2 }}>
                 <Box flex={1}>
-                  <Typography variant='subtitle2' color='primary' gutterBottom>
+                  <Typography variant="subtitle2" color="primary" gutterBottom>
                     Existing Data
                   </Typography>
-                  <Typography variant='body2' fontWeight='bold'>
+                  <Typography variant="body2" fontWeight="bold">
                     Singular:
                   </Typography>
-                  <Typography variant='body2' sx={{ ml: 1 }}>
+                  <Typography variant="body2" sx={{ ml: 1 }}>
                     IT: {conflict.existing.singolare.it}
                   </Typography>
-                  <Typography variant='body2' sx={{ ml: 1 }}>
+                  <Typography variant="body2" sx={{ ml: 1 }}>
                     PT: {conflict.existing.singolare.pt}
                   </Typography>
-                  <Typography variant='body2' sx={{ ml: 1 }}>
+                  <Typography variant="body2" sx={{ ml: 1 }}>
                     EN: {conflict.existing.singolare.en}
                   </Typography>
-                  <Typography variant='body2' fontWeight='bold' sx={{ mt: 1 }}>
+                  <Typography variant="body2" fontWeight="bold" sx={{ mt: 1 }}>
                     Plural:
                   </Typography>
-                  <Typography variant='body2' sx={{ ml: 1 }}>
+                  <Typography variant="body2" sx={{ ml: 1 }}>
                     IT: {conflict.existing.plurale.it}
                   </Typography>
-                  <Typography variant='body2' sx={{ ml: 1 }}>
+                  <Typography variant="body2" sx={{ ml: 1 }}>
                     PT: {conflict.existing.plurale.pt}
                   </Typography>
-                  <Typography variant='body2' sx={{ ml: 1 }}>
+                  <Typography variant="body2" sx={{ ml: 1 }}>
                     EN: {conflict.existing.plurale.en}
                   </Typography>
                 </Box>
 
                 <Box flex={1}>
                   <Typography
-                    variant='subtitle2'
-                    color='secondary'
+                    variant="subtitle2"
+                    color="secondary"
                     gutterBottom
                   >
                     New Data
                   </Typography>
-                  <Typography variant='body2' fontWeight='bold'>
+                  <Typography variant="body2" fontWeight="bold">
                     Singular:
                   </Typography>
-                  <Typography variant='body2' sx={{ ml: 1 }}>
+                  <Typography variant="body2" sx={{ ml: 1 }}>
                     IT: {conflict.new.singolare.it}
                   </Typography>
-                  <Typography variant='body2' sx={{ ml: 1 }}>
+                  <Typography variant="body2" sx={{ ml: 1 }}>
                     PT: {conflict.new.singolare.pt}
                   </Typography>
-                  <Typography variant='body2' sx={{ ml: 1 }}>
+                  <Typography variant="body2" sx={{ ml: 1 }}>
                     EN: {conflict.new.singolare.en}
                   </Typography>
-                  <Typography variant='body2' fontWeight='bold' sx={{ mt: 1 }}>
+                  <Typography variant="body2" fontWeight="bold" sx={{ mt: 1 }}>
                     Plural:
                   </Typography>
-                  <Typography variant='body2' sx={{ ml: 1 }}>
+                  <Typography variant="body2" sx={{ ml: 1 }}>
                     IT: {conflict.new.plurale.it}
                   </Typography>
-                  <Typography variant='body2' sx={{ ml: 1 }}>
+                  <Typography variant="body2" sx={{ ml: 1 }}>
                     PT: {conflict.new.plurale.pt}
                   </Typography>
-                  <Typography variant='body2' sx={{ ml: 1 }}>
+                  <Typography variant="body2" sx={{ ml: 1 }}>
                     EN: {conflict.new.plurale.en}
                   </Typography>
                 </Box>
               </Stack>
 
-              <Stack direction='row' spacing={2}>
+              <Stack direction="row" spacing={2}>
                 <Button
-                  size='small'
+                  size="small"
                   variant={
                     nounConflictResolutions[conflict.italian] === 'keep'
                       ? 'contained'
@@ -315,13 +315,13 @@ export default function ImportNouns({ onError, onSuccess }: ImportNounsProps) {
                   Keep Existing
                 </Button>
                 <Button
-                  size='small'
+                  size="small"
                   variant={
                     nounConflictResolutions[conflict.italian] === 'replace'
                       ? 'contained'
                       : 'outlined'
                   }
-                  color='secondary'
+                  color="secondary"
                   onClick={() =>
                     handleNounConflictResolution(conflict.italian, 'replace')
                   }
@@ -338,7 +338,7 @@ export default function ImportNouns({ onError, onSuccess }: ImportNounsProps) {
           </Button>
           <Button
             onClick={handleResolveNounConflicts}
-            variant='contained'
+            variant="contained"
             disabled={
               Object.keys(nounConflictResolutions).length !==
               nounConflicts.length
@@ -353,24 +353,24 @@ export default function ImportNouns({ onError, onSuccess }: ImportNounsProps) {
       <Dialog
         open={showFormatInfoDialog}
         onClose={() => setShowFormatInfoDialog(false)}
-        maxWidth='sm'
+        maxWidth="sm"
         fullWidth
       >
         <DialogTitle>
-          <Box display='flex' alignItems='center' gap={1}>
-            <Info color='primary' />
+          <Box display="flex" alignItems="center" gap={1}>
+            <Info color="primary" />
             JSON Format Information
           </Box>
         </DialogTitle>
         <DialogContent>
-          <Typography variant='body2' color='text.secondary' sx={{ mb: 2 }}>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
             Upload a JSON file with Italian nouns and their translations in
             singular and plural forms. Expected format:
           </Typography>
           <Paper sx={{ p: 2, backgroundColor: 'grey.100' }}>
             <Typography
-              variant='body2'
-              component='pre'
+              variant="body2"
+              component="pre"
               sx={{ fontFamily: 'monospace', fontSize: '0.85rem' }}
             >
               {`{

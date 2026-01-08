@@ -7,10 +7,7 @@ import {
   useUpdateAdjectiveStatisticMutation,
 } from '@/app/store/api'
 
-import {
-  SortOption,
-  DisplayCount,
-} from '../components/AdjectiveItem/internals'
+import { SortOption, DisplayCount } from '../components/AdjectiveItem/internals'
 import { InputValues, ResetDialogState, ValidationState } from '../types'
 import { validateAnswer } from '../utils'
 
@@ -41,11 +38,7 @@ export const useAdjectivesPractice = () => {
   const lastValidatedRef = useRef<{ [key: string]: number }>({})
 
   const handleInputChange = useCallback(
-    (
-      adjectiveId: string,
-      field: keyof InputValues[string],
-      value: string
-    ) => {
+    (adjectiveId: string, field: keyof InputValues[string], value: string) => {
       setInputValues((prev) => ({
         ...prev,
         [adjectiveId]: {
@@ -129,17 +122,10 @@ export const useAdjectivesPractice = () => {
         'femininePlural',
       ]
       const allFilled = allFields.every((f) =>
-        f === field
-          ? userInput.trim()
-          : inputValues[adjectiveId]?.[f]?.trim()
+        f === field ? userInput.trim() : inputValues[adjectiveId]?.[f]?.trim()
       )
-      const allValidated = allFields.every(
-        (f) =>
-          f === field
-            ? isCorrect
-              ? 'correct'
-              : 'incorrect'
-            : updatedState[f]
+      const allValidated = allFields.every((f) =>
+        f === field ? (isCorrect ? 'correct' : 'incorrect') : updatedState[f]
       )
 
       // Only save statistics if all fields are validated
@@ -365,7 +351,7 @@ export const useAdjectivesPractice = () => {
 
         const adjective = filteredAndSortedAdjectives[currentIndex]
         if (!adjective) return
-        
+
         const correctAnswers = {
           masculineSingular: adjective.masculineSingular,
           masculinePlural: adjective.masculinePlural,
@@ -468,4 +454,3 @@ export const useAdjectivesPractice = () => {
     shouldShowRefreshButton,
   }
 }
-

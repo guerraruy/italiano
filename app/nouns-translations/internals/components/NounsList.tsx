@@ -72,7 +72,7 @@ export const NounsList: React.FC<NounsListProps> = ({
 }) => {
   if (nouns.length === 0) {
     return (
-      <Alert severity='info'>
+      <Alert severity="info">
         No nouns available. Please ask your administrator to import nouns.
       </Alert>
     )

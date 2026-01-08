@@ -6,6 +6,7 @@ import {
   useDeleteConjugationMutation,
   VerbConjugation,
 } from '@/app/store/api'
+
 import DeleteConfirmationDialog from '../../shared/DeleteConfirmationDialog'
 
 interface DeleteConjugationDialogProps {
@@ -36,23 +37,23 @@ export default function DeleteConjugationDialog({
 
     return (
       <>
-        <Typography variant='h6' gutterBottom>
+        <Typography variant="h6" gutterBottom>
           {conjugation.verb.italian}
         </Typography>
         <Box sx={{ mb: 1, display: 'flex', gap: 1 }}>
           {conjugation.verb.regular ? (
-            <Chip label='Regular' size='small' color='success' />
+            <Chip label="Regular" size="small" color="success" />
           ) : (
-            <Chip label='Irregular' size='small' color='warning' />
+            <Chip label="Irregular" size="small" color="warning" />
           )}
           {conjugation.verb.reflexive && (
-            <Chip label='Reflexive' size='small' color='info' />
+            <Chip label="Reflexive" size="small" color="info" />
           )}
         </Box>
-        <Typography variant='body2'>
+        <Typography variant="body2">
           <strong>Moods:</strong> {moods.join(', ')}
         </Typography>
-        <Typography variant='body2'>
+        <Typography variant="body2">
           <strong>Total Tenses:</strong> {totalTenses}
         </Typography>
       </>
@@ -63,14 +64,14 @@ export default function DeleteConjugationDialog({
     <DeleteConfirmationDialog
       open={open}
       item={conjugation}
-      entityName='conjugation'
+      entityName="conjugation"
       onClose={onClose}
       onSuccess={onSuccess}
       onError={onError}
       deleteMutation={(id) => deleteConjugation(id).unwrap()}
       isDeleting={deletingConjugation}
       renderItemDetails={renderConjugationDetails}
-      warningMessage='This action cannot be undone. The conjugation data will be permanently deleted from the database.'
+      warningMessage="This action cannot be undone. The conjugation data will be permanently deleted from the database."
     />
   )
 }

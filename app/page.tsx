@@ -1,4 +1,9 @@
 'use client'
+import HomeIcon from '@mui/icons-material/Home'
+import RecordVoiceOverIcon from '@mui/icons-material/RecordVoiceOver'
+import ScheduleIcon from '@mui/icons-material/Schedule'
+import StyleIcon from '@mui/icons-material/Style'
+import TranslateIcon from '@mui/icons-material/Translate'
 import {
   Container,
   Typography,
@@ -9,11 +14,6 @@ import {
   CardContent,
 } from '@mui/material'
 import { styled } from '@mui/material/styles'
-import HomeIcon from '@mui/icons-material/Home'
-import TranslateIcon from '@mui/icons-material/Translate'
-import RecordVoiceOverIcon from '@mui/icons-material/RecordVoiceOver'
-import ScheduleIcon from '@mui/icons-material/Schedule'
-import StyleIcon from '@mui/icons-material/Style'
 import { useRouter } from 'next/navigation'
 
 const PageContainer = styled(Container)(({ theme }) => ({
@@ -62,44 +62,44 @@ export default function Home() {
       title: 'Nouns Translations',
       description:
         'Learn and practice Italian vocabulary with interactive translations',
-      icon: <TranslateIcon fontSize='inherit' />,
+      icon: <TranslateIcon fontSize="inherit" />,
       path: '/nouns-translations',
     },
     {
       title: 'Adjectives Translations',
       description:
         'Practice Italian adjectives with masculine, feminine, singular and plural forms',
-      icon: <StyleIcon fontSize='inherit' />,
+      icon: <StyleIcon fontSize="inherit" />,
       path: '/adjectives-translations',
     },
     {
       title: 'Verbs Translations',
       description:
         'Master Italian verbs with comprehensive translation exercises',
-      icon: <RecordVoiceOverIcon fontSize='inherit' />,
+      icon: <RecordVoiceOverIcon fontSize="inherit" />,
       path: '/verbs-translations',
     },
     {
       title: 'Verb Tenses',
       description: 'Practice verb conjugations across different tenses',
-      icon: <ScheduleIcon fontSize='inherit' />,
+      icon: <ScheduleIcon fontSize="inherit" />,
       path: '/verb-tenses',
     },
   ]
 
   return (
-    <PageContainer maxWidth='lg'>
+    <PageContainer maxWidth="lg">
       <HeroSection>
         <IconWrapper>
-          <HomeIcon fontSize='inherit' />
+          <HomeIcon fontSize="inherit" />
         </IconWrapper>
-        <Typography variant='h2' component='h1' gutterBottom fontWeight='bold'>
+        <Typography variant="h2" component="h1" gutterBottom fontWeight="bold">
           Welcome to Italiano
         </Typography>
-        <Typography variant='h5' color='text.secondary' paragraph>
+        <Typography variant="h5" color="text.secondary" paragraph>
           Your journey to learning Italian starts here
         </Typography>
-        <Typography variant='body1' color='text.secondary' maxWidth='md'>
+        <Typography variant="body1" color="text.secondary" maxWidth="md">
           Choose a learning path below to begin mastering the Italian language
           with interactive exercises and comprehensive lessons.
         </Typography>
@@ -108,7 +108,11 @@ export default function Home() {
       <Box
         sx={{
           display: 'grid',
-          gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(4, 1fr)' },
+          gridTemplateColumns: {
+            xs: '1fr',
+            sm: 'repeat(2, 1fr)',
+            md: 'repeat(4, 1fr)',
+          },
           gap: 4,
         }}
       >
@@ -131,14 +135,14 @@ export default function Home() {
               >
                 <FeatureIcon>{feature.icon}</FeatureIcon>
                 <Typography
-                  variant='h5'
-                  component='h2'
+                  variant="h5"
+                  component="h2"
                   gutterBottom
-                  fontWeight='bold'
+                  fontWeight="bold"
                 >
                   {feature.title}
                 </Typography>
-                <Typography variant='body2' color='text.secondary'>
+                <Typography variant="body2" color="text.secondary">
                   {feature.description}
                 </Typography>
               </CardContent>
@@ -156,10 +160,10 @@ export default function Home() {
           background: 'linear-gradient(145deg, #ffffff 0%, #f5f5f5 100%)',
         }}
       >
-        <Typography variant='h6' gutterBottom>
+        <Typography variant="h6" gutterBottom>
           Ready to start learning?
         </Typography>
-        <Typography variant='body2' color='text.secondary' paragraph>
+        <Typography variant="body2" color="text.secondary" paragraph>
           Click on any of the cards above to begin your Italian learning journey
         </Typography>
         <Box
@@ -172,9 +176,9 @@ export default function Home() {
           }}
         >
           <Button
-            variant='contained'
-            size='large'
-            color='primary'
+            variant="contained"
+            size="large"
+            color="primary"
             onClick={() => router.push('/nouns-translations')}
           >
             Get Started

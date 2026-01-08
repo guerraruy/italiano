@@ -45,17 +45,17 @@ export default function AdminPanel() {
 
   return (
     <Box sx={{ maxWidth: 1200, mx: 'auto', p: 3 }}>
-      <PageHeader title='Administration Panel' />
+      <PageHeader title="Administration Panel" />
 
       {error && (
-        <Alert severity='error' sx={{ mb: 2 }} onClose={() => setError(null)}>
+        <Alert severity="error" sx={{ mb: 2 }} onClose={() => setError(null)}>
           {error}
         </Alert>
       )}
 
       {successMessage && (
         <Alert
-          severity='success'
+          severity="success"
           sx={{ mb: 2 }}
           onClose={() => setSuccessMessage(null)}
         >
@@ -68,11 +68,11 @@ export default function AdminPanel() {
           value={currentTab}
           onChange={(_, newValue) => setCurrentTab(newValue)}
         >
-          <Tab label='Manage Users' />
-          <Tab label='Manage Verbs' />
-          <Tab label='Manage Conjugations' />
-          <Tab label='Manage Nouns' />
-          <Tab label='Manage Adjectives' />
+          <Tab label="Manage Users" />
+          <Tab label="Manage Verbs" />
+          <Tab label="Manage Conjugations" />
+          <Tab label="Manage Nouns" />
+          <Tab label="Manage Adjectives" />
         </Tabs>
       </Box>
 

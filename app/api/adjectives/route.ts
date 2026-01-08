@@ -34,9 +34,7 @@ export const GET = withAuth(async (request: NextRequest, userId: string) => {
 
       // Get translation based on native language
       const translation =
-        nativeLanguage === 'en'
-          ? maschile.singolare.en
-          : maschile.singolare.pt
+        nativeLanguage === 'en' ? maschile.singolare.en : maschile.singolare.pt
 
       return {
         id: adj.id,

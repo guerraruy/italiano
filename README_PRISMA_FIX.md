@@ -3,6 +3,7 @@
 ## The Problem
 
 You're seeing this error:
+
 ```
 TypeError: Cannot read properties of undefined (reading 'findMany')
 at prisma.verbConjugation.findMany
@@ -17,43 +18,51 @@ at prisma.verbConjugation.findMany
 Then run these commands in your terminal:
 
 ### 1. Update Node.js
+
 ```bash
 nvm install 22.12
 nvm use 22.12
 ```
 
 ### 2. Verify Node Version
+
 ```bash
 node --version
 # Should show: v22.12.0 or higher
 ```
 
 ### 3. Navigate to Project
+
 ```bash
 cd /Users/ruyguerra/Projects/Italiano
 ```
 
 ### 4. Regenerate Prisma Client (THIS IS THE KEY STEP!)
+
 ```bash
 npx prisma generate
 ```
 
 You should see output like:
+
 ```
 ✔ Generated Prisma Client (5.x.x) to ./node_modules/@prisma/client
 ```
 
 ### 5. Apply Database Migration
+
 ```bash
 npx prisma db push
 ```
 
 ### 6. Restart Dev Server
+
 ```bash
 yarn dev
 ```
 
 ### 7. Test the Feature
+
 Navigate to: http://localhost:3000/admin/verbs/conjugations
 
 ---
@@ -76,7 +85,7 @@ Your Node.js v22.1.0 can't run `prisma generate` due to a compatibility issue, s
 ✅ `prisma.verbConjugation` will be defined  
 ✅ The API will work correctly  
 ✅ You can import verb conjugations  
-✅ No more errors!  
+✅ No more errors!
 
 ---
 
@@ -91,4 +100,3 @@ ls -la node_modules/.prisma/client/index.d.ts
 You should see the file exists and was recently modified.
 
 Then restart your dev server and visit `/admin/verbs/conjugations` - the error should be gone!
-

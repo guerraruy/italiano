@@ -7,6 +7,7 @@ This document summarizes the implementation of the Nouns Translation management 
 ## Changes Made
 
 ### 1. Page Renaming
+
 - **Words Translations** → **Nouns Translations**
 - Updated in:
   - `/app/words-translations/page.tsx`
@@ -14,7 +15,9 @@ This document summarizes the implementation of the Nouns Translation management 
   - `/app/page.tsx` (home page features)
 
 ### 2. Database Schema
+
 Added new `Noun` model to `/prisma/schema.prisma`:
+
 ```prisma
 model Noun {
   id          String   @id @default(cuid())
@@ -27,6 +30,7 @@ model Noun {
 ```
 
 **Note:** You need to run the following command to apply the schema changes:
+
 ```bash
 npx prisma db push
 # or
@@ -34,14 +38,18 @@ yarn prisma db push
 ```
 
 ### 3. API Endpoints
+
 Created `/app/api/admin/nouns/import/route.ts` with:
+
 - **POST** endpoint for importing nouns with conflict resolution
 - **GET** endpoint for fetching all nouns (admin only)
 - Authentication via JWT tokens
 - Conflict detection and resolution logic
 
 ### 4. RTK Query Store Updates
+
 Updated `/app/store/api.ts` with:
+
 - New TypeScript interfaces:
   - `NounTranslations`
   - `NounData`
@@ -57,7 +65,9 @@ Updated `/app/store/api.ts` with:
   - `useImportNounsMutation`
 
 ### 5. Admin Panel Component
+
 Created `/app/components/AdminPanel/internals/ManageNouns.tsx`:
+
 - File upload for JSON import
 - Preview of loaded data
 - Import functionality with loading states
@@ -67,13 +77,17 @@ Created `/app/components/AdminPanel/internals/ManageNouns.tsx`:
 - Full Portuguese and English translation support
 
 ### 6. Admin Panel Integration
+
 Updated `/app/components/AdminPanel/AdminPanel.tsx`:
+
 - Added "Manage Nouns" tab (4th tab)
 - Integrated ManageNouns component
 - Updated exports in `/app/components/AdminPanel/internals/index.ts`
 
 ### 7. Documentation & Sample Files
+
 Created:
+
 - `data/samples/nouns.json` - Example import file with 5 sample nouns
 - `NOUN_IMPORT_GUIDE.md` - Comprehensive guide for importing nouns
 
@@ -99,6 +113,7 @@ The import expects JSON files in this format:
 ```
 
 **Key Points:**
+
 - The object key is the Italian noun in its base form (without article)
 - Each noun has `singolare` and `plurale` objects
 - Each form includes translations for Italian (it), Portuguese (pt), and English (en)
@@ -128,11 +143,13 @@ The import expects JSON files in this format:
 ### For Developers:
 
 1. **Apply Database Changes:**
+
    ```bash
    yarn prisma db push
    ```
 
 2. **Restart Development Server:**
+
    ```bash
    yarn dev
    ```
@@ -145,6 +162,7 @@ The import expects JSON files in this format:
 ## Technical Architecture
 
 ### Data Flow:
+
 1. User uploads JSON file in admin panel
 2. File is validated on client side
 3. Data sent to `/api/admin/nouns/import` endpoint
@@ -157,12 +175,14 @@ The import expects JSON files in this format:
 10. UI automatically refreshes with new data
 
 ### Security:
+
 - All noun management endpoints require admin authentication
 - JWT token validation on every request
 - Prisma ORM for SQL injection protection
 - Input validation on both client and server
 
 ### Performance:
+
 - Batch operations for multiple noun imports
 - JSONB type in PostgreSQL for efficient storage and querying
 - RTK Query caching to minimize API calls
@@ -200,6 +220,7 @@ Potential improvements for the feature:
 ## Files Changed/Created
 
 ### Modified Files:
+
 - `/app/words-translations/page.tsx`
 - `/app/components/Navbar.tsx`
 - `/app/page.tsx`
@@ -209,6 +230,7 @@ Potential improvements for the feature:
 - `/app/components/AdminPanel/internals/index.ts`
 
 ### New Files:
+
 - `/app/api/admin/nouns/import/route.ts`
 - `/app/components/AdminPanel/internals/ManageNouns.tsx`
 - `/data/samples/nouns.json`
@@ -238,9 +260,9 @@ Potential improvements for the feature:
 ## Support
 
 For questions or issues:
+
 1. Check the `NOUN_IMPORT_GUIDE.md` for usage instructions
 2. Review the sample file `data/samples/nouns.json` for format reference
 3. Ensure you're logged in as an admin user
 4. Check browser console for client-side errors
 5. Check server logs for API errors
-

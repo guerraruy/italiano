@@ -28,12 +28,12 @@ export default function ResetStatisticsDialog({
     <Dialog
       open={open}
       onClose={onClose}
-      aria-labelledby='reset-dialog-title'
-      aria-describedby='reset-dialog-description'
+      aria-labelledby="reset-dialog-title"
+      aria-describedby="reset-dialog-description"
     >
-      <DialogTitle id='reset-dialog-title'>Reset Statistics</DialogTitle>
+      <DialogTitle id="reset-dialog-title">Reset Statistics</DialogTitle>
       <DialogContent>
-        <DialogContentText id='reset-dialog-description'>
+        <DialogContentText id="reset-dialog-description">
           Are you sure you want to reset all statistics for the verb &quot;
           {verbTranslation}&quot;? This action cannot be undone.
         </DialogContentText>
@@ -44,8 +44,8 @@ export default function ResetStatisticsDialog({
         </Button>
         <Button
           onClick={onConfirm}
-          color='error'
-          variant='contained'
+          color="error"
+          variant="contained"
           disabled={isResetting}
           autoFocus
         >
@@ -55,4 +55,3 @@ export default function ResetStatisticsDialog({
     </Dialog>
   )
 }
-

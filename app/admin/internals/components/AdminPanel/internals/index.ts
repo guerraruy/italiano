@@ -3,4 +3,3 @@ export { default as ManageVerbs } from './ManageVerbs'
 export { default as ManageConjugations } from './ManageConjugations'
 export { default as ManageNouns } from './ManageNouns'
 export { default as ManageAdjectives } from './ManageAdjectives'
-

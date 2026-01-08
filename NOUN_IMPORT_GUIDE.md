@@ -9,6 +9,7 @@ The noun import feature allows administrators to bulk import Italian nouns with 
 ## Database Schema
 
 The `Noun` model in the database contains:
+
 - `italian` - The noun in Italian (base form without article, unique)
 - `singolare` - JSON object with singular translations: `{ it, pt, en }`
 - `plurale` - JSON object with plural translations: `{ it, pt, en }`
@@ -142,6 +143,7 @@ When importing nouns that already exist in the database:
 ## Viewing Imported Nouns
 
 After successful import, you can view all nouns in the "Current Nouns in Database" table, which shows:
+
 - Italian base form
 - Singular forms in all three languages
 - Plural forms in all three languages
@@ -152,4 +154,3 @@ After successful import, you can view all nouns in the "Current Nouns in Databas
 - The import process uses PostgreSQL's JSONB type for efficient storage
 - Nouns are indexed by their Italian base form for fast lookup
 - The API requires admin authentication via JWT token
-

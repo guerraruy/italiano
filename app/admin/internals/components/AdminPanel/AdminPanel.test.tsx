@@ -19,7 +19,7 @@ jest.mock('@/app/contexts/AuthContext', () => ({
 
 jest.mock('@/app/components/PageHeader', () => ({
   PageHeader: ({ title }: { title: string }) => (
-    <h1 data-testid='page-header'>{title}</h1>
+    <h1 data-testid="page-header">{title}</h1>
   ),
 }))
 
@@ -32,23 +32,23 @@ jest.mock('./internals', () => ({
     onError: (msg: string) => void
     onSuccess: (msg: string) => void
   }) => (
-    <div data-testid='manage-users'>
+    <div data-testid="manage-users">
       Manage Users Component
       <button onClick={() => onError('Test Error')}>Trigger Error</button>
       <button onClick={() => onSuccess('Test Success')}>Trigger Success</button>
     </div>
   ),
   ManageVerbs: () => (
-    <div data-testid='manage-verbs'>Manage Verbs Component</div>
+    <div data-testid="manage-verbs">Manage Verbs Component</div>
   ),
   ManageConjugations: () => (
-    <div data-testid='manage-conjugations'>Manage Conjugations Component</div>
+    <div data-testid="manage-conjugations">Manage Conjugations Component</div>
   ),
   ManageNouns: () => (
-    <div data-testid='manage-nouns'>Manage Nouns Component</div>
+    <div data-testid="manage-nouns">Manage Nouns Component</div>
   ),
   ManageAdjectives: () => (
-    <div data-testid='manage-adjectives'>Manage Adjectives Component</div>
+    <div data-testid="manage-adjectives">Manage Adjectives Component</div>
   ),
 }))
 

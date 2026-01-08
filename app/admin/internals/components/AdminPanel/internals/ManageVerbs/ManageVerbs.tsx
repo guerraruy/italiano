@@ -9,4 +9,3 @@ interface ManageVerbsProps {
 export default function ManageVerbs({ onError, onSuccess }: ManageVerbsProps) {
   return <VerbsList onError={onError} onSuccess={onSuccess} />
 }
-

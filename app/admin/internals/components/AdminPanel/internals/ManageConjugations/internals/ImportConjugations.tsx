@@ -163,22 +163,22 @@ export default function ImportConjugations({
       <Box sx={{ mt: 2, p: 2, backgroundColor: 'grey.50', borderRadius: 1 }}>
         {Object.entries(conjugation).map(([mood, tenses]) => (
           <Box key={mood} sx={{ mb: 2 }}>
-            <Typography variant='subtitle2' color='primary' gutterBottom>
+            <Typography variant="subtitle2" color="primary" gutterBottom>
               {mood}
             </Typography>
             {Object.entries(tenses).map(([tense, forms]) => (
               <Box key={tense} sx={{ ml: 2, mb: 1 }}>
-                <Typography variant='body2' fontWeight='medium'>
+                <Typography variant="body2" fontWeight="medium">
                   {tense}
                 </Typography>
                 {typeof forms === 'string' ? (
-                  <Typography variant='body2' sx={{ ml: 2 }}>
+                  <Typography variant="body2" sx={{ ml: 2 }}>
                     {forms}
                   </Typography>
                 ) : (
                   <Box sx={{ ml: 2 }}>
                     {Object.entries(forms).map(([person, form]) => (
-                      <Typography key={person} variant='body2'>
+                      <Typography key={person} variant="body2">
                         {person}: {form}
                       </Typography>
                     ))}
@@ -195,9 +195,9 @@ export default function ImportConjugations({
   return (
     <>
       {/* Import Icon */}
-      <Tooltip title='Import Conjugations from JSON'>
+      <Tooltip title="Import Conjugations from JSON">
         <IconButton
-          color='primary'
+          color="primary"
           onClick={() => setShowImportDialog(true)}
           disabled={importingConjugations}
         >
@@ -209,17 +209,17 @@ export default function ImportConjugations({
       <Dialog
         open={showImportDialog}
         onClose={() => setShowImportDialog(false)}
-        maxWidth='sm'
+        maxWidth="sm"
         fullWidth
       >
         <DialogTitle>
-          <Box display='flex' alignItems='center' gap={1}>
+          <Box display="flex" alignItems="center" gap={1}>
             Import Verb Conjugations from JSON Files
-            <Tooltip title='View JSON Format Information'>
+            <Tooltip title="View JSON Format Information">
               <IconButton
-                size='small'
+                size="small"
                 onClick={() => setShowFormatInfoDialog(true)}
-                color='primary'
+                color="primary"
               >
                 <InfoOutlined />
               </IconButton>
@@ -227,17 +227,17 @@ export default function ImportConjugations({
           </Box>
         </DialogTitle>
         <DialogContent>
-          <Stack direction='row' spacing={2} alignItems='center' sx={{ mt: 1 }}>
+          <Stack direction="row" spacing={2} alignItems="center" sx={{ mt: 1 }}>
             <Button
-              component='label'
-              variant='outlined'
+              component="label"
+              variant="outlined"
               startIcon={<CloudUpload />}
               disabled={importingConjugations}
             >
               Choose JSON File(s)
               <input
-                type='file'
-                accept='.json'
+                type="file"
+                accept=".json"
                 multiple
                 hidden
                 onChange={handleConjugationFileUpload}
@@ -247,15 +247,15 @@ export default function ImportConjugations({
               <Chip
                 icon={<CheckCircle />}
                 label={`${selectedFiles.length} file(s) loaded`}
-                color='success'
-                size='small'
+                color="success"
+                size="small"
               />
             )}
           </Stack>
 
           {selectedFiles.length > 0 && (
             <Box sx={{ mt: 2 }}>
-              <Typography variant='subtitle2' gutterBottom>
+              <Typography variant="subtitle2" gutterBottom>
                 Selected Files:
               </Typography>
               <List dense>
@@ -264,8 +264,8 @@ export default function ImportConjugations({
                     key={fileData.verbName}
                     secondaryAction={
                       <IconButton
-                        edge='end'
-                        aria-label='delete'
+                        edge="end"
+                        aria-label="delete"
                         onClick={() => handleRemoveFile(fileData.verbName)}
                       >
                         <DeleteIcon />
@@ -286,7 +286,7 @@ export default function ImportConjugations({
           <Button onClick={() => setShowImportDialog(false)}>Cancel</Button>
           {selectedFiles.length > 0 && (
             <Button
-              variant='contained'
+              variant="contained"
               onClick={() => {
                 handleImportConjugations()
                 setShowImportDialog(false)
@@ -310,17 +310,17 @@ export default function ImportConjugations({
       <Dialog
         open={showConjugationConflictDialog}
         onClose={() => setShowConjugationConflictDialog(false)}
-        maxWidth='lg'
+        maxWidth="lg"
         fullWidth
       >
         <DialogTitle>
-          <Box display='flex' alignItems='center' gap={1}>
-            <Warning color='warning' />
+          <Box display="flex" alignItems="center" gap={1}>
+            <Warning color="warning" />
             Resolve Conflicts ({conjugationConflicts.length} verb(s))
           </Box>
         </DialogTitle>
         <DialogContent>
-          <Typography variant='body2' color='text.secondary' sx={{ mb: 2 }}>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
             The following verbs already have conjugations in the database.
             Choose whether to keep the existing data or replace it with the new
             data.
@@ -328,13 +328,13 @@ export default function ImportConjugations({
 
           {conjugationConflicts.map((conflict) => (
             <Paper key={conflict.verbName} sx={{ p: 2, mb: 2 }}>
-              <Typography variant='h6' gutterBottom>
+              <Typography variant="h6" gutterBottom>
                 {conflict.verbName}
               </Typography>
 
-              <Stack direction='row' spacing={3} sx={{ mb: 2 }}>
+              <Stack direction="row" spacing={3} sx={{ mb: 2 }}>
                 <Box flex={1}>
-                  <Typography variant='subtitle2' color='primary' gutterBottom>
+                  <Typography variant="subtitle2" color="primary" gutterBottom>
                     Existing Data
                   </Typography>
                   <Box sx={{ maxHeight: 300, overflow: 'auto' }}>
@@ -344,8 +344,8 @@ export default function ImportConjugations({
 
                 <Box flex={1}>
                   <Typography
-                    variant='subtitle2'
-                    color='secondary'
+                    variant="subtitle2"
+                    color="secondary"
                     gutterBottom
                   >
                     New Data
@@ -356,9 +356,9 @@ export default function ImportConjugations({
                 </Box>
               </Stack>
 
-              <Stack direction='row' spacing={2}>
+              <Stack direction="row" spacing={2}>
                 <Button
-                  size='small'
+                  size="small"
                   variant={
                     conjugationConflictResolutions[conflict.verbName] === 'keep'
                       ? 'contained'
@@ -374,14 +374,14 @@ export default function ImportConjugations({
                   Keep Existing
                 </Button>
                 <Button
-                  size='small'
+                  size="small"
                   variant={
                     conjugationConflictResolutions[conflict.verbName] ===
                     'replace'
                       ? 'contained'
                       : 'outlined'
                   }
-                  color='secondary'
+                  color="secondary"
                   onClick={() =>
                     handleConjugationConflictResolution(
                       conflict.verbName,
@@ -401,7 +401,7 @@ export default function ImportConjugations({
           </Button>
           <Button
             onClick={handleResolveConjugationConflicts}
-            variant='contained'
+            variant="contained"
             disabled={
               Object.keys(conjugationConflictResolutions).length !==
               conjugationConflicts.length
@@ -416,28 +416,28 @@ export default function ImportConjugations({
       <Dialog
         open={showFormatInfoDialog}
         onClose={() => setShowFormatInfoDialog(false)}
-        maxWidth='sm'
+        maxWidth="sm"
         fullWidth
       >
         <DialogTitle>
-          <Box display='flex' alignItems='center' gap={1}>
-            <Info color='primary' />
+          <Box display="flex" alignItems="center" gap={1}>
+            <Info color="primary" />
             JSON Format Information
           </Box>
         </DialogTitle>
         <DialogContent>
-          <Typography variant='body2' color='text.secondary' sx={{ mb: 2 }}>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
             Upload one or multiple JSON files with Italian verb conjugations.
             The filename (without .json extension) will be used as the verb
             name.
           </Typography>
-          <Typography variant='body2' color='text.secondary' sx={{ mb: 2 }}>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
             Expected format (example for &quot;aiutare.json&quot;):
           </Typography>
           <Paper sx={{ p: 2, backgroundColor: 'grey.100' }}>
             <Typography
-              variant='body2'
-              component='pre'
+              variant="body2"
+              component="pre"
               sx={{ fontFamily: 'monospace', fontSize: '0.75rem' }}
             >
               {`{

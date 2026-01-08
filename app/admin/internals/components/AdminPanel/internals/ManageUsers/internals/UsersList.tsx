@@ -34,6 +34,7 @@ import {
   UserData,
   useUpdateUserMutation,
 } from '@/app/store/api'
+
 import DeleteUserDialog from './DeleteUserDialog'
 
 interface UsersListProps {
@@ -116,10 +117,10 @@ export default function UsersList({ onError, onSuccess }: UsersListProps) {
   if (loadingUsers) {
     return (
       <Box
-        display='flex'
-        justifyContent='center'
-        alignItems='center'
-        minHeight='400px'
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        minHeight="400px"
       >
         <CircularProgress />
       </Box>
@@ -138,13 +139,13 @@ export default function UsersList({ onError, onSuccess }: UsersListProps) {
               mb: 2,
             }}
           >
-            <Typography variant='h6'>
+            <Typography variant="h6">
               Manage Users ({filteredUsers.length}
               {deferredFilterText && ` of ${usersData?.users?.length || 0}`})
             </Typography>
             <TextField
-              size='small'
-              placeholder='Filter by username, email, or name...'
+              size="small"
+              placeholder="Filter by username, email, or name..."
               value={filterText}
               onChange={(e) => {
                 const value = e.target.value
@@ -157,19 +158,19 @@ export default function UsersList({ onError, onSuccess }: UsersListProps) {
               disabled={loadingUsers}
               InputProps={{
                 startAdornment: (
-                  <InputAdornment position='start'>
-                    <Search fontSize='small' />
+                  <InputAdornment position="start">
+                    <Search fontSize="small" />
                   </InputAdornment>
                 ),
                 endAdornment: filterText && (
-                  <InputAdornment position='end'>
+                  <InputAdornment position="end">
                     <IconButton
-                      size='small'
+                      size="small"
                       onClick={() => setFilterText('')}
-                      edge='end'
-                      aria-label='clear filter'
+                      edge="end"
+                      aria-label="clear filter"
                     >
-                      <Clear fontSize='small' />
+                      <Clear fontSize="small" />
                     </IconButton>
                   </InputAdornment>
                 ),
@@ -186,9 +187,9 @@ export default function UsersList({ onError, onSuccess }: UsersListProps) {
                   <TableCell>Username</TableCell>
                   <TableCell>Email</TableCell>
                   <TableCell>Name</TableCell>
-                  <TableCell align='center'>Admin</TableCell>
-                  <TableCell align='center'>Registered</TableCell>
-                  <TableCell align='center'>Actions</TableCell>
+                  <TableCell align="center">Admin</TableCell>
+                  <TableCell align="center">Registered</TableCell>
+                  <TableCell align="center">Actions</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -197,26 +198,26 @@ export default function UsersList({ onError, onSuccess }: UsersListProps) {
                     <TableCell>{userData.username}</TableCell>
                     <TableCell>{userData.email}</TableCell>
                     <TableCell>{userData.name || '-'}</TableCell>
-                    <TableCell align='center'>
+                    <TableCell align="center">
                       {userData.admin ? (
                         <Chip
-                          label='Admin'
-                          color='primary'
-                          size='small'
+                          label="Admin"
+                          color="primary"
+                          size="small"
                           icon={<AdminPanelSettings />}
                         />
                       ) : (
-                        <Chip label='User' size='small' />
+                        <Chip label="User" size="small" />
                       )}
                     </TableCell>
-                    <TableCell align='center'>
+                    <TableCell align="center">
                       {userData.createdAt
                         ? new Date(userData.createdAt).toLocaleDateString(
                             'en-US'
                           )
                         : '-'}
                     </TableCell>
-                    <TableCell align='center'>
+                    <TableCell align="center">
                       <Box
                         sx={{
                           display: 'flex',
@@ -234,7 +235,7 @@ export default function UsersList({ onError, onSuccess }: UsersListProps) {
                           <span>
                             <IconButton
                               color={userData.admin ? 'warning' : 'primary'}
-                              size='small'
+                              size="small"
                               onClick={() =>
                                 handleToggleAdmin(userData.id, userData.admin)
                               }
@@ -249,11 +250,11 @@ export default function UsersList({ onError, onSuccess }: UsersListProps) {
                           </span>
                         </Tooltip>
 
-                        <Tooltip title='Delete user'>
+                        <Tooltip title="Delete user">
                           <span>
                             <IconButton
-                              color='error'
-                              size='small'
+                              color="error"
+                              size="small"
                               onClick={() => handleOpenDeleteDialog(userData)}
                               disabled={userData.id === user?.id}
                             >
@@ -272,7 +273,7 @@ export default function UsersList({ onError, onSuccess }: UsersListProps) {
           {/* Pagination */}
           {filteredUsers.length > 0 && (
             <TablePagination
-              component='div'
+              component="div"
               count={filteredUsers.length}
               page={page}
               onPageChange={(_, newPage) => {

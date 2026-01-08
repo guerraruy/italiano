@@ -59,61 +59,61 @@ export default function FilterControls({
 }: FilterControlsProps) {
   return (
     <FilterBox>
-      <FormControl size='small' sx={{ minWidth: 150 }}>
-        <InputLabel id='verb-type-filter-label'>Verb Type</InputLabel>
+      <FormControl size="small" sx={{ minWidth: 150 }}>
+        <InputLabel id="verb-type-filter-label">Verb Type</InputLabel>
         <Select
-          labelId='verb-type-filter-label'
-          id='verb-type-filter'
+          labelId="verb-type-filter-label"
+          id="verb-type-filter"
           value={verbTypeFilter}
-          label='Verb Type'
+          label="Verb Type"
           onChange={(e) => onVerbTypeChange(e.target.value as VerbTypeFilter)}
         >
-          <MenuItem value='all'>All</MenuItem>
-          <MenuItem value='regular'>Regular</MenuItem>
-          <MenuItem value='irregular'>Irregular</MenuItem>
-          <MenuItem value='reflexive'>Reflexive</MenuItem>
+          <MenuItem value="all">All</MenuItem>
+          <MenuItem value="regular">Regular</MenuItem>
+          <MenuItem value="irregular">Irregular</MenuItem>
+          <MenuItem value="reflexive">Reflexive</MenuItem>
         </Select>
       </FormControl>
 
-      <FormControl size='small' sx={{ minWidth: 180 }}>
-        <InputLabel id='sort-option-label'>Sort By</InputLabel>
+      <FormControl size="small" sx={{ minWidth: 180 }}>
+        <InputLabel id="sort-option-label">Sort By</InputLabel>
         <Select
-          labelId='sort-option-label'
-          id='sort-option'
+          labelId="sort-option-label"
+          id="sort-option"
           value={sortOption}
-          label='Sort By'
+          label="Sort By"
           onChange={(e) => onSortChange(e.target.value as SortOption)}
         >
-          <MenuItem value='none'>None</MenuItem>
-          <MenuItem value='alphabetical'>Alphabetical</MenuItem>
-          <MenuItem value='random'>Random</MenuItem>
-          <MenuItem value='most-errors'>Most Errors</MenuItem>
-          <MenuItem value='worst-performance'>Worst Performance</MenuItem>
+          <MenuItem value="none">None</MenuItem>
+          <MenuItem value="alphabetical">Alphabetical</MenuItem>
+          <MenuItem value="random">Random</MenuItem>
+          <MenuItem value="most-errors">Most Errors</MenuItem>
+          <MenuItem value="worst-performance">Worst Performance</MenuItem>
         </Select>
       </FormControl>
 
-      <FormControl size='small' sx={{ minWidth: 120 }}>
-        <InputLabel id='display-count-label'>Display</InputLabel>
+      <FormControl size="small" sx={{ minWidth: 120 }}>
+        <InputLabel id="display-count-label">Display</InputLabel>
         <Select
-          labelId='display-count-label'
-          id='display-count'
+          labelId="display-count-label"
+          id="display-count"
           value={displayCount}
-          label='Display'
+          label="Display"
           onChange={(e) => onDisplayCountChange(e.target.value as DisplayCount)}
         >
           <MenuItem value={10}>10 verbs</MenuItem>
           <MenuItem value={20}>20 verbs</MenuItem>
           <MenuItem value={30}>30 verbs</MenuItem>
-          <MenuItem value='all'>All verbs</MenuItem>
+          <MenuItem value="all">All verbs</MenuItem>
         </Select>
       </FormControl>
 
       {showRefreshButton && (
-        <Tooltip title='Refresh list'>
+        <Tooltip title="Refresh list">
           <IconButton
             onClick={onRefresh}
-            color='primary'
-            size='small'
+            color="primary"
+            size="small"
             sx={{ ml: 1 }}
           >
             <RefreshIcon />
@@ -121,10 +121,9 @@ export default function FilterControls({
         </Tooltip>
       )}
 
-      <Typography variant='body2' color='text.secondary' sx={{ ml: 1 }}>
+      <Typography variant="body2" color="text.secondary" sx={{ ml: 1 }}>
         Showing {displayedCount} of {totalCount} verbs
       </Typography>
     </FilterBox>
   )
 }
-

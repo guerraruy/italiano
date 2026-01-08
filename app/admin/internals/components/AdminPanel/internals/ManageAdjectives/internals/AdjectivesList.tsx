@@ -27,12 +27,17 @@ import {
   TablePagination,
 } from '@mui/material'
 
-import { EditAdjectiveDialog, DeleteAdjectiveDialog, ImportAdjectives } from './'
 import {
   AdjectiveGenderForms,
   ImportedAdjective,
   useGetAdjectivesQuery,
 } from '@/app/store/api'
+
+import {
+  EditAdjectiveDialog,
+  DeleteAdjectiveDialog,
+  ImportAdjectives,
+} from './'
 
 interface AdjectivesListProps {
   onError: (message: string) => void
@@ -116,8 +121,8 @@ export default function AdjectivesList({
               mb: 2,
             }}
           >
-            <Box display='flex' alignItems='center' gap={1}>
-              <Typography variant='h6'>
+            <Box display="flex" alignItems="center" gap={1}>
+              <Typography variant="h6">
                 Current Adjectives in Database ({filteredAdjectives.length}
                 {deferredFilterText &&
                   ` of ${adjectivesData?.adjectives?.length || 0}`}
@@ -126,8 +131,8 @@ export default function AdjectivesList({
               <ImportAdjectives onError={onError} onSuccess={onSuccess} />
             </Box>
             <TextField
-              size='small'
-              placeholder='Filter by Italian name...'
+              size="small"
+              placeholder="Filter by Italian name..."
               value={filterText}
               onChange={(e) => {
                 const value = e.target.value
@@ -140,19 +145,19 @@ export default function AdjectivesList({
               disabled={loadingAdjectives}
               InputProps={{
                 startAdornment: (
-                  <InputAdornment position='start'>
-                    <Search fontSize='small' />
+                  <InputAdornment position="start">
+                    <Search fontSize="small" />
                   </InputAdornment>
                 ),
                 endAdornment: filterText && (
-                  <InputAdornment position='end'>
+                  <InputAdornment position="end">
                     <IconButton
-                      size='small'
+                      size="small"
                       onClick={() => setFilterText('')}
-                      edge='end'
-                      aria-label='clear filter'
+                      edge="end"
+                      aria-label="clear filter"
                     >
-                      <Clear fontSize='small' />
+                      <Clear fontSize="small" />
                     </IconButton>
                   </InputAdornment>
                 ),
@@ -161,23 +166,23 @@ export default function AdjectivesList({
           </Box>
 
           {loadingAdjectives ? (
-            <Box display='flex' justifyContent='center' p={3}>
+            <Box display="flex" justifyContent="center" p={3}>
               <CircularProgress />
             </Box>
           ) : (adjectivesData?.adjectives?.length || 0) === 0 ? (
-            <Alert severity='info' icon={<Info />}>
+            <Alert severity="info" icon={<Info />}>
               No adjectives in the database yet. Import some using the form
               above.
             </Alert>
           ) : filteredAdjectives.length === 0 ? (
-            <Alert severity='info' icon={<Info />}>
+            <Alert severity="info" icon={<Info />}>
               No adjectives found matching &quot;{deferredFilterText}&quot;
             </Alert>
           ) : (
             <TableContainer
               sx={{ opacity: isPending ? 0.5 : 1, transition: 'opacity 0.2s' }}
             >
-              <Table size='small'>
+              <Table size="small">
                 <TableHead>
                   <TableRow>
                     <TableCell>Italian</TableCell>
@@ -185,7 +190,7 @@ export default function AdjectivesList({
                     <TableCell>Portuguese</TableCell>
                     <TableCell>English</TableCell>
                     <TableCell>Last Updated</TableCell>
-                    <TableCell align='center' sx={{ minWidth: 100 }}>
+                    <TableCell align="center" sx={{ minWidth: 100 }}>
                       Actions
                     </TableCell>
                   </TableRow>
@@ -202,30 +207,30 @@ export default function AdjectivesList({
                         </TableCell>
                         <TableCell>
                           <Box>
-                            <Typography variant='body2'>
+                            <Typography variant="body2">
                               {maschile.singolare.it} / {femminile.singolare.it}
                             </Typography>
-                            <Typography variant='body2' color='text.secondary'>
+                            <Typography variant="body2" color="text.secondary">
                               {maschile.plurale.it} / {femminile.plurale.it}
                             </Typography>
                           </Box>
                         </TableCell>
                         <TableCell>
                           <Box>
-                            <Typography variant='body2'>
+                            <Typography variant="body2">
                               {maschile.singolare.pt} / {femminile.singolare.pt}
                             </Typography>
-                            <Typography variant='body2' color='text.secondary'>
+                            <Typography variant="body2" color="text.secondary">
                               {maschile.plurale.pt} / {femminile.plurale.pt}
                             </Typography>
                           </Box>
                         </TableCell>
                         <TableCell>
                           <Box>
-                            <Typography variant='body2'>
+                            <Typography variant="body2">
                               {maschile.singolare.en}
                             </Typography>
-                            <Typography variant='body2' color='text.secondary'>
+                            <Typography variant="body2" color="text.secondary">
                               {maschile.plurale.en}
                             </Typography>
                           </Box>
@@ -235,7 +240,7 @@ export default function AdjectivesList({
                             'en-US'
                           )}
                         </TableCell>
-                        <TableCell align='center'>
+                        <TableCell align="center">
                           <Box
                             sx={{
                               display: 'flex',
@@ -244,18 +249,18 @@ export default function AdjectivesList({
                             }}
                           >
                             <IconButton
-                              size='small'
-                              color='primary'
+                              size="small"
+                              color="primary"
                               onClick={() => handleOpenEditDialog(adjective)}
                             >
-                              <EditOutlined fontSize='small' />
+                              <EditOutlined fontSize="small" />
                             </IconButton>
                             <IconButton
-                              size='small'
-                              color='error'
+                              size="small"
+                              color="error"
                               onClick={() => handleOpenDeleteDialog(adjective)}
                             >
-                              <DeleteOutlined fontSize='small' />
+                              <DeleteOutlined fontSize="small" />
                             </IconButton>
                           </Box>
                         </TableCell>
@@ -270,7 +275,7 @@ export default function AdjectivesList({
           {/* Pagination */}
           {filteredAdjectives.length > 0 && (
             <TablePagination
-              component='div'
+              component="div"
               count={filteredAdjectives.length}
               page={page}
               onPageChange={(_, newPage) => {

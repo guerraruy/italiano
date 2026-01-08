@@ -28,14 +28,14 @@ export const ResetStatisticsDialog: React.FC<ResetStatisticsDialogProps> = ({
     <Dialog
       open={open}
       onClose={onClose}
-      aria-labelledby='reset-dialog-title'
-      aria-describedby='reset-dialog-description'
+      aria-labelledby="reset-dialog-title"
+      aria-describedby="reset-dialog-description"
     >
-      <DialogTitle id='reset-dialog-title'>Reset Statistics</DialogTitle>
+      <DialogTitle id="reset-dialog-title">Reset Statistics</DialogTitle>
       <DialogContent>
-        <DialogContentText id='reset-dialog-description'>
-          Are you sure you want to reset all conjugation statistics for the
-          verb &quot;
+        <DialogContentText id="reset-dialog-description">
+          Are you sure you want to reset all conjugation statistics for the verb
+          &quot;
           {verbName}&quot;? This action cannot be undone.
         </DialogContentText>
       </DialogContent>
@@ -45,8 +45,8 @@ export const ResetStatisticsDialog: React.FC<ResetStatisticsDialogProps> = ({
         </Button>
         <Button
           onClick={onConfirm}
-          color='error'
-          variant='contained'
+          color="error"
+          variant="contained"
           disabled={isResetting}
           autoFocus
         >
@@ -56,4 +56,3 @@ export const ResetStatisticsDialog: React.FC<ResetStatisticsDialogProps> = ({
     </Dialog>
   )
 }
-

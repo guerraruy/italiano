@@ -11,7 +11,7 @@ import ConjugationsList from './ConjugationsList'
 jest.mock('./EditConjugationDialog', () => ({
   __esModule: true,
   default: ({ open, onClose }: { open: boolean; onClose: () => void }) => (
-    <div data-testid='edit-dialog' data-open={open}>
+    <div data-testid="edit-dialog" data-open={open}>
       <button onClick={onClose}>Close Edit</button>
     </div>
   ),
@@ -20,7 +20,7 @@ jest.mock('./EditConjugationDialog', () => ({
 jest.mock('./DeleteConjugationDialog', () => ({
   __esModule: true,
   default: ({ open, onClose }: { open: boolean; onClose: () => void }) => (
-    <div data-testid='delete-dialog' data-open={open}>
+    <div data-testid="delete-dialog" data-open={open}>
       <button onClick={onClose}>Close Delete</button>
     </div>
   ),

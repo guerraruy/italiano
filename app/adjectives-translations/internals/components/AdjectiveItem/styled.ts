@@ -22,4 +22,3 @@ export const AdjectiveInfo = styled(Box)(({ theme }) => ({
   gap: theme.spacing(2),
   minWidth: '200px',
 }))
-

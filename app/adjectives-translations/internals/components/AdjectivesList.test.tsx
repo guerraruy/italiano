@@ -40,7 +40,7 @@ jest.mock('./AdjectiveItem/internals', () => ({
     displayedCount: number
     totalCount: number
   }) => (
-    <div data-testid='filter-controls'>
+    <div data-testid="filter-controls">
       FilterControls: {displayedCount}/{totalCount}
     </div>
   ),

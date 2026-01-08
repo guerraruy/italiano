@@ -52,4 +52,3 @@ export type UpdateAdjectiveInput = z.infer<typeof updateAdjectiveSchema>
 export type UpdateAdjectiveStatisticInput = z.infer<
   typeof updateAdjectiveStatisticSchema
 >
-

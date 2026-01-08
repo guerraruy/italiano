@@ -1,2 +1,1 @@
 export { ConjugationForm } from './ConjugationForm'
-

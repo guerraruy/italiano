@@ -98,25 +98,25 @@ function EditFormContent({
       <DialogContent>
         <Stack spacing={3} sx={{ mt: 2 }}>
           <TextField
-            label='Italian (base form)'
+            label="Italian (base form)"
             value={editForm.italian}
             onChange={(e) => handleEditFormChange('italian', e.target.value)}
             fullWidth
-            size='small'
+            size="small"
           />
 
-          <Box display='flex' gap={3}>
+          <Box display="flex" gap={3}>
             {/* Masculine Forms */}
             <Box flex={1}>
-              <Typography variant='subtitle2' gutterBottom>
+              <Typography variant="subtitle2" gutterBottom>
                 Masculine Forms
               </Typography>
               <Stack spacing={2}>
-                <Typography variant='caption' fontWeight='bold'>
+                <Typography variant="caption" fontWeight="bold">
                   Singular:
                 </Typography>
                 <TextField
-                  label='Italian'
+                  label="Italian"
                   value={editForm.maschile.singolare.it}
                   onChange={(e) =>
                     handleEditFormChange(
@@ -128,10 +128,10 @@ function EditFormContent({
                     )
                   }
                   fullWidth
-                  size='small'
+                  size="small"
                 />
                 <TextField
-                  label='Portuguese'
+                  label="Portuguese"
                   value={editForm.maschile.singolare.pt}
                   onChange={(e) =>
                     handleEditFormChange(
@@ -143,10 +143,10 @@ function EditFormContent({
                     )
                   }
                   fullWidth
-                  size='small'
+                  size="small"
                 />
                 <TextField
-                  label='English'
+                  label="English"
                   value={editForm.maschile.singolare.en}
                   onChange={(e) =>
                     handleEditFormChange(
@@ -158,13 +158,13 @@ function EditFormContent({
                     )
                   }
                   fullWidth
-                  size='small'
+                  size="small"
                 />
-                <Typography variant='caption' fontWeight='bold' sx={{ mt: 1 }}>
+                <Typography variant="caption" fontWeight="bold" sx={{ mt: 1 }}>
                   Plural:
                 </Typography>
                 <TextField
-                  label='Italian'
+                  label="Italian"
                   value={editForm.maschile.plurale.it}
                   onChange={(e) =>
                     handleEditFormChange(
@@ -176,10 +176,10 @@ function EditFormContent({
                     )
                   }
                   fullWidth
-                  size='small'
+                  size="small"
                 />
                 <TextField
-                  label='Portuguese'
+                  label="Portuguese"
                   value={editForm.maschile.plurale.pt}
                   onChange={(e) =>
                     handleEditFormChange(
@@ -191,10 +191,10 @@ function EditFormContent({
                     )
                   }
                   fullWidth
-                  size='small'
+                  size="small"
                 />
                 <TextField
-                  label='English'
+                  label="English"
                   value={editForm.maschile.plurale.en}
                   onChange={(e) =>
                     handleEditFormChange(
@@ -206,22 +206,22 @@ function EditFormContent({
                     )
                   }
                   fullWidth
-                  size='small'
+                  size="small"
                 />
               </Stack>
             </Box>
 
             {/* Feminine Forms */}
             <Box flex={1}>
-              <Typography variant='subtitle2' gutterBottom>
+              <Typography variant="subtitle2" gutterBottom>
                 Feminine Forms
               </Typography>
               <Stack spacing={2}>
-                <Typography variant='caption' fontWeight='bold'>
+                <Typography variant="caption" fontWeight="bold">
                   Singular:
                 </Typography>
                 <TextField
-                  label='Italian'
+                  label="Italian"
                   value={editForm.femminile.singolare.it}
                   onChange={(e) =>
                     handleEditFormChange(
@@ -233,10 +233,10 @@ function EditFormContent({
                     )
                   }
                   fullWidth
-                  size='small'
+                  size="small"
                 />
                 <TextField
-                  label='Portuguese'
+                  label="Portuguese"
                   value={editForm.femminile.singolare.pt}
                   onChange={(e) =>
                     handleEditFormChange(
@@ -248,10 +248,10 @@ function EditFormContent({
                     )
                   }
                   fullWidth
-                  size='small'
+                  size="small"
                 />
                 <TextField
-                  label='English'
+                  label="English"
                   value={editForm.femminile.singolare.en}
                   onChange={(e) =>
                     handleEditFormChange(
@@ -263,13 +263,13 @@ function EditFormContent({
                     )
                   }
                   fullWidth
-                  size='small'
+                  size="small"
                 />
-                <Typography variant='caption' fontWeight='bold' sx={{ mt: 1 }}>
+                <Typography variant="caption" fontWeight="bold" sx={{ mt: 1 }}>
                   Plural:
                 </Typography>
                 <TextField
-                  label='Italian'
+                  label="Italian"
                   value={editForm.femminile.plurale.it}
                   onChange={(e) =>
                     handleEditFormChange(
@@ -281,10 +281,10 @@ function EditFormContent({
                     )
                   }
                   fullWidth
-                  size='small'
+                  size="small"
                 />
                 <TextField
-                  label='Portuguese'
+                  label="Portuguese"
                   value={editForm.femminile.plurale.pt}
                   onChange={(e) =>
                     handleEditFormChange(
@@ -296,10 +296,10 @@ function EditFormContent({
                     )
                   }
                   fullWidth
-                  size='small'
+                  size="small"
                 />
                 <TextField
-                  label='English'
+                  label="English"
                   value={editForm.femminile.plurale.en}
                   onChange={(e) =>
                     handleEditFormChange(
@@ -311,7 +311,7 @@ function EditFormContent({
                     )
                   }
                   fullWidth
-                  size='small'
+                  size="small"
                 />
               </Stack>
             </Box>
@@ -324,7 +324,7 @@ function EditFormContent({
         </Button>
         <Button
           onClick={handleUpdateAdjective}
-          variant='contained'
+          variant="contained"
           disabled={updatingAdjective}
         >
           {updatingAdjective ? 'Updating...' : 'Update'}
@@ -346,7 +346,7 @@ export default function EditAdjectiveDialog({
   }
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth='md' fullWidth>
+    <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
       <EditFormContent
         key={adjective.id}
         adjective={adjective}

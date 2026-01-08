@@ -9,6 +9,7 @@ The verb import feature allows administrators to bulk import Italian verbs with 
 ## Database Schema
 
 The `Verb` model in the database contains:
+
 - `italian` - The verb infinitive in Italian (unique)
 - `tr_ptBR` - Portuguese (Brazil) translation
 - `tr_en` - English translation (optional)
@@ -86,6 +87,7 @@ The import file must be a valid JSON file with the following structure:
 ## API Endpoints
 
 ### Import Verbs
+
 - **Endpoint:** `POST /api/admin/verbs/import`
 - **Authentication:** Required (Admin only)
 - **Request Body:**
@@ -106,6 +108,7 @@ The import file must be a valid JSON file with the following structure:
   ```
 
 ### Get All Verbs
+
 - **Endpoint:** `GET /api/admin/verbs/import`
 - **Authentication:** Required (Admin only)
 - **Response:**
@@ -141,4 +144,3 @@ The import file must be a valid JSON file with the following structure:
 - The Italian verb infinitive must be unique (case-sensitive)
 - All existing verbs are preserved unless explicitly replaced during conflict resolution
 - The import process is transactional - if an error occurs, no changes are made
-

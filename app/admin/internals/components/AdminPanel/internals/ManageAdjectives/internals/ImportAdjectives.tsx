@@ -129,9 +129,9 @@ export default function ImportAdjectives({
   return (
     <>
       {/* Import Icon */}
-      <Tooltip title='Import Adjectives from JSON'>
+      <Tooltip title="Import Adjectives from JSON">
         <IconButton
-          color='primary'
+          color="primary"
           onClick={() => setShowImportDialog(true)}
           disabled={importingAdjectives}
         >
@@ -143,17 +143,17 @@ export default function ImportAdjectives({
       <Dialog
         open={showImportDialog}
         onClose={() => setShowImportDialog(false)}
-        maxWidth='sm'
+        maxWidth="sm"
         fullWidth
       >
         <DialogTitle>
-          <Box display='flex' alignItems='center' gap={1}>
+          <Box display="flex" alignItems="center" gap={1}>
             Import Adjectives from JSON
-            <Tooltip title='View JSON Format Information'>
+            <Tooltip title="View JSON Format Information">
               <IconButton
-                size='small'
+                size="small"
                 onClick={() => setShowFormatInfoDialog(true)}
-                color='primary'
+                color="primary"
               >
                 <InfoOutlined />
               </IconButton>
@@ -161,17 +161,17 @@ export default function ImportAdjectives({
           </Box>
         </DialogTitle>
         <DialogContent>
-          <Stack direction='row' spacing={2} alignItems='center' sx={{ mt: 1 }}>
+          <Stack direction="row" spacing={2} alignItems="center" sx={{ mt: 1 }}>
             <Button
-              component='label'
-              variant='outlined'
+              component="label"
+              variant="outlined"
               startIcon={<CloudUpload />}
               disabled={importingAdjectives}
             >
               Choose JSON File
               <input
-                type='file'
-                accept='.json'
+                type="file"
+                accept=".json"
                 hidden
                 onChange={handleAdjectiveFileUpload}
               />
@@ -179,16 +179,16 @@ export default function ImportAdjectives({
             {adjectiveJsonContent && (
               <Chip
                 icon={<CheckCircle />}
-                label='File loaded'
-                color='success'
-                size='small'
+                label="File loaded"
+                color="success"
+                size="small"
               />
             )}
           </Stack>
 
           {adjectiveJsonContent && (
             <Box sx={{ mt: 2 }}>
-              <Typography variant='body2' color='text.secondary' gutterBottom>
+              <Typography variant="body2" color="text.secondary" gutterBottom>
                 Preview: {Object.keys(JSON.parse(adjectiveJsonContent)).length}{' '}
                 adjectives ready to import
               </Typography>
@@ -199,7 +199,7 @@ export default function ImportAdjectives({
           <Button onClick={() => setShowImportDialog(false)}>Cancel</Button>
           {adjectiveJsonContent && (
             <Button
-              variant='contained'
+              variant="contained"
               onClick={() => {
                 handleImportAdjectives()
                 setShowImportDialog(false)
@@ -223,144 +223,144 @@ export default function ImportAdjectives({
       <Dialog
         open={showAdjectiveConflictDialog}
         onClose={() => setShowAdjectiveConflictDialog(false)}
-        maxWidth='md'
+        maxWidth="md"
         fullWidth
       >
         <DialogTitle>
-          <Box display='flex' alignItems='center' gap={1}>
-            <Warning color='warning' />
+          <Box display="flex" alignItems="center" gap={1}>
+            <Warning color="warning" />
             Resolve Conflicts ({adjectiveConflicts.length} adjectives)
           </Box>
         </DialogTitle>
         <DialogContent>
-          <Typography variant='body2' color='text.secondary' sx={{ mb: 2 }}>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
             The following adjectives already exist in the database. Choose
             whether to keep the existing data or replace it with the new data.
           </Typography>
 
           {adjectiveConflicts.map((conflict) => (
             <Paper key={conflict.italian} sx={{ p: 2, mb: 2 }}>
-              <Typography variant='h6' gutterBottom>
+              <Typography variant="h6" gutterBottom>
                 {conflict.italian}
               </Typography>
 
-              <Stack direction='row' spacing={3} sx={{ mb: 2 }}>
+              <Stack direction="row" spacing={3} sx={{ mb: 2 }}>
                 <Box flex={1}>
-                  <Typography variant='subtitle2' color='primary' gutterBottom>
+                  <Typography variant="subtitle2" color="primary" gutterBottom>
                     Existing Data
                   </Typography>
-                  <Typography variant='body2' fontWeight='bold'>
+                  <Typography variant="body2" fontWeight="bold">
                     Masculine Singular:
                   </Typography>
-                  <Typography variant='body2' sx={{ ml: 1 }}>
+                  <Typography variant="body2" sx={{ ml: 1 }}>
                     IT: {conflict.existing.maschile.singolare.it}
                   </Typography>
-                  <Typography variant='body2' sx={{ ml: 1 }}>
+                  <Typography variant="body2" sx={{ ml: 1 }}>
                     PT: {conflict.existing.maschile.singolare.pt}
                   </Typography>
-                  <Typography variant='body2' sx={{ ml: 1 }}>
+                  <Typography variant="body2" sx={{ ml: 1 }}>
                     EN: {conflict.existing.maschile.singolare.en}
                   </Typography>
-                  <Typography variant='body2' fontWeight='bold' sx={{ mt: 1 }}>
+                  <Typography variant="body2" fontWeight="bold" sx={{ mt: 1 }}>
                     Masculine Plural:
                   </Typography>
-                  <Typography variant='body2' sx={{ ml: 1 }}>
+                  <Typography variant="body2" sx={{ ml: 1 }}>
                     IT: {conflict.existing.maschile.plurale.it}
                   </Typography>
-                  <Typography variant='body2' sx={{ ml: 1 }}>
+                  <Typography variant="body2" sx={{ ml: 1 }}>
                     PT: {conflict.existing.maschile.plurale.pt}
                   </Typography>
-                  <Typography variant='body2' sx={{ ml: 1 }}>
+                  <Typography variant="body2" sx={{ ml: 1 }}>
                     EN: {conflict.existing.maschile.plurale.en}
                   </Typography>
-                  <Typography variant='body2' fontWeight='bold' sx={{ mt: 1 }}>
+                  <Typography variant="body2" fontWeight="bold" sx={{ mt: 1 }}>
                     Feminine Singular:
                   </Typography>
-                  <Typography variant='body2' sx={{ ml: 1 }}>
+                  <Typography variant="body2" sx={{ ml: 1 }}>
                     IT: {conflict.existing.femminile.singolare.it}
                   </Typography>
-                  <Typography variant='body2' sx={{ ml: 1 }}>
+                  <Typography variant="body2" sx={{ ml: 1 }}>
                     PT: {conflict.existing.femminile.singolare.pt}
                   </Typography>
-                  <Typography variant='body2' sx={{ ml: 1 }}>
+                  <Typography variant="body2" sx={{ ml: 1 }}>
                     EN: {conflict.existing.femminile.singolare.en}
                   </Typography>
-                  <Typography variant='body2' fontWeight='bold' sx={{ mt: 1 }}>
+                  <Typography variant="body2" fontWeight="bold" sx={{ mt: 1 }}>
                     Feminine Plural:
                   </Typography>
-                  <Typography variant='body2' sx={{ ml: 1 }}>
+                  <Typography variant="body2" sx={{ ml: 1 }}>
                     IT: {conflict.existing.femminile.plurale.it}
                   </Typography>
-                  <Typography variant='body2' sx={{ ml: 1 }}>
+                  <Typography variant="body2" sx={{ ml: 1 }}>
                     PT: {conflict.existing.femminile.plurale.pt}
                   </Typography>
-                  <Typography variant='body2' sx={{ ml: 1 }}>
+                  <Typography variant="body2" sx={{ ml: 1 }}>
                     EN: {conflict.existing.femminile.plurale.en}
                   </Typography>
                 </Box>
 
                 <Box flex={1}>
                   <Typography
-                    variant='subtitle2'
-                    color='secondary'
+                    variant="subtitle2"
+                    color="secondary"
                     gutterBottom
                   >
                     New Data
                   </Typography>
-                  <Typography variant='body2' fontWeight='bold'>
+                  <Typography variant="body2" fontWeight="bold">
                     Masculine Singular:
                   </Typography>
-                  <Typography variant='body2' sx={{ ml: 1 }}>
+                  <Typography variant="body2" sx={{ ml: 1 }}>
                     IT: {conflict.new.maschile.singolare.it}
                   </Typography>
-                  <Typography variant='body2' sx={{ ml: 1 }}>
+                  <Typography variant="body2" sx={{ ml: 1 }}>
                     PT: {conflict.new.maschile.singolare.pt}
                   </Typography>
-                  <Typography variant='body2' sx={{ ml: 1 }}>
+                  <Typography variant="body2" sx={{ ml: 1 }}>
                     EN: {conflict.new.maschile.singolare.en}
                   </Typography>
-                  <Typography variant='body2' fontWeight='bold' sx={{ mt: 1 }}>
+                  <Typography variant="body2" fontWeight="bold" sx={{ mt: 1 }}>
                     Masculine Plural:
                   </Typography>
-                  <Typography variant='body2' sx={{ ml: 1 }}>
+                  <Typography variant="body2" sx={{ ml: 1 }}>
                     IT: {conflict.new.maschile.plurale.it}
                   </Typography>
-                  <Typography variant='body2' sx={{ ml: 1 }}>
+                  <Typography variant="body2" sx={{ ml: 1 }}>
                     PT: {conflict.new.maschile.plurale.pt}
                   </Typography>
-                  <Typography variant='body2' sx={{ ml: 1 }}>
+                  <Typography variant="body2" sx={{ ml: 1 }}>
                     EN: {conflict.new.maschile.plurale.en}
                   </Typography>
-                  <Typography variant='body2' fontWeight='bold' sx={{ mt: 1 }}>
+                  <Typography variant="body2" fontWeight="bold" sx={{ mt: 1 }}>
                     Feminine Singular:
                   </Typography>
-                  <Typography variant='body2' sx={{ ml: 1 }}>
+                  <Typography variant="body2" sx={{ ml: 1 }}>
                     IT: {conflict.new.femminile.singolare.it}
                   </Typography>
-                  <Typography variant='body2' sx={{ ml: 1 }}>
+                  <Typography variant="body2" sx={{ ml: 1 }}>
                     PT: {conflict.new.femminile.singolare.pt}
                   </Typography>
-                  <Typography variant='body2' sx={{ ml: 1 }}>
+                  <Typography variant="body2" sx={{ ml: 1 }}>
                     EN: {conflict.new.femminile.singolare.en}
                   </Typography>
-                  <Typography variant='body2' fontWeight='bold' sx={{ mt: 1 }}>
+                  <Typography variant="body2" fontWeight="bold" sx={{ mt: 1 }}>
                     Feminine Plural:
                   </Typography>
-                  <Typography variant='body2' sx={{ ml: 1 }}>
+                  <Typography variant="body2" sx={{ ml: 1 }}>
                     IT: {conflict.new.femminile.plurale.it}
                   </Typography>
-                  <Typography variant='body2' sx={{ ml: 1 }}>
+                  <Typography variant="body2" sx={{ ml: 1 }}>
                     PT: {conflict.new.femminile.plurale.pt}
                   </Typography>
-                  <Typography variant='body2' sx={{ ml: 1 }}>
+                  <Typography variant="body2" sx={{ ml: 1 }}>
                     EN: {conflict.new.femminile.plurale.en}
                   </Typography>
                 </Box>
               </Stack>
 
-              <Stack direction='row' spacing={2}>
+              <Stack direction="row" spacing={2}>
                 <Button
-                  size='small'
+                  size="small"
                   variant={
                     adjectiveConflictResolutions[conflict.italian] === 'keep'
                       ? 'contained'
@@ -373,13 +373,13 @@ export default function ImportAdjectives({
                   Keep Existing
                 </Button>
                 <Button
-                  size='small'
+                  size="small"
                   variant={
                     adjectiveConflictResolutions[conflict.italian] === 'replace'
                       ? 'contained'
                       : 'outlined'
                   }
-                  color='secondary'
+                  color="secondary"
                   onClick={() =>
                     handleAdjectiveConflictResolution(
                       conflict.italian,
@@ -399,7 +399,7 @@ export default function ImportAdjectives({
           </Button>
           <Button
             onClick={handleResolveAdjectiveConflicts}
-            variant='contained'
+            variant="contained"
             disabled={
               Object.keys(adjectiveConflictResolutions).length !==
               adjectiveConflicts.length
@@ -414,24 +414,24 @@ export default function ImportAdjectives({
       <Dialog
         open={showFormatInfoDialog}
         onClose={() => setShowFormatInfoDialog(false)}
-        maxWidth='sm'
+        maxWidth="sm"
         fullWidth
       >
         <DialogTitle>
-          <Box display='flex' alignItems='center' gap={1}>
-            <Info color='primary' />
+          <Box display="flex" alignItems="center" gap={1}>
+            <Info color="primary" />
             JSON Format Information
           </Box>
         </DialogTitle>
         <DialogContent>
-          <Typography variant='body2' color='text.secondary' sx={{ mb: 2 }}>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
             Upload a JSON file with Italian adjectives and their translations in
             masculine/feminine and singular/plural forms. Expected format:
           </Typography>
           <Paper sx={{ p: 2, backgroundColor: 'grey.100' }}>
             <Typography
-              variant='body2'
-              component='pre'
+              variant="body2"
+              component="pre"
               sx={{ fontFamily: 'monospace', fontSize: '0.85rem' }}
             >
               {`{

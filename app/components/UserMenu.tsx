@@ -63,9 +63,9 @@ export default function UserMenu({ onSettingsClick }: UserMenuProps) {
     <>
       <IconButton
         onClick={handleClick}
-        size='small'
+        size="small"
         aria-controls={open ? 'user-menu' : undefined}
-        aria-haspopup='true'
+        aria-haspopup="true"
         aria-expanded={open ? 'true' : undefined}
         sx={{
           ml: 2,
@@ -87,7 +87,7 @@ export default function UserMenu({ onSettingsClick }: UserMenuProps) {
 
       <Menu
         anchorEl={anchorEl}
-        id='user-menu'
+        id="user-menu"
         open={open}
         onClose={handleClose}
         onClick={handleClose}
@@ -106,10 +106,10 @@ export default function UserMenu({ onSettingsClick }: UserMenuProps) {
         }}
       >
         <Box sx={{ px: 2, py: 1.5 }}>
-          <Typography variant='subtitle2' color='text.secondary'>
+          <Typography variant="subtitle2" color="text.secondary">
             Logged in as
           </Typography>
-          <Typography variant='body1' fontWeight='bold'>
+          <Typography variant="body1" fontWeight="bold">
             {user?.username}
           </Typography>
         </Box>
@@ -118,21 +118,21 @@ export default function UserMenu({ onSettingsClick }: UserMenuProps) {
 
         <MenuItem onClick={handleSettings}>
           <ListItemIcon>
-            <SettingsIcon fontSize='small' />
+            <SettingsIcon fontSize="small" />
           </ListItemIcon>
           <ListItemText>Profile Settings</ListItemText>
         </MenuItem>
 
         <MenuItem onClick={handleChangePassword}>
           <ListItemIcon>
-            <LockIcon fontSize='small' />
+            <LockIcon fontSize="small" />
           </ListItemIcon>
           <ListItemText>Change Password</ListItemText>
         </MenuItem>
 
         <MenuItem onClick={handleLogout}>
           <ListItemIcon>
-            <LogoutIcon fontSize='small' />
+            <LogoutIcon fontSize="small" />
           </ListItemIcon>
           <ListItemText>Logout</ListItemText>
         </MenuItem>

@@ -128,12 +128,12 @@ export const TenseSection: React.FC<TenseSectionProps> = ({
     return (
       <StyledTenseSection elevation={2}>
         <Box
-          display='flex'
-          alignItems='center'
-          justifyContent='space-between'
+          display="flex"
+          alignItems="center"
+          justifyContent="space-between"
           mb={2}
         >
-          <Typography variant='h6' fontWeight='bold'>
+          <Typography variant="h6" fontWeight="bold">
             {tense} ({mood})
           </Typography>
         </Box>
@@ -148,8 +148,8 @@ export const TenseSection: React.FC<TenseSectionProps> = ({
           >
             <TextField
               fullWidth
-              size='small'
-              placeholder='Type the conjugation...'
+              size="small"
+              placeholder="Type the conjugation..."
               value={inputValues[key] || ''}
               onChange={(e) => onInputChange(key, e.target.value)}
               onBlur={() =>
@@ -159,20 +159,20 @@ export const TenseSection: React.FC<TenseSectionProps> = ({
                 onKeyDown(e, key, tenseData, verbId, mood, tense, 'form')
               }
               sx={inputStyle}
-              autoComplete='off'
+              autoComplete="off"
               inputRef={setInputRef(key)}
               slotProps={{
                 input: {
                   endAdornment: (
-                    <InputAdornment position='end'>
-                      <Tooltip title='Clear field'>
+                    <InputAdornment position="end">
+                      <Tooltip title="Clear field">
                         <IconButton
-                          size='small'
+                          size="small"
                           onClick={() => onClearInput(key)}
-                          edge='end'
+                          edge="end"
                           sx={{ mr: 0.5 }}
                         >
-                          <ClearIcon fontSize='small' />
+                          <ClearIcon fontSize="small" />
                         </IconButton>
                       </Tooltip>
                     </InputAdornment>
@@ -180,13 +180,13 @@ export const TenseSection: React.FC<TenseSectionProps> = ({
                 },
               }}
             />
-            <Tooltip title='Show answer'>
+            <Tooltip title="Show answer">
               <IconButton
-                size='small'
+                size="small"
                 onClick={() => onShowAnswer(key, tenseData)}
-                color='primary'
+                color="primary"
               >
-                <LightbulbOutlinedIcon fontSize='small' />
+                <LightbulbOutlinedIcon fontSize="small" />
               </IconButton>
             </Tooltip>
           </Box>
@@ -213,12 +213,12 @@ export const TenseSection: React.FC<TenseSectionProps> = ({
   return (
     <StyledTenseSection elevation={2}>
       <Box
-        display='flex'
-        alignItems='center'
-        justifyContent='space-between'
+        display="flex"
+        alignItems="center"
+        justifyContent="space-between"
         mb={2}
       >
-        <Typography variant='h6' fontWeight='bold'>
+        <Typography variant="h6" fontWeight="bold">
           {tense} ({mood})
         </Typography>
       </Box>
@@ -231,7 +231,7 @@ export const TenseSection: React.FC<TenseSectionProps> = ({
 
         return (
           <PersonRow key={person}>
-            <PersonLabel variant='body1'>{person}</PersonLabel>
+            <PersonLabel variant="body1">{person}</PersonLabel>
             <Box
               sx={{
                 display: 'flex',
@@ -242,8 +242,8 @@ export const TenseSection: React.FC<TenseSectionProps> = ({
             >
               <TextField
                 fullWidth
-                size='small'
-                placeholder='Type the conjugation...'
+                size="small"
+                placeholder="Type the conjugation..."
                 value={inputValues[key] || ''}
                 onChange={(e) => onInputChange(key, e.target.value)}
                 onBlur={() =>
@@ -253,20 +253,20 @@ export const TenseSection: React.FC<TenseSectionProps> = ({
                   onKeyDown(e, key, correctAnswer, verbId, mood, tense, person)
                 }
                 sx={inputStyle}
-                autoComplete='off'
+                autoComplete="off"
                 inputRef={setInputRef(key)}
                 slotProps={{
                   input: {
                     endAdornment: (
-                      <InputAdornment position='end'>
-                        <Tooltip title='Clear field'>
+                      <InputAdornment position="end">
+                        <Tooltip title="Clear field">
                           <IconButton
-                            size='small'
+                            size="small"
                             onClick={() => onClearInput(key)}
-                            edge='end'
+                            edge="end"
                             sx={{ mr: 0.5 }}
                           >
-                            <ClearIcon fontSize='small' />
+                            <ClearIcon fontSize="small" />
                           </IconButton>
                         </Tooltip>
                       </InputAdornment>
@@ -274,13 +274,13 @@ export const TenseSection: React.FC<TenseSectionProps> = ({
                   },
                 }}
               />
-              <Tooltip title='Show answer'>
+              <Tooltip title="Show answer">
                 <IconButton
-                  size='small'
+                  size="small"
                   onClick={() => onShowAnswer(key, correctAnswer)}
-                  color='primary'
+                  color="primary"
                 >
-                  <LightbulbOutlinedIcon fontSize='small' />
+                  <LightbulbOutlinedIcon fontSize="small" />
                 </IconButton>
               </Tooltip>
             </Box>

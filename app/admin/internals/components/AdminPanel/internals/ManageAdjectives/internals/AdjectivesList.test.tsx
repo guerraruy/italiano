@@ -16,7 +16,7 @@ jest.mock('@/app/store/api', () => ({
 jest.mock('./EditAdjectiveDialog', () => ({
   __esModule: true,
   default: ({ open, onClose }: { open: boolean; onClose: () => void }) => (
-    <div data-testid='edit-dialog' data-open={open}>
+    <div data-testid="edit-dialog" data-open={open}>
       <button onClick={onClose}>Close Edit</button>
     </div>
   ),
@@ -25,7 +25,7 @@ jest.mock('./EditAdjectiveDialog', () => ({
 jest.mock('./DeleteAdjectiveDialog', () => ({
   __esModule: true,
   default: ({ open, onClose }: { open: boolean; onClose: () => void }) => (
-    <div data-testid='delete-dialog' data-open={open}>
+    <div data-testid="delete-dialog" data-open={open}>
       <button onClick={onClose}>Close Delete</button>
     </div>
   ),
@@ -33,7 +33,7 @@ jest.mock('./DeleteAdjectiveDialog', () => ({
 
 jest.mock('./ImportAdjectives', () => ({
   __esModule: true,
-  default: () => <div data-testid='import-adjectives'>Import Adjectives</div>,
+  default: () => <div data-testid="import-adjectives">Import Adjectives</div>,
 }))
 
 const mockAdjectives = [

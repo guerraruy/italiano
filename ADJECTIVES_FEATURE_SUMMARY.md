@@ -11,6 +11,7 @@ This document summarizes the implementation of the Adjectives management feature
 Added new models to `/prisma/schema.prisma`:
 
 #### Adjective Model
+
 ```prisma
 model Adjective {
   id          String               @id @default(cuid())
@@ -24,6 +25,7 @@ model Adjective {
 ```
 
 #### AdjectiveStatistic Model
+
 ```prisma
 model AdjectiveStatistic {
   id              String     @id @default(cuid())
@@ -44,6 +46,7 @@ model AdjectiveStatistic {
 ```
 
 **Note:** You need to run the following command to apply the schema changes:
+
 ```bash
 yarn prisma db push
 # or
@@ -55,12 +58,14 @@ npx prisma db push
 Created API routes for adjectives management:
 
 #### `/app/api/admin/adjectives/import/route.ts`
+
 - **POST** endpoint for importing adjectives with conflict resolution
 - **GET** endpoint for fetching all adjectives (admin only)
 - Authentication via JWT tokens
 - Conflict detection and resolution logic
 
 #### `/app/api/admin/adjectives/[adjectiveId]/route.ts`
+
 - **PATCH** endpoint for updating individual adjectives
 - **DELETE** endpoint for deleting adjectives (cascades to statistics)
 - Admin-only access with JWT authentication
@@ -70,6 +75,7 @@ Created API routes for adjectives management:
 Updated `/app/store/api.ts` with:
 
 #### New TypeScript Interfaces:
+
 - `AdjectiveTranslations` - Translation structure (it, pt, en)
 - `AdjectiveGenderForms` - Gender-specific forms (singolare, plurale)
 - `AdjectiveData` - Complete adjective data (maschile, femminile)
@@ -81,11 +87,13 @@ Updated `/app/store/api.ts` with:
 - `AdjectiveStatisticsMap` - Statistics mapping
 
 #### Added Tag Types:
+
 - `'Adjectives'` - For admin adjective management
 - `'AdjectivesPractice'` - For practice mode
 - `'AdjectiveStatistics'` - For user statistics
 
 #### New Endpoints:
+
 - `getAdjectives` - Fetch all adjectives (admin)
 - `importAdjectives` - Import adjectives with conflict resolution
 - `updateAdjective` - Update an adjective
@@ -96,6 +104,7 @@ Updated `/app/store/api.ts` with:
 - `resetAdjectiveStatistic` - Reset statistics for an adjective
 
 #### Exported Hooks:
+
 - `useGetAdjectivesQuery`
 - `useImportAdjectivesMutation`
 - `useUpdateAdjectiveMutation`
@@ -110,9 +119,11 @@ Updated `/app/store/api.ts` with:
 Created complete component structure under `/app/components/AdminPanel/internals/ManageAdjectives/`:
 
 #### Main Component
+
 - `ManageAdjectives.tsx` - Container component
 
 #### Internal Components (`internals/` folder)
+
 - `ImportAdjectives.tsx` - File upload and import functionality
 - `AdjectivesList.tsx` - Table display with search and pagination
 - `EditAdjectiveDialog.tsx` - Edit dialog with all form fields
@@ -122,6 +133,7 @@ Created complete component structure under `/app/components/AdminPanel/internals
 ### 5. Admin Panel Integration
 
 Updated `/app/components/AdminPanel/AdminPanel.tsx`:
+
 - Added new "Manage Adjectives" tab (5th tab)
 - Integrated ManageAdjectives component
 - Updated imports and exports
@@ -164,6 +176,7 @@ The import feature expects JSON files with the following structure:
 ### 7. Key Features
 
 #### Import System
+
 - JSON file upload with validation
 - Preview of data before import
 - Conflict detection for existing adjectives
@@ -171,6 +184,7 @@ The import feature expects JSON files with the following structure:
 - User decides: Keep existing or Replace with new
 
 #### Adjectives List
+
 - Searchable table with real-time filtering
 - Pagination (10, 25, 50, 100 items per page)
 - Displays all forms (masculine/feminine, singular/plural)
@@ -178,12 +192,14 @@ The import feature expects JSON files with the following structure:
 - Responsive design with Material-UI
 
 #### Edit Functionality
+
 - Full form with all fields editable
 - Separate sections for masculine and feminine forms
 - Validation and error handling
 - Real-time updates
 
 #### Delete Functionality
+
 - Confirmation dialog with adjective details
 - Warning about cascade deletion of statistics
 - Safe deletion with error handling
@@ -270,6 +286,7 @@ ManageAdjectives/
 ## Files Created/Modified
 
 ### Created Files
+
 1. `/prisma/schema.prisma` - Added Adjective and AdjectiveStatistic models
 2. `/app/api/admin/adjectives/import/route.ts` - Import and list endpoints
 3. `/app/api/admin/adjectives/[adjectiveId]/route.ts` - Update and delete endpoints
@@ -282,6 +299,7 @@ ManageAdjectives/
 10. `/app/components/AdminPanel/internals/ManageAdjectives/internals/index.ts`
 
 ### Modified Files
+
 1. `/app/store/api.ts` - Added adjective types and endpoints
 2. `/app/components/AdminPanel/AdminPanel.tsx` - Added Manage Adjectives tab
 3. `/app/components/AdminPanel/internals/index.ts` - Exported ManageAdjectives
@@ -303,4 +321,3 @@ After applying the database schema changes, the Adjectives management feature wi
 - RTK Query is used for API state management and data fetching
 - Components follow the project's structure with internals folders for child components
 - The system is fully integrated with the existing authentication and authorization
-

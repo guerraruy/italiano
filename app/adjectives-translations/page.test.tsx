@@ -13,17 +13,17 @@ jest.mock('./internals/hooks/useAdjectivesPractice')
 // Mock child components
 jest.mock('./internals/components/AdjectivesList', () => ({
   AdjectivesList: jest.fn(() => (
-    <div data-testid='adjectives-list'>AdjectivesList</div>
+    <div data-testid="adjectives-list">AdjectivesList</div>
   )),
 }))
 
 jest.mock('../components/PageHeader', () => ({
-  PageHeader: jest.fn(() => <div data-testid='page-header'>PageHeader</div>),
+  PageHeader: jest.fn(() => <div data-testid="page-header">PageHeader</div>),
 }))
 
 jest.mock('./internals/components/AdjectiveItem/internals', () => ({
   ResetStatisticsDialog: jest.fn(() => (
-    <div data-testid='reset-dialog'>ResetDialog</div>
+    <div data-testid="reset-dialog">ResetDialog</div>
   )),
 }))
 

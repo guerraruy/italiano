@@ -1,4 +1,6 @@
 'use client'
+import { ReactNode } from 'react'
+
 import { Warning } from '@mui/icons-material'
 import {
   Box,
@@ -11,7 +13,6 @@ import {
   Typography,
   Alert,
 } from '@mui/material'
-import { ReactNode } from 'react'
 
 interface DeleteConfirmationDialogProps<T> {
   open: boolean
@@ -52,15 +53,15 @@ export default function DeleteConfirmationDialog<T extends { id: string }>({
   }
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth='sm' fullWidth>
+    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
       <DialogTitle>
-        <Box display='flex' alignItems='center' gap={1}>
-          <Warning color='error' />
+        <Box display="flex" alignItems="center" gap={1}>
+          <Warning color="error" />
           Confirm Deletion
         </Box>
       </DialogTitle>
       <DialogContent>
-        <Typography variant='body1' gutterBottom>
+        <Typography variant="body1" gutterBottom>
           Are you sure you want to delete this {entityName}?
         </Typography>
         {item && (
@@ -68,7 +69,7 @@ export default function DeleteConfirmationDialog<T extends { id: string }>({
             {renderItemDetails(item)}
           </Paper>
         )}
-        <Alert severity='warning' sx={{ mt: 2 }}>
+        <Alert severity="warning" sx={{ mt: 2 }}>
           {warningMessage}
         </Alert>
       </DialogContent>
@@ -78,8 +79,8 @@ export default function DeleteConfirmationDialog<T extends { id: string }>({
         </Button>
         <Button
           onClick={handleDelete}
-          variant='contained'
-          color='error'
+          variant="contained"
+          color="error"
           disabled={isDeleting}
         >
           {isDeleting ? 'Deleting...' : 'Delete'}

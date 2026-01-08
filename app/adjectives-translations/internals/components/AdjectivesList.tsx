@@ -39,10 +39,7 @@ interface AdjectivesListProps {
     field: keyof InputValues[string],
     correctAnswer: string
   ) => void
-  onClearInput: (
-    adjectiveId: string,
-    field?: keyof InputValues[string]
-  ) => void
+  onClearInput: (adjectiveId: string, field?: keyof InputValues[string]) => void
   onShowAnswer: (adjectiveId: string) => void
   onResetStatistics: (adjectiveId: string) => void
   onKeyDown: (
@@ -82,7 +79,7 @@ export const AdjectivesList: React.FC<AdjectivesListProps> = ({
 }) => {
   if (adjectives.length === 0) {
     return (
-      <Alert severity='info'>
+      <Alert severity="info">
         No adjectives available. Please ask your administrator to import
         adjectives.
       </Alert>
@@ -138,4 +135,3 @@ export const AdjectivesList: React.FC<AdjectivesListProps> = ({
     </>
   )
 }
-

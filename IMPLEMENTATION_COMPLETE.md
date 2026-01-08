@@ -154,17 +154,14 @@ yarn dev
 ## ⚠️ Important Notes
 
 1. **Database Migration Required**
-
    - Run `yarn prisma db push` to create the Noun table
    - Or restart the server (it will auto-generate the schema)
 
 2. **Admin Access Only**
-
    - Only users with `admin: true` can access this feature
    - API endpoints validate JWT tokens
 
 3. **Conflict Resolution**
-
    - When re-importing existing nouns, you'll see a conflict dialog
    - Compare old vs. new data side-by-side
    - Choose whether to keep or replace for each noun

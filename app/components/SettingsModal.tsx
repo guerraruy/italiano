@@ -171,16 +171,16 @@ export default function SettingsModal({ open, onClose }: SettingsModalProps) {
     <Dialog
       open={open}
       onClose={handleClose}
-      maxWidth='sm'
+      maxWidth="sm"
       fullWidth
       sx={{ zIndex: 1300 }}
     >
       <DialogTitle sx={{ py: 1.5, px: 2 }}>
-        <Box display='flex' alignItems='center' justifyContent='space-between'>
-          <Typography variant='h6' component='div' sx={{ fontSize: '18px' }}>
+        <Box display="flex" alignItems="center" justifyContent="space-between">
+          <Typography variant="h6" component="div" sx={{ fontSize: '18px' }}>
             Profile Settings
           </Typography>
-          <IconButton aria-label='close' onClick={handleClose} size='small'>
+          <IconButton aria-label="close" onClick={handleClose} size="small">
             <CloseIcon />
           </IconButton>
         </Box>
@@ -189,25 +189,25 @@ export default function SettingsModal({ open, onClose }: SettingsModalProps) {
       <DialogContent sx={{ py: 1.5, px: 2 }}>
         <Box sx={{ py: 1 }}>
           {isLoading ? (
-            <Box display='flex' justifyContent='center' py={2}>
+            <Box display="flex" justifyContent="center" py={2}>
               <CircularProgress />
             </Box>
           ) : error ? (
-            <Alert severity='error' sx={{ py: 0.5 }}>
+            <Alert severity="error" sx={{ py: 0.5 }}>
               Failed to load profile settings. Please try again.
             </Alert>
           ) : (
             <>
-              <FormControl component='fieldset' fullWidth>
+              <FormControl component="fieldset" fullWidth>
                 <FormLabel
-                  component='legend'
+                  component="legend"
                   sx={{ mb: 1, fontWeight: 'bold', fontSize: '16px' }}
                 >
                   Native Language
                 </FormLabel>
                 <Typography
-                  variant='body2'
-                  color='text.secondary'
+                  variant="body2"
+                  color="text.secondary"
                   sx={{ mb: 1, fontSize: '14px' }}
                 >
                   Select your native language to see translations in your
@@ -220,8 +220,8 @@ export default function SettingsModal({ open, onClose }: SettingsModalProps) {
                   }
                 >
                   <FormControlLabel
-                    value='pt-BR'
-                    control={<Radio size='small' sx={{ py: 0.5 }} />}
+                    value="pt-BR"
+                    control={<Radio size="small" sx={{ py: 0.5 }} />}
                     label={
                       <Typography sx={{ fontSize: '16px' }}>
                         Português (Brasil)
@@ -230,8 +230,8 @@ export default function SettingsModal({ open, onClose }: SettingsModalProps) {
                     sx={{ mb: 0, my: 0.25 }}
                   />
                   <FormControlLabel
-                    value='en'
-                    control={<Radio size='small' sx={{ py: 0.5 }} />}
+                    value="en"
+                    control={<Radio size="small" sx={{ py: 0.5 }} />}
                     label={
                       <Typography sx={{ fontSize: '16px' }}>English</Typography>
                     }
@@ -242,16 +242,16 @@ export default function SettingsModal({ open, onClose }: SettingsModalProps) {
 
               <Divider sx={{ my: 2 }} />
 
-              <FormControl component='fieldset' fullWidth>
+              <FormControl component="fieldset" fullWidth>
                 <FormLabel
-                  component='legend'
+                  component="legend"
                   sx={{ mb: 1, fontWeight: 'bold', fontSize: '16px' }}
                 >
                   Enabled Verb Tenses
                 </FormLabel>
                 <Typography
-                  variant='body2'
-                  color='text.secondary'
+                  variant="body2"
+                  color="text.secondary"
                   sx={{ mb: 1, fontSize: '14px' }}
                 >
                   Select which verb tenses you want to practice. Only selected
@@ -286,14 +286,14 @@ export default function SettingsModal({ open, onClose }: SettingsModalProps) {
                                 onChange={() =>
                                   handleSelectAllInCategory(category)
                                 }
-                                size='small'
+                                size="small"
                                 sx={{ py: 0.5 }}
                               />
                             }
                             label={
                               <Typography
-                                variant='subtitle2'
-                                fontWeight='bold'
+                                variant="subtitle2"
+                                fontWeight="bold"
                                 sx={{ fontSize: '14px' }}
                               >
                                 {category}
@@ -316,13 +316,13 @@ export default function SettingsModal({ open, onClose }: SettingsModalProps) {
                                     onChange={() =>
                                       handleVerbTenseToggle(tenseKey)
                                     }
-                                    size='small'
+                                    size="small"
                                     sx={{ py: 0.5 }}
                                   />
                                 }
                                 label={
                                   <Typography
-                                    variant='body2'
+                                    variant="body2"
                                     sx={{ fontSize: '14px' }}
                                   >
                                     {tense}
@@ -341,7 +341,7 @@ export default function SettingsModal({ open, onClose }: SettingsModalProps) {
 
               {successMessage && (
                 <Alert
-                  severity='success'
+                  severity="success"
                   sx={{ mt: 1.5, py: 0.5, fontSize: '14px' }}
                 >
                   {successMessage}
@@ -350,7 +350,7 @@ export default function SettingsModal({ open, onClose }: SettingsModalProps) {
 
               {errorMessage && (
                 <Alert
-                  severity='error'
+                  severity="error"
                   sx={{ mt: 1.5, py: 0.5, fontSize: '14px' }}
                 >
                   {errorMessage}
@@ -364,17 +364,17 @@ export default function SettingsModal({ open, onClose }: SettingsModalProps) {
       <DialogActions sx={{ px: 2, py: 1.5 }}>
         <Button
           onClick={handleClose}
-          variant='outlined'
+          variant="outlined"
           disabled={isUpdating}
-          size='small'
+          size="small"
         >
           Cancel
         </Button>
         <Button
           onClick={handleSave}
-          variant='contained'
+          variant="contained"
           disabled={isLoading || isUpdating}
-          size='small'
+          size="small"
         >
           {isUpdating ? 'Saving...' : 'Save'}
         </Button>

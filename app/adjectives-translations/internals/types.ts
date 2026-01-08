@@ -21,4 +21,3 @@ export interface ResetDialogState {
   adjectiveId: string | null
   adjectiveTranslation: string | null
 }
-

@@ -33,4 +33,3 @@ export const InputActionsBox = styled(Box)(({ theme }) => ({
   flexGrow: 1,
   maxWidth: '500px',
 }))
-

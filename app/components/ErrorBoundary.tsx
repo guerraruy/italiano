@@ -58,7 +58,7 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
 
       // Default error UI
       return (
-        <Container maxWidth='md' sx={{ mt: 8 }}>
+        <Container maxWidth="md" sx={{ mt: 8 }}>
           <Paper
             elevation={3}
             sx={{
@@ -75,10 +75,10 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
                 mb: 2,
               }}
             />
-            <Typography variant='h4' gutterBottom color='error'>
+            <Typography variant="h4" gutterBottom color="error">
               Oops! Something went wrong
             </Typography>
-            <Typography variant='body1' color='text.secondary' paragraph>
+            <Typography variant="body1" color="text.secondary" paragraph>
               We encountered an unexpected error. Please try refreshing the
               page.
             </Typography>
@@ -95,16 +95,16 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
                 }}
               >
                 <Typography
-                  variant='subtitle2'
-                  color='error'
+                  variant="subtitle2"
+                  color="error"
                   gutterBottom
                   sx={{ fontWeight: 'bold' }}
                 >
                   Error Details (Development Only):
                 </Typography>
                 <Typography
-                  variant='body2'
-                  component='pre'
+                  variant="body2"
+                  component="pre"
                   sx={{
                     fontFamily: 'monospace',
                     fontSize: '0.875rem',
@@ -122,19 +122,19 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
               sx={{ mt: 4, display: 'flex', gap: 2, justifyContent: 'center' }}
             >
               <Button
-                variant='contained'
-                color='primary'
+                variant="contained"
+                color="primary"
                 startIcon={<RefreshIcon />}
                 onClick={this.resetError}
-                size='large'
+                size="large"
               >
                 Try Again
               </Button>
               <Button
-                variant='outlined'
-                color='primary'
+                variant="outlined"
+                color="primary"
                 onClick={() => (window.location.href = '/')}
-                size='large'
+                size="large"
               >
                 Go to Home
               </Button>

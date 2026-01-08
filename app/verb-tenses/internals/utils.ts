@@ -24,4 +24,3 @@ export const getFilterStorageKey = (userId: string) =>
 // Create input key for conjugation fields
 export const createInputKey = (mood: string, tense: string, person: string) =>
   `${mood}:${tense}:${person}`
-

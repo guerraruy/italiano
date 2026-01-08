@@ -19,9 +19,9 @@ export const PageHeader: React.FC<PageHeaderProps> = ({ title }) => {
   return (
     <HeaderBox>
       <Typography
-        variant='h5'
-        component='h1'
-        fontWeight='bold'
+        variant="h5"
+        component="h1"
+        fontWeight="bold"
         style={{ textTransform: 'uppercase' }}
       >
         {title}

@@ -25,6 +25,7 @@ yarn dev
 ## The Error is Fixed!
 
 The error you were seeing:
+
 ```
 Cannot read properties of undefined (reading 'findMany')
 ```
@@ -46,4 +47,3 @@ Is now **completely resolved**! The Prisma client now knows about `prisma.adject
 - All components and API routes are ready
 
 Enjoy your new Adjectives management feature! 🇮🇹
-

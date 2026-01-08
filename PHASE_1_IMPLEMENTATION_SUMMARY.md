@@ -3,6 +3,7 @@
 ## What Has Been Completed ✅
 
 ### 1. Foundation Infrastructure
+
 - ✅ **Installed Zod** for input validation
 - ✅ **Created `lib/env.ts`** - Environment variable validation that fails fast on startup
 - ✅ **Created `lib/auth.ts`** - Centralized authentication middleware with `withAuth` and `withAdmin` helpers
@@ -15,6 +16,7 @@
   - `lib/validation/users.ts` - User management (admin)
 
 ### 2. Security Improvements
+
 - ✅ **Removed hardcoded JWT secrets** from updated routes
 - ✅ **Added input validation** with Zod schemas providing detailed error messages
 - ✅ **Centralized authentication** - No more duplicated auth logic
@@ -22,12 +24,15 @@
 - ✅ **Type-safe environment access** - TypeScript-checked environment variables
 
 ### 3. Updated API Routes
+
 #### Authentication Routes ✅
+
 - `/api/auth/login` - Now uses validation schema, centralized token generation
 - `/api/auth/register` - Now uses validation schema with strong password requirements
 - `/api/auth/change-password` - Now uses `withAuth` middleware and validation
 
 #### Other Routes ✅
+
 - `/api/profile` (GET & PATCH) - Now uses `withAuth` middleware
 - `/api/verbs/conjugations/statistics` (GET & POST) - Now uses `withAuth` middleware
 - `/api/admin/users` (GET) - Now uses `withAdmin` middleware
@@ -35,6 +40,7 @@
 ## What Still Needs To Be Done ⚠️
 
 ### Immediate Action Required
+
 **You need to update your `.env` file:**
 
 ```bash
@@ -45,6 +51,7 @@ openssl rand -base64 32
 ```
 
 Add to your `.env` file:
+
 ```
 JWT_SECRET=your-generated-secret-here-at-least-32-characters
 DATABASE_URL=your-existing-database-url
@@ -55,6 +62,7 @@ DATABASE_URL=your-existing-database-url
 The following routes still need to be updated to use centralized auth:
 
 #### Admin Routes
+
 - `/api/admin/users/[id]` (PATCH, DELETE)
 - `/api/admin/verbs/import` (GET, POST)
 - `/api/admin/verbs/[verbId]` (PATCH, DELETE)
@@ -66,6 +74,7 @@ The following routes still need to be updated to use centralized auth:
 - `/api/admin/adjectives/[adjectiveId]` (PATCH, DELETE)
 
 #### Verb Routes
+
 - `/api/verbs` (GET)
 - `/api/verbs/conjugations` (GET)
 - `/api/verbs/statistics` (GET, POST)
@@ -73,11 +82,13 @@ The following routes still need to be updated to use centralized auth:
 - `/api/verbs/conjugations/statistics/[verbId]` (DELETE)
 
 #### Noun Routes
+
 - `/api/nouns` (GET)
 - `/api/nouns/statistics` (GET, POST)
 - `/api/nouns/statistics/[nounId]` (DELETE)
 
 #### Adjective Routes
+
 - `/api/adjectives` (GET)
 - `/api/adjectives/statistics` (GET, POST)
 - `/api/adjectives/statistics/[adjectiveId]` (DELETE)
@@ -85,6 +96,7 @@ The following routes still need to be updated to use centralized auth:
 ### Pattern to Follow
 
 For routes requiring authentication:
+
 ```typescript
 import { withAuth } from '@/lib/auth'
 
@@ -94,6 +106,7 @@ export const GET = withAuth(async (request, userId) => {
 ```
 
 For admin-only routes:
+
 ```typescript
 import { withAdmin } from '@/lib/auth'
 
@@ -103,6 +116,7 @@ export const GET = withAdmin(async (request, userId) => {
 ```
 
 ### Frontend Updates Not Done
+
 - ❌ AuthContext and API store still use old localStorage approach
 - ❌ No cookie-based authentication implemented yet (would be breaking change)
 - ❌ No CSRF protection added
@@ -112,11 +126,13 @@ export const GET = withAdmin(async (request, userId) => {
 1. **Update your `.env` file** with a proper JWT_SECRET (at least 32 characters)
 
 2. **Test the build:**
+
    ```bash
    yarn build
    ```
 
 3. **Run the dev server:**
+
    ```bash
    yarn dev
    ```
@@ -146,6 +162,7 @@ To complete Phase 1, you can either:
 ## Files Created/Modified
 
 ### Created:
+
 - `lib/env.ts`
 - `lib/auth.ts`
 - `lib/validation/auth.ts`
@@ -156,6 +173,7 @@ To complete Phase 1, you can either:
 - `lib/validation/users.ts`
 
 ### Modified:
+
 - `app/api/auth/login/route.ts`
 - `app/api/auth/register/route.ts`
 - `app/api/auth/change-password/route.ts`
@@ -176,4 +194,3 @@ To complete Phase 1, you can either:
 - The `.env.example` file couldn't be created due to gitignore restrictions. You should manually create it using the template in this document.
 - Cookie-based authentication (more secure than localStorage) was planned but not implemented to avoid breaking the frontend immediately.
 - All updated routes now have consistent error handling and response formats.
-

@@ -57,14 +57,14 @@ export default function NounsTranslationsPage() {
 
   if (isLoading) {
     return (
-      <PageContainer maxWidth='lg'>
-        <PageHeader title='Nouns Translations' />
+      <PageContainer maxWidth="lg">
+        <PageHeader title="Nouns Translations" />
         <ContentPaper elevation={3}>
           <Box
-            display='flex'
-            justifyContent='center'
-            alignItems='center'
-            minHeight='400px'
+            display="flex"
+            justifyContent="center"
+            alignItems="center"
+            minHeight="400px"
           >
             <CircularProgress />
           </Box>
@@ -75,10 +75,10 @@ export default function NounsTranslationsPage() {
 
   if (error) {
     return (
-      <PageContainer maxWidth='lg'>
-        <PageHeader title='Nouns Translations' />
+      <PageContainer maxWidth="lg">
+        <PageHeader title="Nouns Translations" />
         <ContentPaper elevation={3}>
-          <Alert severity='error'>
+          <Alert severity="error">
             Error loading nouns. Please try again later.
           </Alert>
         </ContentPaper>
@@ -87,13 +87,13 @@ export default function NounsTranslationsPage() {
   }
 
   return (
-    <PageContainer maxWidth='lg'>
-      <PageHeader title='Nouns Translations' />
+    <PageContainer maxWidth="lg">
+      <PageHeader title="Nouns Translations" />
 
       <ContentPaper elevation={3}>
         <Typography
-          variant='h6'
-          color='text.secondary'
+          variant="h6"
+          color="text.secondary"
           gutterBottom
           sx={{ mb: 3 }}
         >

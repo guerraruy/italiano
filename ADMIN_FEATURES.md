@@ -27,6 +27,7 @@ model User {
 ## New APIs
 
 ### 1. List All Users (Admin Only)
+
 - **Endpoint**: `GET /api/admin/users`
 - **Authentication**: Bearer Token (JWT)
 - **Permission**: Administrators only
@@ -50,6 +51,7 @@ model User {
   ```
 
 ### 2. Delete User (Admin Only)
+
 - **Endpoint**: `DELETE /api/admin/users/:id`
 - **Authentication**: Bearer Token (JWT)
 - **Permission**: Administrators only
@@ -57,6 +59,7 @@ model User {
 - **Response**: `{ "message": "User deleted successfully" }`
 
 ### 3. Toggle Admin Status (Admin Only)
+
 - **Endpoint**: `PATCH /api/admin/users/:id`
 - **Authentication**: Bearer Token (JWT)
 - **Permission**: Administrators only
@@ -64,7 +67,7 @@ model User {
 - **Body**:
   ```json
   {
-    "admin": true  // or false
+    "admin": true // or false
   }
   ```
 - **Response**:
@@ -84,6 +87,7 @@ model User {
 ## Administration Interface
 
 ### Admin Panel
+
 - **Route**: `/admin`
 - **Access**: Only users with `admin = true`
 - **Features**:
@@ -95,11 +99,13 @@ model User {
   - Protections: cannot delete or modify own account
 
 ### Link in Navbar
+
 The "Admin Panel" link appears automatically in the navbar for administrator users, in both desktop and mobile versions.
 
 ## Updated Authentication
 
 The login and registration APIs now return:
+
 - **user**: object with user data (including `admin` field)
 - **token**: JWT token for authentication in protected routes
 
@@ -124,6 +130,7 @@ And manually edit the `admin` field of the desired user.
 ## Security
 
 ### Implemented Protections
+
 1. **Admin Verification**: All admin routes verify that the user has `admin = true`
 2. **Self-protection**: Admins cannot delete or modify their own permissions
 3. **JWT Authentication**: All admin routes require a valid token
@@ -131,6 +138,7 @@ And manually edit the `admin` field of the desired user.
 5. **Cascade Delete**: When a user is deleted, their lessons are also removed
 
 ### Recommendations
+
 - Set `JWT_SECRET` in production environment variables
 - Use HTTPS in production
 - Keep the number of admins to the minimum necessary
@@ -155,4 +163,3 @@ JWT_SECRET=your_very_secure_secret_key_here
 ```
 
 **IMPORTANT**: In production, use a long and random key!
-

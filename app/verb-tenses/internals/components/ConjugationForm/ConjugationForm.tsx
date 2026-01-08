@@ -69,7 +69,7 @@ export const ConjugationForm: React.FC<ConjugationFormProps> = ({
 }) => {
   if (verbsCount === 0) {
     return (
-      <Alert severity='info'>
+      <Alert severity="info">
         No verbs with conjugations available. Please ask your administrator to
         import verb conjugations.
       </Alert>
@@ -78,7 +78,7 @@ export const ConjugationForm: React.FC<ConjugationFormProps> = ({
 
   if (!selectedVerb) {
     return (
-      <Alert severity='info'>
+      <Alert severity="info">
         Please select a verb to start practicing conjugations.
       </Alert>
     )
@@ -88,7 +88,7 @@ export const ConjugationForm: React.FC<ConjugationFormProps> = ({
 
   if (!conjugation) {
     return (
-      <Alert severity='warning'>
+      <Alert severity="warning">
         No conjugation data available for this verb. Please ask your
         administrator to import conjugation data.
       </Alert>
@@ -100,7 +100,7 @@ export const ConjugationForm: React.FC<ConjugationFormProps> = ({
       {enabledVerbTenses.map((tenseKey) => {
         const [mood, tense] = tenseKey.split('.')
         if (!mood || !tense) return null
-        
+
         const moodData = conjugation[mood]
 
         if (!moodData || !moodData[tense]) {

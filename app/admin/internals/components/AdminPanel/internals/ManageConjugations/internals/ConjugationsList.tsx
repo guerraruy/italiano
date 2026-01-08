@@ -42,7 +42,11 @@ import {
   VerbConjugation,
 } from '@/app/store/api'
 
-import { EditConjugationDialog, DeleteConjugationDialog, ImportConjugations } from './'
+import {
+  EditConjugationDialog,
+  DeleteConjugationDialog,
+  ImportConjugations,
+} from './'
 
 interface ConjugationsListProps {
   onError: (message: string) => void
@@ -136,7 +140,7 @@ export default function ConjugationsList({
       0
     )
     return (
-      <Typography variant='body2'>
+      <Typography variant="body2">
         {totalTenses} tense{totalTenses !== 1 ? 's' : ''}
       </Typography>
     )
@@ -147,22 +151,22 @@ export default function ConjugationsList({
       <Box sx={{ mt: 2, p: 2, backgroundColor: 'grey.50', borderRadius: 1 }}>
         {Object.entries(conjugation).map(([mood, tenses]) => (
           <Box key={mood} sx={{ mb: 2 }}>
-            <Typography variant='subtitle2' color='primary' gutterBottom>
+            <Typography variant="subtitle2" color="primary" gutterBottom>
               {mood}
             </Typography>
             {Object.entries(tenses).map(([tense, forms]) => (
               <Box key={tense} sx={{ ml: 2, mb: 1 }}>
-                <Typography variant='body2' fontWeight='medium'>
+                <Typography variant="body2" fontWeight="medium">
                   {tense}
                 </Typography>
                 {typeof forms === 'string' ? (
-                  <Typography variant='body2' sx={{ ml: 2 }}>
+                  <Typography variant="body2" sx={{ ml: 2 }}>
                     {forms}
                   </Typography>
                 ) : (
                   <Box sx={{ ml: 2 }}>
                     {Object.entries(forms).map(([person, form]) => (
-                      <Typography key={person} variant='body2'>
+                      <Typography key={person} variant="body2">
                         {person}: {form}
                       </Typography>
                     ))}
@@ -189,8 +193,8 @@ export default function ConjugationsList({
               mb: 2,
             }}
           >
-            <Box display='flex' alignItems='center' gap={1}>
-              <Typography variant='h6'>
+            <Box display="flex" alignItems="center" gap={1}>
+              <Typography variant="h6">
                 Current Conjugations in Database ({filteredConjugations.length}
                 {deferredFilterText &&
                   ` of ${conjugationsData?.conjugations?.length || 0}`}
@@ -199,8 +203,8 @@ export default function ConjugationsList({
               <ImportConjugations onError={onError} onSuccess={onSuccess} />
             </Box>
             <TextField
-              size='small'
-              placeholder='Filter by verb name...'
+              size="small"
+              placeholder="Filter by verb name..."
               value={filterText}
               onChange={(e) => {
                 const value = e.target.value
@@ -213,19 +217,19 @@ export default function ConjugationsList({
               disabled={loadingConjugations}
               InputProps={{
                 startAdornment: (
-                  <InputAdornment position='start'>
-                    <Search fontSize='small' />
+                  <InputAdornment position="start">
+                    <Search fontSize="small" />
                   </InputAdornment>
                 ),
                 endAdornment: filterText && (
-                  <InputAdornment position='end'>
+                  <InputAdornment position="end">
                     <IconButton
-                      size='small'
+                      size="small"
                       onClick={() => setFilterText('')}
-                      edge='end'
-                      aria-label='clear filter'
+                      edge="end"
+                      aria-label="clear filter"
                     >
-                      <Clear fontSize='small' />
+                      <Clear fontSize="small" />
                     </IconButton>
                   </InputAdornment>
                 ),
@@ -234,23 +238,23 @@ export default function ConjugationsList({
           </Box>
 
           {loadingConjugations ? (
-            <Box display='flex' justifyContent='center' p={3}>
+            <Box display="flex" justifyContent="center" p={3}>
               <CircularProgress />
             </Box>
           ) : (conjugationsData?.conjugations?.length || 0) === 0 ? (
-            <Alert severity='info' icon={<Info />}>
+            <Alert severity="info" icon={<Info />}>
               No conjugations in the database yet. Import some using the form
               above.
             </Alert>
           ) : filteredConjugations.length === 0 ? (
-            <Alert severity='info' icon={<Info />}>
+            <Alert severity="info" icon={<Info />}>
               No conjugations found matching &quot;{deferredFilterText}&quot;
             </Alert>
           ) : (
             <TableContainer
               sx={{ opacity: isPending ? 0.5 : 1, transition: 'opacity 0.2s' }}
             >
-              <Table size='small'>
+              <Table size="small">
                 <TableHead>
                   <TableRow>
                     <TableCell>Italian Verb</TableCell>
@@ -258,7 +262,7 @@ export default function ConjugationsList({
                     <TableCell>Reflexive</TableCell>
                     <TableCell>Conjugation Summary</TableCell>
                     <TableCell>Last Updated</TableCell>
-                    <TableCell align='center' sx={{ minWidth: 120 }}>
+                    <TableCell align="center" sx={{ minWidth: 120 }}>
                       Actions
                     </TableCell>
                   </TableRow>
@@ -273,23 +277,23 @@ export default function ConjugationsList({
                         <TableCell>
                           {conj.verb.regular ? (
                             <Chip
-                              label='Regular'
-                              size='small'
-                              color='success'
+                              label="Regular"
+                              size="small"
+                              color="success"
                             />
                           ) : (
                             <Chip
-                              label='Irregular'
-                              size='small'
-                              color='warning'
+                              label="Irregular"
+                              size="small"
+                              color="warning"
                             />
                           )}
                         </TableCell>
                         <TableCell>
                           {conj.verb.reflexive ? (
-                            <Chip label='Yes' size='small' color='info' />
+                            <Chip label="Yes" size="small" color="info" />
                           ) : (
-                            <Chip label='No' size='small' />
+                            <Chip label="No" size="small" />
                           )}
                         </TableCell>
                         <TableCell>
@@ -300,7 +304,7 @@ export default function ConjugationsList({
                         <TableCell>
                           {new Date(conj.updatedAt).toLocaleDateString('en-US')}
                         </TableCell>
-                        <TableCell align='center'>
+                        <TableCell align="center">
                           <Box
                             sx={{
                               display: 'flex',
@@ -309,29 +313,29 @@ export default function ConjugationsList({
                             }}
                           >
                             <IconButton
-                              size='small'
+                              size="small"
                               onClick={() => toggleExpanded(conj.id)}
-                              title='Toggle preview'
+                              title="Toggle preview"
                             >
                               {expandedConjugations.has(conj.id) ? (
-                                <ExpandLess fontSize='small' />
+                                <ExpandLess fontSize="small" />
                               ) : (
-                                <ExpandMore fontSize='small' />
+                                <ExpandMore fontSize="small" />
                               )}
                             </IconButton>
                             <IconButton
-                              size='small'
-                              color='primary'
+                              size="small"
+                              color="primary"
                               onClick={() => handleOpenEditDialog(conj)}
                             >
-                              <EditOutlined fontSize='small' />
+                              <EditOutlined fontSize="small" />
                             </IconButton>
                             <IconButton
-                              size='small'
-                              color='error'
+                              size="small"
+                              color="error"
                               onClick={() => handleOpenDeleteDialog(conj)}
                             >
-                              <DeleteOutlined fontSize='small' />
+                              <DeleteOutlined fontSize="small" />
                             </IconButton>
                           </Box>
                         </TableCell>
@@ -355,7 +359,7 @@ export default function ConjugationsList({
           {/* Pagination */}
           {filteredConjugations.length > 0 && (
             <TablePagination
-              component='div'
+              component="div"
               count={filteredConjugations.length}
               page={page}
               onPageChange={(_, newPage) => {

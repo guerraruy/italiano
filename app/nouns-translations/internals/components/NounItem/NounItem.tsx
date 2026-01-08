@@ -90,15 +90,15 @@ const NounItem = ({
       <NounInfo>
         <Box>
           <Typography
-            variant='body1'
-            fontWeight='bold'
+            variant="body1"
+            fontWeight="bold"
             sx={{ minWidth: '180px' }}
           >
             {noun.translation}
           </Typography>
           <Typography
-            variant='body2'
-            color='text.secondary'
+            variant="body2"
+            color="text.secondary"
             sx={{ minWidth: '180px' }}
           >
             {noun.translationPlural}
@@ -116,27 +116,27 @@ const NounItem = ({
       >
         <TextField
           fullWidth
-          size='small'
-          placeholder='Type the Italian singular...'
+          size="small"
+          placeholder="Type the Italian singular..."
           value={inputValues.singular || ''}
           onChange={(e) => onInputChange(noun.id, 'singular', e.target.value)}
           onBlur={() => onValidation(noun.id, false)}
           onKeyDown={(e) => onKeyDown(e, noun.id, 'singular', index)}
           sx={getInputStyle(validationState.singular)}
-          autoComplete='off'
+          autoComplete="off"
           inputRef={inputRefSingular}
           slotProps={{
             input: {
               endAdornment: (
-                <InputAdornment position='end'>
-                  <Tooltip title='Clear field'>
+                <InputAdornment position="end">
+                  <Tooltip title="Clear field">
                     <IconButton
-                      size='small'
+                      size="small"
                       onClick={() => onClearInput(noun.id, 'singular')}
-                      edge='end'
+                      edge="end"
                       sx={{ mr: 0.5 }}
                     >
-                      <ClearIcon fontSize='small' />
+                      <ClearIcon fontSize="small" />
                     </IconButton>
                   </Tooltip>
                 </InputAdornment>
@@ -147,27 +147,27 @@ const NounItem = ({
 
         <TextField
           fullWidth
-          size='small'
-          placeholder='Type the Italian plural...'
+          size="small"
+          placeholder="Type the Italian plural..."
           value={inputValues.plural || ''}
           onChange={(e) => onInputChange(noun.id, 'plural', e.target.value)}
           onBlur={() => onValidation(noun.id)}
           onKeyDown={(e) => onKeyDown(e, noun.id, 'plural', index)}
           sx={getInputStyle(validationState.plural)}
-          autoComplete='off'
+          autoComplete="off"
           inputRef={inputRefPlural}
           slotProps={{
             input: {
               endAdornment: (
-                <InputAdornment position='end'>
-                  <Tooltip title='Clear field'>
+                <InputAdornment position="end">
+                  <Tooltip title="Clear field">
                     <IconButton
-                      size='small'
+                      size="small"
                       onClick={() => onClearInput(noun.id, 'plural')}
-                      edge='end'
+                      edge="end"
                       sx={{ mr: 0.5 }}
                     >
-                      <ClearIcon fontSize='small' />
+                      <ClearIcon fontSize="small" />
                     </IconButton>
                   </Tooltip>
                 </InputAdornment>
@@ -177,11 +177,11 @@ const NounItem = ({
         />
       </Box>
 
-      <Tooltip title='Show answer'>
+      <Tooltip title="Show answer">
         <IconButton
-          size='small'
+          size="small"
           onClick={() => onShowAnswer(noun.id)}
-          color='primary'
+          color="primary"
         >
           <LightbulbOutlinedIcon />
         </IconButton>
@@ -189,14 +189,14 @@ const NounItem = ({
 
       <Statistics correct={statistics.correct} wrong={statistics.wrong} />
 
-      <Tooltip title='Reset statistics'>
+      <Tooltip title="Reset statistics">
         <IconButton
-          size='small'
+          size="small"
           onClick={() => onResetStatistics(noun.id)}
-          color='default'
+          color="default"
           disabled={statistics.correct === 0 && statistics.wrong === 0}
         >
-          <DeleteSweepIcon fontSize='small' />
+          <DeleteSweepIcon fontSize="small" />
         </IconButton>
       </Tooltip>
     </NounListItem>

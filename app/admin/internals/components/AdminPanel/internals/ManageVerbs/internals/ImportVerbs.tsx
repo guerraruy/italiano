@@ -119,9 +119,9 @@ export default function ImportVerbs({ onError, onSuccess }: ImportVerbsProps) {
   return (
     <>
       {/* Import Icon */}
-      <Tooltip title='Import Verbs from JSON'>
+      <Tooltip title="Import Verbs from JSON">
         <IconButton
-          color='primary'
+          color="primary"
           onClick={() => setShowImportDialog(true)}
           disabled={importingVerbs}
         >
@@ -133,17 +133,17 @@ export default function ImportVerbs({ onError, onSuccess }: ImportVerbsProps) {
       <Dialog
         open={showImportDialog}
         onClose={() => setShowImportDialog(false)}
-        maxWidth='sm'
+        maxWidth="sm"
         fullWidth
       >
         <DialogTitle>
-          <Box display='flex' alignItems='center' gap={1}>
+          <Box display="flex" alignItems="center" gap={1}>
             Import Verbs from JSON
-            <Tooltip title='View JSON Format Information'>
+            <Tooltip title="View JSON Format Information">
               <IconButton
-                size='small'
+                size="small"
                 onClick={() => setShowFormatInfoDialog(true)}
-                color='primary'
+                color="primary"
               >
                 <InfoOutlined />
               </IconButton>
@@ -151,17 +151,17 @@ export default function ImportVerbs({ onError, onSuccess }: ImportVerbsProps) {
           </Box>
         </DialogTitle>
         <DialogContent>
-          <Stack direction='row' spacing={2} alignItems='center' sx={{ mt: 1 }}>
+          <Stack direction="row" spacing={2} alignItems="center" sx={{ mt: 1 }}>
             <Button
-              component='label'
-              variant='outlined'
+              component="label"
+              variant="outlined"
               startIcon={<CloudUpload />}
               disabled={importingVerbs}
             >
               Choose JSON File
               <input
-                type='file'
-                accept='.json'
+                type="file"
+                accept=".json"
                 hidden
                 onChange={handleVerbFileUpload}
               />
@@ -169,16 +169,16 @@ export default function ImportVerbs({ onError, onSuccess }: ImportVerbsProps) {
             {verbJsonContent && (
               <Chip
                 icon={<CheckCircle />}
-                label='File loaded'
-                color='success'
-                size='small'
+                label="File loaded"
+                color="success"
+                size="small"
               />
             )}
           </Stack>
 
           {verbJsonContent && (
             <Box sx={{ mt: 2 }}>
-              <Typography variant='body2' color='text.secondary' gutterBottom>
+              <Typography variant="body2" color="text.secondary" gutterBottom>
                 Preview: {Object.keys(JSON.parse(verbJsonContent)).length} verbs
                 ready to import
               </Typography>
@@ -189,7 +189,7 @@ export default function ImportVerbs({ onError, onSuccess }: ImportVerbsProps) {
           <Button onClick={() => setShowImportDialog(false)}>Cancel</Button>
           {verbJsonContent && (
             <Button
-              variant='contained'
+              variant="contained"
               onClick={() => {
                 handleImportVerbs()
                 setShowImportDialog(false)
@@ -213,72 +213,72 @@ export default function ImportVerbs({ onError, onSuccess }: ImportVerbsProps) {
       <Dialog
         open={showVerbConflictDialog}
         onClose={() => setShowVerbConflictDialog(false)}
-        maxWidth='md'
+        maxWidth="md"
         fullWidth
       >
         <DialogTitle>
-          <Box display='flex' alignItems='center' gap={1}>
-            <Warning color='warning' />
+          <Box display="flex" alignItems="center" gap={1}>
+            <Warning color="warning" />
             Resolve Conflicts ({verbConflicts.length} verbs)
           </Box>
         </DialogTitle>
         <DialogContent>
-          <Typography variant='body2' color='text.secondary' sx={{ mb: 2 }}>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
             The following verbs already exist in the database. Choose whether to
             keep the existing data or replace it with the new data.
           </Typography>
 
           {verbConflicts.map((conflict) => (
             <Paper key={conflict.italian} sx={{ p: 2, mb: 2 }}>
-              <Typography variant='h6' gutterBottom>
+              <Typography variant="h6" gutterBottom>
                 {conflict.italian}
               </Typography>
 
-              <Stack direction='row' spacing={3} sx={{ mb: 2 }}>
+              <Stack direction="row" spacing={3} sx={{ mb: 2 }}>
                 <Box flex={1}>
-                  <Typography variant='subtitle2' color='primary' gutterBottom>
+                  <Typography variant="subtitle2" color="primary" gutterBottom>
                     Existing Data
                   </Typography>
-                  <Typography variant='body2'>
+                  <Typography variant="body2">
                     Portuguese: {conflict.existing.tr_ptBR}
                   </Typography>
-                  <Typography variant='body2'>
+                  <Typography variant="body2">
                     English: {conflict.existing.tr_en || 'N/A'}
                   </Typography>
-                  <Typography variant='body2'>
+                  <Typography variant="body2">
                     Regular: {conflict.existing.regular ? 'Yes' : 'No'}
                   </Typography>
-                  <Typography variant='body2'>
+                  <Typography variant="body2">
                     Reflexive: {conflict.existing.reflexive ? 'Yes' : 'No'}
                   </Typography>
                 </Box>
 
                 <Box flex={1}>
                   <Typography
-                    variant='subtitle2'
-                    color='secondary'
+                    variant="subtitle2"
+                    color="secondary"
                     gutterBottom
                   >
                     New Data
                   </Typography>
-                  <Typography variant='body2'>
+                  <Typography variant="body2">
                     Portuguese: {conflict.new.tr_ptBR}
                   </Typography>
-                  <Typography variant='body2'>
+                  <Typography variant="body2">
                     English: {conflict.new.tr_en || 'N/A'}
                   </Typography>
-                  <Typography variant='body2'>
+                  <Typography variant="body2">
                     Regular: {conflict.new.regular ? 'Yes' : 'No'}
                   </Typography>
-                  <Typography variant='body2'>
+                  <Typography variant="body2">
                     Reflexive: {conflict.new.reflexive ? 'Yes' : 'No'}
                   </Typography>
                 </Box>
               </Stack>
 
-              <Stack direction='row' spacing={2}>
+              <Stack direction="row" spacing={2}>
                 <Button
-                  size='small'
+                  size="small"
                   variant={
                     verbConflictResolutions[conflict.italian] === 'keep'
                       ? 'contained'
@@ -291,13 +291,13 @@ export default function ImportVerbs({ onError, onSuccess }: ImportVerbsProps) {
                   Keep Existing
                 </Button>
                 <Button
-                  size='small'
+                  size="small"
                   variant={
                     verbConflictResolutions[conflict.italian] === 'replace'
                       ? 'contained'
                       : 'outlined'
                   }
-                  color='secondary'
+                  color="secondary"
                   onClick={() =>
                     handleVerbConflictResolution(conflict.italian, 'replace')
                   }
@@ -314,7 +314,7 @@ export default function ImportVerbs({ onError, onSuccess }: ImportVerbsProps) {
           </Button>
           <Button
             onClick={handleResolveVerbConflicts}
-            variant='contained'
+            variant="contained"
             disabled={
               Object.keys(verbConflictResolutions).length !==
               verbConflicts.length
@@ -329,24 +329,24 @@ export default function ImportVerbs({ onError, onSuccess }: ImportVerbsProps) {
       <Dialog
         open={showFormatInfoDialog}
         onClose={() => setShowFormatInfoDialog(false)}
-        maxWidth='sm'
+        maxWidth="sm"
         fullWidth
       >
         <DialogTitle>
-          <Box display='flex' alignItems='center' gap={1}>
-            <Info color='primary' />
+          <Box display="flex" alignItems="center" gap={1}>
+            <Info color="primary" />
             JSON Format Information
           </Box>
         </DialogTitle>
         <DialogContent>
-          <Typography variant='body2' color='text.secondary' sx={{ mb: 2 }}>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
             Upload a JSON file with Italian verbs and their translations.
             Expected format:
           </Typography>
           <Paper sx={{ p: 2, backgroundColor: 'grey.100' }}>
             <Typography
-              variant='body2'
-              component='pre'
+              variant="body2"
+              component="pre"
               sx={{ fontFamily: 'monospace', fontSize: '0.85rem' }}
             >
               {`{

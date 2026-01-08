@@ -17,4 +17,3 @@ export const validateAnswer = (
 
   return normalizedInput === normalizedAnswer
 }
-

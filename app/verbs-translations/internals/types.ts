@@ -11,4 +11,3 @@ export interface ResetDialogState {
   verbId: string | null
   verbTranslation: string | null
 }
-

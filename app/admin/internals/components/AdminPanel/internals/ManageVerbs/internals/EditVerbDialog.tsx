@@ -79,27 +79,27 @@ function EditFormContent({
       <DialogContent>
         <Stack spacing={3} sx={{ mt: 2 }}>
           <TextField
-            label='Italian (infinitive form)'
+            label="Italian (infinitive form)"
             value={editForm.italian}
             onChange={(e) => handleEditFormChange('italian', e.target.value)}
             fullWidth
-            size='small'
+            size="small"
           />
 
           <TextField
-            label='Portuguese (BR) Translation'
+            label="Portuguese (BR) Translation"
             value={editForm.tr_ptBR}
             onChange={(e) => handleEditFormChange('tr_ptBR', e.target.value)}
             fullWidth
-            size='small'
+            size="small"
           />
 
           <TextField
-            label='English Translation (optional)'
+            label="English Translation (optional)"
             value={editForm.tr_en}
             onChange={(e) => handleEditFormChange('tr_en', e.target.value)}
             fullWidth
-            size='small'
+            size="small"
           />
 
           <Box>
@@ -112,7 +112,7 @@ function EditFormContent({
                   }
                 />
               }
-              label='Regular verb'
+              label="Regular verb"
             />
           </Box>
 
@@ -126,7 +126,7 @@ function EditFormContent({
                   }
                 />
               }
-              label='Reflexive verb'
+              label="Reflexive verb"
             />
           </Box>
         </Stack>
@@ -137,7 +137,7 @@ function EditFormContent({
         </Button>
         <Button
           onClick={handleUpdateVerb}
-          variant='contained'
+          variant="contained"
           disabled={updatingVerb}
         >
           {updatingVerb ? 'Updating...' : 'Update'}
@@ -159,7 +159,7 @@ export default function EditVerbDialog({
   }
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth='sm' fullWidth>
+    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
       <EditFormContent
         key={verb.id}
         verb={verb}

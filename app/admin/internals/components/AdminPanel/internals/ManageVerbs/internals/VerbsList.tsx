@@ -108,16 +108,16 @@ export default function VerbsList({ onError, onSuccess }: VerbsListProps) {
               mb: 2,
             }}
           >
-            <Box display='flex' alignItems='center' gap={1}>
-              <Typography variant='h6'>
+            <Box display="flex" alignItems="center" gap={1}>
+              <Typography variant="h6">
                 Current Verbs in Database ({filteredVerbs.length}
                 {deferredFilterText && ` of ${verbsData?.verbs?.length || 0}`})
               </Typography>
               <ImportVerbs onError={onError} onSuccess={onSuccess} />
             </Box>
             <TextField
-              size='small'
-              placeholder='Filter by Italian name...'
+              size="small"
+              placeholder="Filter by Italian name..."
               value={filterText}
               onChange={(e) => {
                 const value = e.target.value
@@ -130,19 +130,19 @@ export default function VerbsList({ onError, onSuccess }: VerbsListProps) {
               disabled={loadingVerbs}
               InputProps={{
                 startAdornment: (
-                  <InputAdornment position='start'>
-                    <Search fontSize='small' />
+                  <InputAdornment position="start">
+                    <Search fontSize="small" />
                   </InputAdornment>
                 ),
                 endAdornment: filterText && (
-                  <InputAdornment position='end'>
+                  <InputAdornment position="end">
                     <IconButton
-                      size='small'
+                      size="small"
                       onClick={() => setFilterText('')}
-                      edge='end'
-                      aria-label='clear filter'
+                      edge="end"
+                      aria-label="clear filter"
                     >
-                      <Clear fontSize='small' />
+                      <Clear fontSize="small" />
                     </IconButton>
                   </InputAdornment>
                 ),
@@ -151,31 +151,31 @@ export default function VerbsList({ onError, onSuccess }: VerbsListProps) {
           </Box>
 
           {loadingVerbs ? (
-            <Box display='flex' justifyContent='center' p={3}>
+            <Box display="flex" justifyContent="center" p={3}>
               <CircularProgress />
             </Box>
           ) : (verbsData?.verbs?.length || 0) === 0 ? (
-            <Alert severity='info' icon={<Info />}>
+            <Alert severity="info" icon={<Info />}>
               No verbs in the database yet. Import some using the form above.
             </Alert>
           ) : filteredVerbs.length === 0 ? (
-            <Alert severity='info' icon={<Info />}>
+            <Alert severity="info" icon={<Info />}>
               No verbs found matching &quot;{deferredFilterText}&quot;
             </Alert>
           ) : (
             <TableContainer
               sx={{ opacity: isPending ? 0.5 : 1, transition: 'opacity 0.2s' }}
             >
-              <Table size='small'>
+              <Table size="small">
                 <TableHead>
                   <TableRow>
                     <TableCell>Italian</TableCell>
                     <TableCell>Portuguese (BR)</TableCell>
                     <TableCell>English</TableCell>
-                    <TableCell align='center'>Regular</TableCell>
-                    <TableCell align='center'>Reflexive</TableCell>
+                    <TableCell align="center">Regular</TableCell>
+                    <TableCell align="center">Reflexive</TableCell>
                     <TableCell>Last Updated</TableCell>
-                    <TableCell align='center' sx={{ minWidth: 100 }}>
+                    <TableCell align="center" sx={{ minWidth: 100 }}>
                       Actions
                     </TableCell>
                   </TableRow>
@@ -188,28 +188,28 @@ export default function VerbsList({ onError, onSuccess }: VerbsListProps) {
                       </TableCell>
                       <TableCell>{verb.tr_ptBR}</TableCell>
                       <TableCell>{verb.tr_en || '-'}</TableCell>
-                      <TableCell align='center'>
+                      <TableCell align="center">
                         {verb.regular ? (
-                          <Chip label='Regular' size='small' color='success' />
+                          <Chip label="Regular" size="small" color="success" />
                         ) : (
                           <Chip
-                            label='Irregular'
-                            size='small'
-                            color='warning'
+                            label="Irregular"
+                            size="small"
+                            color="warning"
                           />
                         )}
                       </TableCell>
-                      <TableCell align='center'>
+                      <TableCell align="center">
                         {verb.reflexive ? (
-                          <Chip label='Yes' size='small' color='info' />
+                          <Chip label="Yes" size="small" color="info" />
                         ) : (
-                          <Chip label='No' size='small' />
+                          <Chip label="No" size="small" />
                         )}
                       </TableCell>
                       <TableCell>
                         {new Date(verb.updatedAt).toLocaleDateString('en-US')}
                       </TableCell>
-                      <TableCell align='center'>
+                      <TableCell align="center">
                         <Box
                           sx={{
                             display: 'flex',
@@ -218,18 +218,18 @@ export default function VerbsList({ onError, onSuccess }: VerbsListProps) {
                           }}
                         >
                           <IconButton
-                            size='small'
-                            color='primary'
+                            size="small"
+                            color="primary"
                             onClick={() => handleOpenEditDialog(verb)}
                           >
-                            <EditOutlined fontSize='small' />
+                            <EditOutlined fontSize="small" />
                           </IconButton>
                           <IconButton
-                            size='small'
-                            color='error'
+                            size="small"
+                            color="error"
                             onClick={() => handleOpenDeleteDialog(verb)}
                           >
-                            <DeleteOutlined fontSize='small' />
+                            <DeleteOutlined fontSize="small" />
                           </IconButton>
                         </Box>
                       </TableCell>
@@ -243,7 +243,7 @@ export default function VerbsList({ onError, onSuccess }: VerbsListProps) {
           {/* Pagination */}
           {filteredVerbs.length > 0 && (
             <TablePagination
-              component='div'
+              component="div"
               count={filteredVerbs.length}
               page={page}
               onPageChange={(_, newPage) => {

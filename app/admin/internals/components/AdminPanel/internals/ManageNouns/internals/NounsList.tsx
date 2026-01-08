@@ -111,16 +111,16 @@ export default function NounsList({ onError, onSuccess }: NounsListProps) {
               mb: 2,
             }}
           >
-            <Box display='flex' alignItems='center' gap={1}>
-              <Typography variant='h6'>
+            <Box display="flex" alignItems="center" gap={1}>
+              <Typography variant="h6">
                 Current Nouns in Database ({filteredNouns.length}
                 {deferredFilterText && ` of ${nounsData?.nouns?.length || 0}`})
               </Typography>
               <ImportNouns onError={onError} onSuccess={onSuccess} />
             </Box>
             <TextField
-              size='small'
-              placeholder='Filter by Italian name...'
+              size="small"
+              placeholder="Filter by Italian name..."
               value={filterText}
               onChange={(e) => {
                 const value = e.target.value
@@ -133,19 +133,19 @@ export default function NounsList({ onError, onSuccess }: NounsListProps) {
               disabled={loadingNouns}
               InputProps={{
                 startAdornment: (
-                  <InputAdornment position='start'>
-                    <Search fontSize='small' />
+                  <InputAdornment position="start">
+                    <Search fontSize="small" />
                   </InputAdornment>
                 ),
                 endAdornment: filterText && (
-                  <InputAdornment position='end'>
+                  <InputAdornment position="end">
                     <IconButton
-                      size='small'
+                      size="small"
                       onClick={() => setFilterText('')}
-                      edge='end'
-                      aria-label='clear filter'
+                      edge="end"
+                      aria-label="clear filter"
                     >
-                      <Clear fontSize='small' />
+                      <Clear fontSize="small" />
                     </IconButton>
                   </InputAdornment>
                 ),
@@ -154,22 +154,22 @@ export default function NounsList({ onError, onSuccess }: NounsListProps) {
           </Box>
 
           {loadingNouns ? (
-            <Box display='flex' justifyContent='center' p={3}>
+            <Box display="flex" justifyContent="center" p={3}>
               <CircularProgress />
             </Box>
           ) : (nounsData?.nouns?.length || 0) === 0 ? (
-            <Alert severity='info' icon={<Info />}>
+            <Alert severity="info" icon={<Info />}>
               No nouns in the database yet. Import some using the form above.
             </Alert>
           ) : filteredNouns.length === 0 ? (
-            <Alert severity='info' icon={<Info />}>
+            <Alert severity="info" icon={<Info />}>
               No nouns found matching &quot;{deferredFilterText}&quot;
             </Alert>
           ) : (
             <TableContainer
               sx={{ opacity: isPending ? 0.5 : 1, transition: 'opacity 0.2s' }}
             >
-              <Table size='small'>
+              <Table size="small">
                 <TableHead>
                   <TableRow>
                     <TableCell>Italian</TableCell>
@@ -177,7 +177,7 @@ export default function NounsList({ onError, onSuccess }: NounsListProps) {
                     <TableCell>Portuguese</TableCell>
                     <TableCell>English</TableCell>
                     <TableCell>Last Updated</TableCell>
-                    <TableCell align='center' sx={{ minWidth: 100 }}>
+                    <TableCell align="center" sx={{ minWidth: 100 }}>
                       Actions
                     </TableCell>
                   </TableRow>
@@ -193,30 +193,30 @@ export default function NounsList({ onError, onSuccess }: NounsListProps) {
                         </TableCell>
                         <TableCell>
                           <Box>
-                            <Typography variant='body2'>
+                            <Typography variant="body2">
                               {singolare.it}
                             </Typography>
-                            <Typography variant='body2' color='text.secondary'>
+                            <Typography variant="body2" color="text.secondary">
                               {plurale.it}
                             </Typography>
                           </Box>
                         </TableCell>
                         <TableCell>
                           <Box>
-                            <Typography variant='body2'>
+                            <Typography variant="body2">
                               {singolare.pt}
                             </Typography>
-                            <Typography variant='body2' color='text.secondary'>
+                            <Typography variant="body2" color="text.secondary">
                               {plurale.pt}
                             </Typography>
                           </Box>
                         </TableCell>
                         <TableCell>
                           <Box>
-                            <Typography variant='body2'>
+                            <Typography variant="body2">
                               {singolare.en}
                             </Typography>
-                            <Typography variant='body2' color='text.secondary'>
+                            <Typography variant="body2" color="text.secondary">
                               {plurale.en}
                             </Typography>
                           </Box>
@@ -224,7 +224,7 @@ export default function NounsList({ onError, onSuccess }: NounsListProps) {
                         <TableCell>
                           {new Date(noun.updatedAt).toLocaleDateString('en-US')}
                         </TableCell>
-                        <TableCell align='center'>
+                        <TableCell align="center">
                           <Box
                             sx={{
                               display: 'flex',
@@ -233,18 +233,18 @@ export default function NounsList({ onError, onSuccess }: NounsListProps) {
                             }}
                           >
                             <IconButton
-                              size='small'
-                              color='primary'
+                              size="small"
+                              color="primary"
                               onClick={() => handleOpenEditDialog(noun)}
                             >
-                              <EditOutlined fontSize='small' />
+                              <EditOutlined fontSize="small" />
                             </IconButton>
                             <IconButton
-                              size='small'
-                              color='error'
+                              size="small"
+                              color="error"
                               onClick={() => handleOpenDeleteDialog(noun)}
                             >
-                              <DeleteOutlined fontSize='small' />
+                              <DeleteOutlined fontSize="small" />
                             </IconButton>
                           </Box>
                         </TableCell>
@@ -259,7 +259,7 @@ export default function NounsList({ onError, onSuccess }: NounsListProps) {
           {/* Pagination */}
           {filteredNouns.length > 0 && (
             <TablePagination
-              component='div'
+              component="div"
               count={filteredNouns.length}
               page={page}
               onPageChange={(_, newPage) => {
