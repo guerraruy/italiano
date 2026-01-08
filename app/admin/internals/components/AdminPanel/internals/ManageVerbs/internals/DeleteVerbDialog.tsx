@@ -1,19 +1,8 @@
 'use client'
-import { Warning } from '@mui/icons-material'
-import {
-  Box,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
-  Paper,
-  Typography,
-  Alert,
-  Chip,
-} from '@mui/material'
+import { Box, Typography, Chip } from '@mui/material'
 
 import { ImportedVerb, useDeleteVerbMutation } from '@/app/store/api'
+import DeleteConfirmationDialog from '../../shared/DeleteConfirmationDialog'
 
 interface DeleteVerbDialogProps {
   open: boolean
@@ -32,72 +21,40 @@ export default function DeleteVerbDialog({
 }: DeleteVerbDialogProps) {
   const [deleteVerb, { isLoading: deletingVerb }] = useDeleteVerbMutation()
 
-  const handleDeleteVerb = async () => {
-    if (!verb) return
-
-    try {
-      const result = await deleteVerb(verb.id).unwrap()
-      onSuccess(result.message)
-      onClose()
-    } catch (err: unknown) {
-      const error = err as { data?: { error?: string } }
-      onError(error?.data?.error || 'Error deleting verb')
-    }
-  }
+  const renderVerbDetails = (verb: ImportedVerb) => (
+    <>
+      <Typography variant='h6' gutterBottom>
+        {verb.italian}
+      </Typography>
+      <Typography variant='body2'>
+        <strong>Portuguese:</strong> {verb.tr_ptBR}
+      </Typography>
+      <Typography variant='body2'>
+        <strong>English:</strong> {verb.tr_en || 'N/A'}
+      </Typography>
+      <Box sx={{ mt: 1, display: 'flex', gap: 1 }}>
+        {verb.regular ? (
+          <Chip label='Regular' size='small' color='success' />
+        ) : (
+          <Chip label='Irregular' size='small' color='warning' />
+        )}
+        {verb.reflexive && <Chip label='Reflexive' size='small' color='info' />}
+      </Box>
+    </>
+  )
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth='sm' fullWidth>
-      <DialogTitle>
-        <Box display='flex' alignItems='center' gap={1}>
-          <Warning color='error' />
-          Confirm Deletion
-        </Box>
-      </DialogTitle>
-      <DialogContent>
-        <Typography variant='body1' gutterBottom>
-          Are you sure you want to delete this verb?
-        </Typography>
-        {verb && (
-          <Paper sx={{ p: 2, mt: 2, backgroundColor: 'grey.100' }}>
-            <Typography variant='h6' gutterBottom>
-              {verb.italian}
-            </Typography>
-            <Typography variant='body2'>
-              <strong>Portuguese:</strong> {verb.tr_ptBR}
-            </Typography>
-            <Typography variant='body2'>
-              <strong>English:</strong> {verb.tr_en || 'N/A'}
-            </Typography>
-            <Box sx={{ mt: 1, display: 'flex', gap: 1 }}>
-              {verb.regular ? (
-                <Chip label='Regular' size='small' color='success' />
-              ) : (
-                <Chip label='Irregular' size='small' color='warning' />
-              )}
-              {verb.reflexive && (
-                <Chip label='Reflexive' size='small' color='info' />
-              )}
-            </Box>
-          </Paper>
-        )}
-        <Alert severity='warning' sx={{ mt: 2 }}>
-          This action cannot be undone. All associated conjugations and
-          statistics will also be deleted.
-        </Alert>
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={onClose} disabled={deletingVerb}>
-          Cancel
-        </Button>
-        <Button
-          onClick={handleDeleteVerb}
-          variant='contained'
-          color='error'
-          disabled={deletingVerb}
-        >
-          {deletingVerb ? 'Deleting...' : 'Delete'}
-        </Button>
-      </DialogActions>
-    </Dialog>
+    <DeleteConfirmationDialog
+      open={open}
+      item={verb}
+      entityName='verb'
+      onClose={onClose}
+      onSuccess={onSuccess}
+      onError={onError}
+      deleteMutation={(id) => deleteVerb(id).unwrap()}
+      isDeleting={deletingVerb}
+      renderItemDetails={renderVerbDetails}
+      warningMessage='This action cannot be undone. All associated conjugations and statistics will also be deleted.'
+    />
   )
 }
