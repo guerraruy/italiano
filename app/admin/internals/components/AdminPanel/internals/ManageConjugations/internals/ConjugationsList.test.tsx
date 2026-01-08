@@ -508,7 +508,9 @@ describe('ConjugationsList', () => {
 
       // Find all expand buttons and click the first one
       const expandButtons = screen.getAllByTitle('Toggle preview')
-      await user.click(expandButtons[0])
+      const firstExpandButton = expandButtons[0]
+      if (!firstExpandButton) throw new Error('Expand button not found')
+      await user.click(firstExpandButton)
 
       await waitFor(() => {
         expect(screen.getByText('indicative')).toBeInTheDocument()
@@ -526,14 +528,16 @@ describe('ConjugationsList', () => {
 
       // Expand first
       const expandButtons = screen.getAllByTitle('Toggle preview')
-      await user.click(expandButtons[0])
+      const firstExpandButton = expandButtons[0]
+      if (!firstExpandButton) throw new Error('Expand button not found')
+      await user.click(firstExpandButton)
 
       await waitFor(() => {
         expect(screen.getByText('io: parlo')).toBeInTheDocument()
       })
 
       // Collapse
-      await user.click(expandButtons[0])
+      await user.click(firstExpandButton)
 
       await waitFor(() => {
         expect(screen.queryByText('io: parlo')).not.toBeInTheDocument()

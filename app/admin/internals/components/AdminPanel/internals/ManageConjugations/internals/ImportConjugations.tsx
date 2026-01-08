@@ -76,6 +76,7 @@ export default function ImportConjugations({
 
     for (let i = 0; i < files.length; i++) {
       const file = files[i]
+      if (!file) continue
       const verbName = file.name.replace('.json', '')
 
       try {

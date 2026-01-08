@@ -106,8 +106,10 @@ describe('EditAdjectiveDialog', () => {
     expect(italianInputs).toHaveLength(4)
 
     // Change Masculine Singular Italian (index 0)
-    fireEvent.change(italianInputs[0], { target: { value: 'nuovo_masc_sing' } })
-    expect(italianInputs[0]).toHaveValue('nuovo_masc_sing')
+    const firstItalianInput = italianInputs[0]
+    if (!firstItalianInput) throw new Error('Italian input not found')
+    fireEvent.change(firstItalianInput, { target: { value: 'nuovo_masc_sing' } })
+    expect(firstItalianInput).toHaveValue('nuovo_masc_sing')
   })
 
   it('calls updateAdjective and onSuccess on successful submission', async () => {

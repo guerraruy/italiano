@@ -38,7 +38,7 @@ export const GET = withAuth(async (request: NextRequest, userId: string) => {
           nativeLanguage === 'en' ? verb.tr_en || verb.tr_ptBR : verb.tr_ptBR,
         regular: verb.regular,
         reflexive: verb.reflexive,
-        conjugation: verb.conjugations[0].conjugation, // Get first conjugation
+        conjugation: verb.conjugations[0]?.conjugation || {}, // Get first conjugation
       }))
 
     return NextResponse.json({ verbs }, { status: 200 })

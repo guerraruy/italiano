@@ -238,7 +238,11 @@ export const useNounsPractice = () => {
       }
       for (let i = shuffled.length - 1; i > 0; i--) {
         const j = Math.floor(seededRandom() * (i + 1))
-        ;[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
+        const iItem = shuffled[i]
+        const jItem = shuffled[j]
+        if (iItem !== undefined && jItem !== undefined) {
+          ;[shuffled[i], shuffled[j]] = [jItem, iItem]
+        }
       }
       result = shuffled
     } else if (
@@ -290,9 +294,11 @@ export const useNounsPractice = () => {
 
           if (currentIndex < filteredAndSortedNouns.length - 1) {
             const nextNoun = filteredAndSortedNouns[currentIndex + 1]
-            const nextInput = inputRefsSingular.current[nextNoun.id]
-            if (nextInput) {
-              nextInput.focus()
+            if (nextNoun) {
+              const nextInput = inputRefsSingular.current[nextNoun.id]
+              if (nextInput) {
+                nextInput.focus()
+              }
             }
           }
         }

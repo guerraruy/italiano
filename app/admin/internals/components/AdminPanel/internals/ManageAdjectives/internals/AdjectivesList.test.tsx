@@ -184,7 +184,9 @@ describe('AdjectivesList', () => {
     render(<AdjectivesList onError={mockOnError} onSuccess={mockOnSuccess} />)
 
     const editButtons = screen.getAllByTestId('EditOutlinedIcon')
-    fireEvent.click(editButtons[0].closest('button')!)
+    const firstEditButton = editButtons[0]
+    if (!firstEditButton) throw new Error('Edit button not found')
+    fireEvent.click(firstEditButton.closest('button')!)
 
     const dialog = screen.getByTestId('edit-dialog')
     expect(dialog).toHaveAttribute('data-open', 'true')
@@ -199,7 +201,9 @@ describe('AdjectivesList', () => {
     render(<AdjectivesList onError={mockOnError} onSuccess={mockOnSuccess} />)
 
     const deleteButtons = screen.getAllByTestId('DeleteOutlinedIcon')
-    fireEvent.click(deleteButtons[0].closest('button')!)
+    const firstDeleteButton = deleteButtons[0]
+    if (!firstDeleteButton) throw new Error('Delete button not found')
+    fireEvent.click(firstDeleteButton.closest('button')!)
 
     const dialog = screen.getByTestId('delete-dialog')
     expect(dialog).toHaveAttribute('data-open', 'true')

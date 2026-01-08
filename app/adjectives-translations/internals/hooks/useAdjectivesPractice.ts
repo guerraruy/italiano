@@ -319,7 +319,11 @@ export const useAdjectivesPractice = () => {
       }
       for (let i = shuffled.length - 1; i > 0; i--) {
         const j = Math.floor(seededRandom() * (i + 1))
-        ;[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
+        const iItem = shuffled[i]
+        const jItem = shuffled[j]
+        if (iItem !== undefined && jItem !== undefined) {
+          ;[shuffled[i], shuffled[j]] = [jItem, iItem]
+        }
       }
       result = shuffled
     } else if (
@@ -360,6 +364,8 @@ export const useAdjectivesPractice = () => {
         e.preventDefault()
 
         const adjective = filteredAndSortedAdjectives[currentIndex]
+        if (!adjective) return
+        
         const correctAnswers = {
           masculineSingular: adjective.masculineSingular,
           masculinePlural: adjective.masculinePlural,
@@ -388,10 +394,12 @@ export const useAdjectivesPractice = () => {
         } else if (currentIndex < filteredAndSortedAdjectives.length - 1) {
           // Move to first field of next adjective
           const nextAdjective = filteredAndSortedAdjectives[currentIndex + 1]
-          const nextInput =
-            inputRefs.current[`${nextAdjective.id}-masculineSingular`]
-          if (nextInput) {
-            nextInput.focus()
+          if (nextAdjective) {
+            const nextInput =
+              inputRefs.current[`${nextAdjective.id}-masculineSingular`]
+            if (nextInput) {
+              nextInput.focus()
+            }
           }
         }
       }

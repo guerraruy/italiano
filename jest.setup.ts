@@ -22,6 +22,10 @@ class MockResponse {
   public headers = new (global.Headers as any)()
   public body: any
   public init: any
+  public redirected = false
+  public type = 'basic' as ResponseType
+  public url = ''
+  public bodyUsed = false
 
   constructor(body?: any, init?: any) {
     this.body = body
@@ -46,6 +50,14 @@ class MockResponse {
 
   async arrayBuffer() {
     return new ArrayBuffer(0)
+  }
+
+  async formData() {
+    return new FormData()
+  }
+
+  async bytes() {
+    return new Uint8Array()
   }
 }
 

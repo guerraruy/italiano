@@ -44,7 +44,9 @@ export const useVerbConjugationPractice = () => {
         key.startsWith('verbTypeFilter_')
       )
       if (keys.length > 0) {
-        const saved = localStorage.getItem(keys[0])
+        const firstKey = keys[0]
+        if (!firstKey) return 'all'
+        const saved = localStorage.getItem(firstKey)
         if (
           saved &&
           ['all', 'regular', 'irregular', 'reflexive'].includes(saved)
@@ -251,6 +253,7 @@ export const useVerbConjugationPractice = () => {
 
     enabledVerbTenses.forEach((tenseKey) => {
       const [mood, tense] = tenseKey.split('.')
+      if (!mood || !tense) return
       const moodData = conjugation[mood]
 
       if (!moodData || !moodData[tense]) return
@@ -291,12 +294,14 @@ export const useVerbConjugationPractice = () => {
 
         if (currentIndex !== -1 && currentIndex < allKeys.length - 1) {
           const nextKey = allKeys[currentIndex + 1]
-          setTimeout(() => {
-            const nextInput = inputRefs.current[nextKey]
-            if (nextInput) {
-              nextInput.focus()
-            }
-          }, 0)
+          if (nextKey) {
+            setTimeout(() => {
+              const nextInput = inputRefs.current[nextKey]
+              if (nextInput) {
+                nextInput.focus()
+              }
+            }, 0)
+          }
         }
       }
     },
@@ -352,4 +357,3 @@ export const useVerbConjugationPractice = () => {
     getStatistics,
   }
 }
-

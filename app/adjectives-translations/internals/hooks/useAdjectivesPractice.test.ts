@@ -235,10 +235,10 @@ describe('useAdjectivesPractice', () => {
     // Wait, the hook sorts by translation: 'Good' vs 'Bad'. 'Bad' comes first.
     // mockAdjectives: 1: Good, 2: Bad.
 
-    expect(result.current.filteredAndSortedAdjectives[0].translation).toBe(
+    expect(result.current.filteredAndSortedAdjectives[0]?.translation).toBe(
       'Bad'
     )
-    expect(result.current.filteredAndSortedAdjectives[1].translation).toBe(
+    expect(result.current.filteredAndSortedAdjectives[1]?.translation).toBe(
       'Good'
     )
 
@@ -248,7 +248,7 @@ describe('useAdjectivesPractice', () => {
     act(() => {
       result.current.handleSortChange('most-errors')
     })
-    expect(result.current.filteredAndSortedAdjectives[0].id).toBe('2')
+    expect(result.current.filteredAndSortedAdjectives[0]?.id).toBe('2')
 
     // Worst Performance (Wrong - Correct)
     // 1: 1 - 5 = -4
@@ -260,7 +260,7 @@ describe('useAdjectivesPractice', () => {
     act(() => {
       result.current.handleSortChange('worst-performance')
     })
-    expect(result.current.filteredAndSortedAdjectives[0].id).toBe('2')
+    expect(result.current.filteredAndSortedAdjectives[0]?.id).toBe('2')
   })
 
   it('should handle reset dialog interactions', async () => {

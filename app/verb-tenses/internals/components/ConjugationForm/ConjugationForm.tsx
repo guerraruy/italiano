@@ -99,6 +99,8 @@ export const ConjugationForm: React.FC<ConjugationFormProps> = ({
     <ConjugationGrid>
       {enabledVerbTenses.map((tenseKey) => {
         const [mood, tense] = tenseKey.split('.')
+        if (!mood || !tense) return null
+        
         const moodData = conjugation[mood]
 
         if (!moodData || !moodData[tense]) {

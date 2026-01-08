@@ -81,7 +81,9 @@ describe('ImportAdjectives', () => {
 
     // Close the format info dialog
     const closeButtons = screen.getAllByText('Close')
-    fireEvent.click(closeButtons[0])
+    const firstCloseButton = closeButtons[0]
+    if (!firstCloseButton) throw new Error('Close button not found')
+    fireEvent.click(firstCloseButton)
 
     await waitFor(() => {
       expect(screen.queryByText('JSON Format Information')).not.toBeInTheDocument()
@@ -229,7 +231,9 @@ describe('ImportAdjectives', () => {
     })
 
     // Load file
-    const validJson = JSON.stringify({ bello: conflicts[0].new })
+    const firstConflict = conflicts[0]
+    if (!firstConflict) throw new Error('No conflicts in test data')
+    const validJson = JSON.stringify({ bello: firstConflict.new })
     const file = new File([validJson], 'adjectives.json', {
       type: 'application/json',
     })

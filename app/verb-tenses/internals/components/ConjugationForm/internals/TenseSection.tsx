@@ -122,7 +122,7 @@ export const TenseSection: React.FC<TenseSectionProps> = ({
   // Handle simple forms (string values like Participio, Gerundio, Infinito)
   if (typeof tenseData === 'string') {
     const key = createInputKey(mood, tense, 'form')
-    const inputStyle = getInputStyle(validationState[key])
+    const inputStyle = getInputStyle(validationState[key] ?? null)
     const stats = getStatistics(verbId, mood, tense, 'form')
 
     return (
@@ -224,8 +224,9 @@ export const TenseSection: React.FC<TenseSectionProps> = ({
       </Box>
       {persons.map((person) => {
         const correctAnswer = tenseData[person]
+        if (!correctAnswer) return null
         const key = createInputKey(mood, tense, person)
-        const inputStyle = getInputStyle(validationState[key])
+        const inputStyle = getInputStyle(validationState[key] ?? null)
         const stats = getStatistics(verbId, mood, tense, person)
 
         return (

@@ -173,7 +173,11 @@ export const useVerbsPractice = () => {
       }
       for (let i = shuffled.length - 1; i > 0; i--) {
         const j = Math.floor(seededRandom() * (i + 1))
-        ;[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
+        const iItem = shuffled[i]
+        const jItem = shuffled[j]
+        if (iItem !== undefined && jItem !== undefined) {
+          ;[shuffled[i], shuffled[j]] = [jItem, iItem]
+        }
       }
       result = shuffled
     } else if (
@@ -224,9 +228,11 @@ export const useVerbsPractice = () => {
         // Move to next input in the filtered list
         if (currentIndex < filteredAndSortedVerbs.length - 1) {
           const nextVerb = filteredAndSortedVerbs[currentIndex + 1]
-          const nextInput = inputRefs.current[nextVerb.id]
-          if (nextInput) {
-            nextInput.focus()
+          if (nextVerb) {
+            const nextInput = inputRefs.current[nextVerb.id]
+            if (nextInput) {
+              nextInput.focus()
+            }
           }
         }
       }
@@ -297,4 +303,3 @@ export const useVerbsPractice = () => {
     shouldShowRefreshButton,
   }
 }
-
