@@ -1,3 +1,4 @@
 - All text, comments and filenames in the application must be written in English.
 - use RTK Query for API state management and data fetching
 - When a component becomes too large, move it to a folder with the same name if it isn't already there, and divide it into smaller components. These smaller components should be inside a subfolder called "internals," unless these child components are used elsewhere in the application.
+- for unit tests use react testing library
