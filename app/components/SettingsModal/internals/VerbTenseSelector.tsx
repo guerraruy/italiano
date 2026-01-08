@@ -53,7 +53,7 @@ export default function VerbTenseSelector({
         Select which verb tenses you want to practice. Only selected tenses will
         be shown in conjugation exercises.
       </Typography>
-      <Box sx={{ maxHeight: 400, overflowY: 'auto', pr: 1 }}>
+      <Box>
         {VERB_TENSES.map(({ category, tenses }) => (
           <TenseCategory
             key={category}

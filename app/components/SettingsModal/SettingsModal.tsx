@@ -129,7 +129,13 @@ export default function SettingsModal({ open, onClose }: SettingsModalProps) {
       onClose={handleClose}
       maxWidth="sm"
       fullWidth
-      sx={{ zIndex: 1300 }}
+      sx={{
+        zIndex: 1300,
+        '& .MuiDialog-paper': {
+          maxHeight: 'calc(100vh - 100px)',
+          marginTop: '64px',
+        },
+      }}
     >
       <DialogTitle sx={{ py: 1.5, px: 2 }}>
         <Box display="flex" alignItems="center" justifyContent="space-between">
