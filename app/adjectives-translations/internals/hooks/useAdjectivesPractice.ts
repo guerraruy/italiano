@@ -6,15 +6,25 @@ import {
   useResetAdjectiveStatisticMutation,
   useUpdateAdjectiveStatisticMutation,
 } from '@/app/store/api'
-
-import { SortOption, DisplayCount } from '../components/AdjectiveItem/internals'
 import {
-  InputValues,
-  ResetDialogState,
-  StatisticsError,
-  ValidationState,
-} from '../types'
+  useStatisticsError,
+  useResetDialog,
+  useSortingAndFiltering,
+} from '@/lib/hooks'
+
+import { InputValues, ValidationState } from '../types'
 import { validateAnswer } from '../utils'
+
+interface Adjective {
+  id: string
+  translation: string
+  masculineSingular: string
+  masculinePlural: string
+  feminineSingular: string
+  femininePlural: string
+}
+
+type AdjectiveField = keyof InputValues[string]
 
 export const useAdjectivesPractice = () => {
   const { data, isLoading, error } = useGetAdjectivesForPracticeQuery()
@@ -24,29 +34,80 @@ export const useAdjectivesPractice = () => {
       refetchOnFocus: false,
     })
   const [updateAdjectiveStatistic] = useUpdateAdjectiveStatisticMutation()
-  const [resetAdjectiveStatistic, { isLoading: isResetting }] =
-    useResetAdjectiveStatisticMutation()
+  const [resetAdjectiveStatisticMutation] = useResetAdjectiveStatisticMutation()
 
   const [inputValues, setInputValues] = useState<InputValues>({})
   const [validationState, setValidationState] = useState<ValidationState>({})
-  const [resetDialog, setResetDialog] = useState<ResetDialogState>({
-    open: false,
-    adjectiveId: null,
-    adjectiveTranslation: null,
-    error: null,
-  })
-  const [statisticsError, setStatisticsError] =
-    useState<StatisticsError | null>(null)
-  const [sortOption, setSortOption] = useState<SortOption>('none')
-  const [displayCount, setDisplayCount] = useState<DisplayCount>(10)
-  const [randomSeed, setRandomSeed] = useState(0)
   const [, startTransition] = useTransition()
 
   const inputRefs = useRef<{ [key: string]: HTMLInputElement | null }>({})
   const lastValidatedRef = useRef<{ [key: string]: number }>({})
 
+  // Use shared statistics error hook
+  const { statisticsError, showError } = useStatisticsError()
+
+  // Memoize adjectives array to prevent unnecessary re-renders
+  const adjectives = useMemo(() => data?.adjectives || [], [data?.adjectives])
+
+  // Get statistics callback
+  const getStatistics = useCallback(
+    (adjectiveId: string) => {
+      const stats = statisticsData?.statistics[adjectiveId]
+      return {
+        correct: stats?.correctAttempts || 0,
+        wrong: stats?.wrongAttempts || 0,
+      }
+    },
+    [statisticsData?.statistics]
+  )
+
+  // Use shared reset dialog hook
+  const resetStatistic = useCallback(
+    async (adjectiveId: string) => {
+      await resetAdjectiveStatisticMutation(adjectiveId).unwrap()
+    },
+    [resetAdjectiveStatisticMutation]
+  )
+
+  const {
+    resetDialog: resetDialogState,
+    isResetting,
+    handleOpenResetDialog: openResetDialog,
+    handleCloseResetDialog,
+    handleConfirmReset,
+  } = useResetDialog<Adjective>({
+    getItemLabel: (adjective) => adjective.translation,
+    resetStatistic,
+  })
+
+  // Transform reset dialog state to match expected interface
+  const resetDialog = useMemo(
+    () => ({
+      open: resetDialogState.open,
+      adjectiveId: resetDialogState.itemId,
+      adjectiveTranslation: resetDialogState.itemLabel,
+      error: resetDialogState.error,
+    }),
+    [resetDialogState]
+  )
+
+  // Use shared sorting and filtering hook
+  const {
+    sortOption,
+    displayCount,
+    filteredAndSortedItems: filteredAndSortedAdjectives,
+    handleRefresh,
+    handleSortChange,
+    setDisplayCount,
+    shouldShowRefreshButton,
+  } = useSortingAndFiltering({
+    items: adjectives as Adjective[],
+    getStatistics,
+    refetchStatistics,
+  })
+
   const handleInputChange = useCallback(
-    (adjectiveId: string, field: keyof InputValues[string], value: string) => {
+    (adjectiveId: string, field: AdjectiveField, value: string) => {
       setInputValues((prev) => ({
         ...prev,
         [adjectiveId]: {
@@ -75,11 +136,7 @@ export const useAdjectivesPractice = () => {
   )
 
   const handleValidation = useCallback(
-    (
-      adjectiveId: string,
-      field: keyof InputValues[string],
-      correctAnswer: string
-    ) => {
+    (adjectiveId: string, field: AdjectiveField, correctAnswer: string) => {
       const userInput = inputValues[adjectiveId]?.[field] || ''
       if (!userInput.trim()) return
 
@@ -123,7 +180,7 @@ export const useAdjectivesPractice = () => {
       }
 
       // Check if all fields are filled and validated
-      const allFields: (keyof InputValues[string])[] = [
+      const allFields: AdjectiveField[] = [
         'masculineSingular',
         'masculinePlural',
         'feminineSingular',
@@ -146,21 +203,18 @@ export const useAdjectivesPractice = () => {
         updateAdjectiveStatistic({ adjectiveId, correct: allCorrect }).catch(
           (err) => {
             console.error('Failed to update statistics:', err)
-            setStatisticsError({
-              message:
-                'Failed to save statistics. Your progress may not be saved.',
-              timestamp: Date.now(),
-            })
-            setTimeout(() => setStatisticsError(null), 5000)
+            showError(
+              'Failed to save statistics. Your progress may not be saved.'
+            )
           }
         )
       }
     },
-    [inputValues, validationState, updateAdjectiveStatistic, startTransition]
+    [inputValues, validationState, updateAdjectiveStatistic, showError]
   )
 
   const handleClearInput = useCallback(
-    (adjectiveId: string, field?: keyof InputValues[string]) => {
+    (adjectiveId: string, field?: AdjectiveField) => {
       if (field) {
         // Clear specific field
         setInputValues((prev) => ({
@@ -250,120 +304,17 @@ export const useAdjectivesPractice = () => {
     (adjectiveId: string) => {
       const adjective = data?.adjectives.find((a) => a.id === adjectiveId)
       if (adjective) {
-        setResetDialog({
-          open: true,
-          adjectiveId,
-          adjectiveTranslation: adjective.translation,
-          error: null,
-        })
+        openResetDialog(adjective as Adjective)
       }
     },
-    [data?.adjectives]
+    [data?.adjectives, openResetDialog]
   )
-
-  const handleCloseResetDialog = useCallback(() => {
-    setResetDialog({
-      open: false,
-      adjectiveId: null,
-      adjectiveTranslation: null,
-      error: null,
-    })
-  }, [])
-
-  const handleConfirmReset = useCallback(async () => {
-    if (!resetDialog.adjectiveId) return
-
-    try {
-      await resetAdjectiveStatistic(resetDialog.adjectiveId).unwrap()
-      handleCloseResetDialog()
-    } catch (err) {
-      console.error('Failed to reset statistics:', err)
-      setResetDialog((prev) => ({
-        ...prev,
-        error: 'Failed to reset statistics. Please try again.',
-      }))
-    }
-  }, [resetDialog.adjectiveId, resetAdjectiveStatistic, handleCloseResetDialog])
-
-  // Memoize adjectives array to prevent unnecessary re-renders
-  const adjectives = useMemo(() => data?.adjectives || [], [data?.adjectives])
-
-  // Pre-calculate all statistics once to avoid repeated calls during sorting
-  const statisticsMap = useMemo(() => {
-    const map = new Map<string, { correct: number; wrong: number }>()
-    adjectives.forEach((adj) => {
-      const stats = statisticsData?.statistics[adj.id]
-      map.set(adj.id, {
-        correct: stats?.correctAttempts || 0,
-        wrong: stats?.wrongAttempts || 0,
-      })
-    })
-    return map
-  }, [adjectives, statisticsData?.statistics])
-
-  const getStatistics = useCallback(
-    (adjectiveId: string) => {
-      return statisticsMap.get(adjectiveId) || { correct: 0, wrong: 0 }
-    },
-    [statisticsMap]
-  )
-
-  // Apply filters, sorting, and limit
-  const filteredAndSortedAdjectives = useMemo(() => {
-    let result = [...adjectives]
-
-    // Apply sorting
-    if (sortOption === 'alphabetical') {
-      result.sort((a, b) => a.translation.localeCompare(b.translation))
-    } else if (sortOption === 'random') {
-      // Use Fisher-Yates shuffle with a seeded random
-      const shuffled = [...result]
-      let seed = randomSeed
-      const seededRandom = () => {
-        seed = (seed * 9301 + 49297) % 233280
-        return seed / 233280
-      }
-      for (let i = shuffled.length - 1; i > 0; i--) {
-        const j = Math.floor(seededRandom() * (i + 1))
-        const iItem = shuffled[i]
-        const jItem = shuffled[j]
-        if (iItem !== undefined && jItem !== undefined) {
-          ;[shuffled[i], shuffled[j]] = [jItem, iItem]
-        }
-      }
-      result = shuffled
-    } else if (
-      sortOption === 'most-errors' ||
-      sortOption === 'worst-performance'
-    ) {
-      result.sort((a, b) => {
-        const statsA = statisticsMap.get(a.id) || { correct: 0, wrong: 0 }
-        const statsB = statisticsMap.get(b.id) || { correct: 0, wrong: 0 }
-
-        if (sortOption === 'most-errors') {
-          return statsB.wrong - statsA.wrong
-        } else {
-          // worst-performance: highest (errors - correct) first
-          const performanceA = statsA.wrong - statsA.correct
-          const performanceB = statsB.wrong - statsB.correct
-          return performanceB - performanceA
-        }
-      })
-    }
-
-    // Apply display count limit
-    if (displayCount !== 'all') {
-      result = result.slice(0, displayCount)
-    }
-
-    return result
-  }, [adjectives, sortOption, displayCount, statisticsMap, randomSeed])
 
   const handleKeyDown = useCallback(
     (
       e: React.KeyboardEvent,
       adjectiveId: string,
-      field: keyof InputValues[string],
+      field: AdjectiveField,
       currentIndex: number
     ) => {
       if (e.key === 'Enter') {
@@ -382,7 +333,7 @@ export const useAdjectivesPractice = () => {
         handleValidation(adjectiveId, field, correctAnswers[field])
 
         // Move to next field or next adjective
-        const fields: (keyof InputValues[string])[] = [
+        const fields: AdjectiveField[] = [
           'masculineSingular',
           'masculinePlural',
           'feminineSingular',
@@ -412,31 +363,6 @@ export const useAdjectivesPractice = () => {
     },
     [filteredAndSortedAdjectives, handleValidation]
   )
-
-  const handleRefresh = useCallback(() => {
-    if (sortOption === 'random') {
-      // Update random seed to reshuffle
-      setRandomSeed(Date.now())
-    } else if (
-      sortOption === 'most-errors' ||
-      sortOption === 'worst-performance'
-    ) {
-      // Refetch statistics to get latest data
-      refetchStatistics()
-    }
-  }, [sortOption, refetchStatistics])
-
-  const handleSortChange = useCallback((newSort: SortOption) => {
-    setSortOption(newSort)
-    if (newSort === 'random') {
-      setRandomSeed(Date.now())
-    }
-  }, [])
-
-  const shouldShowRefreshButton =
-    sortOption === 'random' ||
-    sortOption === 'most-errors' ||
-    sortOption === 'worst-performance'
 
   return {
     // Data

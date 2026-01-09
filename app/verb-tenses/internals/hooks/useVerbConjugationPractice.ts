@@ -7,15 +7,24 @@ import {
   useResetConjugationStatisticsMutation,
   useGetProfileQuery,
 } from '@/app/store/api'
+import { useStatisticsError } from '@/lib/hooks'
 
 import {
   VerbTypeFilter,
   ValidationState,
   InputValues,
   ResetDialogState,
-  StatisticsError,
 } from '../types'
 import { validateAnswer, getFilterStorageKey, createInputKey } from '../utils'
+
+interface Verb {
+  id: string
+  italian: string
+  translation: string
+  reflexive: boolean
+  regular: boolean
+  conjugation: Record<string, Record<string, string | Record<string, string>>>
+}
 
 export const useVerbConjugationPractice = () => {
   const { data, isLoading, error } = useGetVerbsForConjugationPracticeQuery()
@@ -68,10 +77,12 @@ export const useVerbConjugationPractice = () => {
     verbName: null,
     error: null,
   })
-  const [statisticsError, setStatisticsError] =
-    useState<StatisticsError | null>(null)
+
   const inputRefs = useRef<{ [key: string]: HTMLInputElement | null }>({})
   const lastValidatedRef = useRef<{ [key: string]: number }>({})
+
+  // Use shared statistics error hook
+  const { statisticsError, showError } = useStatisticsError()
 
   // Load and save verb type filter to/from localStorage
   useEffect(() => {
@@ -190,14 +201,10 @@ export const useVerbConjugationPractice = () => {
         correct: isCorrect,
       }).catch((err) => {
         console.error('Failed to update statistics:', err)
-        setStatisticsError({
-          message: 'Failed to save statistics. Your progress may not be saved.',
-          timestamp: Date.now(),
-        })
-        setTimeout(() => setStatisticsError(null), 5000)
+        showError('Failed to save statistics. Your progress may not be saved.')
       })
     },
-    [inputValues, validationState, updateConjugationStatistic]
+    [inputValues, validationState, updateConjugationStatistic, showError]
   )
 
   const handleClearInput = useCallback((key: string) => {
@@ -262,7 +269,7 @@ export const useVerbConjugationPractice = () => {
     if (!selectedVerb) return []
 
     const keys: string[] = []
-    const conjugation = selectedVerb.conjugation
+    const conjugation = selectedVerb.conjugation as Verb['conjugation']
 
     if (!conjugation) return []
 

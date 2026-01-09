@@ -6,19 +6,22 @@ import {
   useResetVerbStatisticMutation,
   useUpdateVerbStatisticMutation,
 } from '@/app/store/api'
+import {
+  useStatisticsError,
+  useResetDialog,
+  useSortingAndFiltering,
+} from '@/lib/hooks'
 
-import {
-  SortOption,
-  DisplayCount,
-  VerbTypeFilter,
-} from '../components/VerbItem/internals'
-import {
-  InputValues,
-  ResetDialogState,
-  StatisticsError,
-  ValidationState,
-} from '../types'
+import { VerbTypeFilter } from '../components/VerbItem/internals'
+import { InputValues, ValidationState } from '../types'
 import { validateAnswer } from '../utils'
+
+interface Verb {
+  id: string
+  translation: string
+  reflexive: boolean
+  regular: boolean
+}
 
 export const useVerbsPractice = () => {
   const { data, isLoading, error } = useGetVerbsForPracticeQuery()
@@ -28,26 +31,91 @@ export const useVerbsPractice = () => {
       refetchOnFocus: false,
     })
   const [updateVerbStatistic] = useUpdateVerbStatisticMutation()
-  const [resetVerbStatistic, { isLoading: isResetting }] =
-    useResetVerbStatisticMutation()
+  const [resetVerbStatisticMutation] = useResetVerbStatisticMutation()
 
   const [inputValues, setInputValues] = useState<InputValues>({})
   const [validationState, setValidationState] = useState<ValidationState>({})
-  const [resetDialog, setResetDialog] = useState<ResetDialogState>({
-    open: false,
-    verbId: null,
-    verbTranslation: null,
-    error: null,
-  })
-  const [statisticsError, setStatisticsError] =
-    useState<StatisticsError | null>(null)
   const [verbTypeFilter, setVerbTypeFilter] = useState<VerbTypeFilter>('all')
-  const [sortOption, setSortOption] = useState<SortOption>('none')
-  const [displayCount, setDisplayCount] = useState<DisplayCount>(10)
-  const [randomSeed, setRandomSeed] = useState(0)
 
   const inputRefs = useRef<{ [key: string]: HTMLInputElement | null }>({})
   const lastValidatedRef = useRef<{ [key: string]: number }>({})
+
+  // Use shared statistics error hook
+  const { statisticsError, showError } = useStatisticsError()
+
+  // Memoize verbs array to prevent unnecessary re-renders
+  const verbs = useMemo(() => data?.verbs || [], [data?.verbs])
+
+  // Get statistics callback
+  const getStatistics = useCallback(
+    (verbId: string) => {
+      const stats = statisticsData?.statistics[verbId]
+      return {
+        correct: stats?.correctAttempts || 0,
+        wrong: stats?.wrongAttempts || 0,
+      }
+    },
+    [statisticsData?.statistics]
+  )
+
+  // Use shared reset dialog hook
+  const resetStatistic = useCallback(
+    async (verbId: string) => {
+      await resetVerbStatisticMutation(verbId).unwrap()
+    },
+    [resetVerbStatisticMutation]
+  )
+
+  const {
+    resetDialog: resetDialogState,
+    isResetting,
+    handleOpenResetDialog: openResetDialog,
+    handleCloseResetDialog,
+    handleConfirmReset,
+  } = useResetDialog<Verb>({
+    getItemLabel: (verb) => verb.translation,
+    resetStatistic,
+  })
+
+  // Transform reset dialog state to match expected interface
+  const resetDialog = useMemo(
+    () => ({
+      open: resetDialogState.open,
+      verbId: resetDialogState.itemId,
+      verbTranslation: resetDialogState.itemLabel,
+      error: resetDialogState.error,
+    }),
+    [resetDialogState]
+  )
+
+  // Verb type filter function
+  const filterFn = useCallback(
+    (verb: Verb) => {
+      if (verbTypeFilter === 'all') return true
+      if (verbTypeFilter === 'reflexive') return verb.reflexive
+      if (verbTypeFilter === 'regular') return verb.regular && !verb.reflexive
+      if (verbTypeFilter === 'irregular')
+        return !verb.regular && !verb.reflexive
+      return true
+    },
+    [verbTypeFilter]
+  )
+
+  // Use shared sorting and filtering hook
+  const {
+    sortOption,
+    displayCount,
+    filteredAndSortedItems: filteredAndSortedVerbs,
+    handleRefresh,
+    handleSortChange,
+    setDisplayCount,
+    shouldShowRefreshButton,
+  } = useSortingAndFiltering({
+    items: verbs as Verb[],
+    getStatistics,
+    filterFn,
+    refetchStatistics,
+  })
 
   const handleInputChange = useCallback((verbId: string, value: string) => {
     setInputValues((prev) => ({ ...prev, [verbId]: value }))
@@ -81,15 +149,10 @@ export const useVerbsPractice = () => {
       // Save statistics to backend asynchronously
       updateVerbStatistic({ verbId, correct: isCorrect }).catch((err) => {
         console.error('Failed to update statistics:', err)
-        setStatisticsError({
-          message: 'Failed to save statistics. Your progress may not be saved.',
-          timestamp: Date.now(),
-        })
-        // Auto-clear error after 5 seconds
-        setTimeout(() => setStatisticsError(null), 5000)
+        showError('Failed to save statistics. Your progress may not be saved.')
       })
     },
-    [inputValues, updateVerbStatistic]
+    [inputValues, updateVerbStatistic, showError]
   )
 
   const handleClearInput = useCallback((verbId: string) => {
@@ -116,123 +179,11 @@ export const useVerbsPractice = () => {
     (verbId: string) => {
       const verb = data?.verbs.find((v) => v.id === verbId)
       if (verb) {
-        setResetDialog({
-          open: true,
-          verbId,
-          verbTranslation: verb.translation,
-          error: null,
-        })
+        openResetDialog(verb as Verb)
       }
     },
-    [data?.verbs]
+    [data?.verbs, openResetDialog]
   )
-
-  const handleCloseResetDialog = useCallback(() => {
-    setResetDialog({
-      open: false,
-      verbId: null,
-      verbTranslation: null,
-      error: null,
-    })
-  }, [])
-
-  const handleConfirmReset = useCallback(async () => {
-    if (!resetDialog.verbId) return
-
-    try {
-      await resetVerbStatistic(resetDialog.verbId).unwrap()
-      handleCloseResetDialog()
-    } catch (err) {
-      console.error('Failed to reset statistics:', err)
-      setResetDialog((prev) => ({
-        ...prev,
-        error: 'Failed to reset statistics. Please try again.',
-      }))
-    }
-  }, [resetDialog.verbId, resetVerbStatistic, handleCloseResetDialog])
-
-  const getStatistics = useCallback(
-    (verbId: string) => {
-      const stats = statisticsData?.statistics[verbId]
-      return {
-        correct: stats?.correctAttempts || 0,
-        wrong: stats?.wrongAttempts || 0,
-      }
-    },
-    [statisticsData?.statistics]
-  )
-
-  // Memoize verbs array to prevent unnecessary re-renders
-  const verbs = useMemo(() => data?.verbs || [], [data?.verbs])
-
-  // Apply filters, sorting, and limit
-  const filteredAndSortedVerbs = useMemo(() => {
-    let result = [...verbs]
-
-    // Apply verb type filter
-    if (verbTypeFilter !== 'all') {
-      result = result.filter((verb) => {
-        if (verbTypeFilter === 'reflexive') return verb.reflexive
-        if (verbTypeFilter === 'regular') return verb.regular && !verb.reflexive
-        if (verbTypeFilter === 'irregular')
-          return !verb.regular && !verb.reflexive
-        return true
-      })
-    }
-
-    // Apply sorting
-    if (sortOption === 'alphabetical') {
-      result.sort((a, b) => a.translation.localeCompare(b.translation))
-    } else if (sortOption === 'random') {
-      // Use Fisher-Yates shuffle with a seeded random
-      const shuffled = [...result]
-      let seed = randomSeed
-      const seededRandom = () => {
-        seed = (seed * 9301 + 49297) % 233280
-        return seed / 233280
-      }
-      for (let i = shuffled.length - 1; i > 0; i--) {
-        const j = Math.floor(seededRandom() * (i + 1))
-        const iItem = shuffled[i]
-        const jItem = shuffled[j]
-        if (iItem !== undefined && jItem !== undefined) {
-          ;[shuffled[i], shuffled[j]] = [jItem, iItem]
-        }
-      }
-      result = shuffled
-    } else if (
-      sortOption === 'most-errors' ||
-      sortOption === 'worst-performance'
-    ) {
-      result.sort((a, b) => {
-        const statsA = getStatistics(a.id)
-        const statsB = getStatistics(b.id)
-
-        if (sortOption === 'most-errors') {
-          return statsB.wrong - statsA.wrong
-        } else {
-          // worst-performance: highest (errors - correct) first
-          const performanceA = statsA.wrong - statsA.correct
-          const performanceB = statsB.wrong - statsB.correct
-          return performanceB - performanceA
-        }
-      })
-    }
-
-    // Apply display count limit
-    if (displayCount !== 'all') {
-      result = result.slice(0, displayCount)
-    }
-
-    return result
-  }, [
-    verbs,
-    verbTypeFilter,
-    sortOption,
-    displayCount,
-    getStatistics,
-    randomSeed,
-  ])
 
   const handleKeyDown = useCallback(
     (
@@ -259,31 +210,6 @@ export const useVerbsPractice = () => {
     },
     [filteredAndSortedVerbs, handleValidation]
   )
-
-  const handleRefresh = useCallback(() => {
-    if (sortOption === 'random') {
-      // Update random seed to reshuffle
-      setRandomSeed(Date.now())
-    } else if (
-      sortOption === 'most-errors' ||
-      sortOption === 'worst-performance'
-    ) {
-      // Refetch statistics to get latest data
-      refetchStatistics()
-    }
-  }, [sortOption, refetchStatistics])
-
-  const handleSortChange = useCallback((newSort: SortOption) => {
-    setSortOption(newSort)
-    if (newSort === 'random') {
-      setRandomSeed(Date.now())
-    }
-  }, [])
-
-  const shouldShowRefreshButton =
-    sortOption === 'random' ||
-    sortOption === 'most-errors' ||
-    sortOption === 'worst-performance'
 
   return {
     // Data

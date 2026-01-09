@@ -6,15 +6,21 @@ import {
   useResetNounStatisticMutation,
   useUpdateNounStatisticMutation,
 } from '@/app/store/api'
-
-import { SortOption, DisplayCount } from '../components/NounItem/internals'
 import {
-  InputValues,
-  ResetDialogState,
-  StatisticsError,
-  ValidationState,
-} from '../types'
+  useStatisticsError,
+  useResetDialog,
+  useSortingAndFiltering,
+} from '@/lib/hooks'
+
+import { InputValues, ValidationState } from '../types'
 import { validateAnswer } from '../utils'
+
+interface Noun {
+  id: string
+  translation: string
+  italian: string
+  italianPlural: string
+}
 
 export const useNounsPractice = () => {
   const { data, isLoading, error } = useGetNounsForPracticeQuery()
@@ -24,28 +30,79 @@ export const useNounsPractice = () => {
       refetchOnFocus: false,
     })
   const [updateNounStatistic] = useUpdateNounStatisticMutation()
-  const [resetNounStatistic, { isLoading: isResetting }] =
-    useResetNounStatisticMutation()
+  const [resetNounStatisticMutation] = useResetNounStatisticMutation()
 
   const [inputValues, setInputValues] = useState<InputValues>({})
   const [validationState, setValidationState] = useState<ValidationState>({})
-  const [resetDialog, setResetDialog] = useState<ResetDialogState>({
-    open: false,
-    nounId: null,
-    nounTranslation: null,
-    error: null,
-  })
-  const [statisticsError, setStatisticsError] =
-    useState<StatisticsError | null>(null)
-  const [sortOption, setSortOption] = useState<SortOption>('none')
-  const [displayCount, setDisplayCount] = useState<DisplayCount>(10)
-  const [randomSeed, setRandomSeed] = useState(0)
 
   const inputRefsSingular = useRef<{ [key: string]: HTMLInputElement | null }>(
     {}
   )
   const inputRefsPlural = useRef<{ [key: string]: HTMLInputElement | null }>({})
   const lastValidatedRef = useRef<{ [key: string]: number }>({})
+
+  // Use shared statistics error hook
+  const { statisticsError, showError } = useStatisticsError()
+
+  // Memoize nouns array to prevent unnecessary re-renders
+  const nouns = useMemo(() => data?.nouns || [], [data?.nouns])
+
+  // Get statistics callback
+  const getStatistics = useCallback(
+    (nounId: string) => {
+      const stats = statisticsData?.statistics[nounId]
+      return {
+        correct: stats?.correctAttempts || 0,
+        wrong: stats?.wrongAttempts || 0,
+      }
+    },
+    [statisticsData?.statistics]
+  )
+
+  // Use shared reset dialog hook
+  const resetStatistic = useCallback(
+    async (nounId: string) => {
+      await resetNounStatisticMutation(nounId).unwrap()
+    },
+    [resetNounStatisticMutation]
+  )
+
+  const {
+    resetDialog: resetDialogState,
+    isResetting,
+    handleOpenResetDialog: openResetDialog,
+    handleCloseResetDialog,
+    handleConfirmReset,
+  } = useResetDialog<Noun>({
+    getItemLabel: (noun) => noun.translation,
+    resetStatistic,
+  })
+
+  // Transform reset dialog state to match expected interface
+  const resetDialog = useMemo(
+    () => ({
+      open: resetDialogState.open,
+      nounId: resetDialogState.itemId,
+      nounTranslation: resetDialogState.itemLabel,
+      error: resetDialogState.error,
+    }),
+    [resetDialogState]
+  )
+
+  // Use shared sorting and filtering hook
+  const {
+    sortOption,
+    displayCount,
+    filteredAndSortedItems: filteredAndSortedNouns,
+    handleRefresh,
+    handleSortChange,
+    setDisplayCount,
+    shouldShowRefreshButton,
+  } = useSortingAndFiltering({
+    items: nouns as Noun[],
+    getStatistics,
+    refetchStatistics,
+  })
 
   const handleInputChange = useCallback(
     (nounId: string, field: 'singular' | 'plural', value: string) => {
@@ -128,16 +185,13 @@ export const useNounsPractice = () => {
       if (saveStatistics && hasSingularInput && hasPluralInput) {
         updateNounStatistic({ nounId, correct: bothCorrect }).catch((err) => {
           console.error('Failed to update statistics:', err)
-          setStatisticsError({
-            message:
-              'Failed to save statistics. Your progress may not be saved.',
-            timestamp: Date.now(),
-          })
-          setTimeout(() => setStatisticsError(null), 5000)
+          showError(
+            'Failed to save statistics. Your progress may not be saved.'
+          )
         })
       }
     },
-    [inputValues, updateNounStatistic, data?.nouns]
+    [inputValues, updateNounStatistic, data?.nouns, showError]
   )
 
   const handleClearInput = useCallback(
@@ -192,105 +246,11 @@ export const useNounsPractice = () => {
     (nounId: string) => {
       const noun = data?.nouns.find((n) => n.id === nounId)
       if (noun) {
-        setResetDialog({
-          open: true,
-          nounId,
-          nounTranslation: noun.translation,
-          error: null,
-        })
+        openResetDialog(noun as Noun)
       }
     },
-    [data?.nouns]
+    [data?.nouns, openResetDialog]
   )
-
-  const handleCloseResetDialog = useCallback(() => {
-    setResetDialog({
-      open: false,
-      nounId: null,
-      nounTranslation: null,
-      error: null,
-    })
-  }, [])
-
-  const handleConfirmReset = useCallback(async () => {
-    if (!resetDialog.nounId) return
-
-    try {
-      await resetNounStatistic(resetDialog.nounId).unwrap()
-      handleCloseResetDialog()
-    } catch (err) {
-      console.error('Failed to reset statistics:', err)
-      setResetDialog((prev) => ({
-        ...prev,
-        error: 'Failed to reset statistics. Please try again.',
-      }))
-    }
-  }, [resetDialog.nounId, resetNounStatistic, handleCloseResetDialog])
-
-  const getStatistics = useCallback(
-    (nounId: string) => {
-      const stats = statisticsData?.statistics[nounId]
-      return {
-        correct: stats?.correctAttempts || 0,
-        wrong: stats?.wrongAttempts || 0,
-      }
-    },
-    [statisticsData?.statistics]
-  )
-
-  // Memoize nouns array to prevent unnecessary re-renders
-  const nouns = useMemo(() => data?.nouns || [], [data?.nouns])
-
-  // Apply filters, sorting, and limit
-  const filteredAndSortedNouns = useMemo(() => {
-    let result = [...nouns]
-
-    // Apply sorting
-    if (sortOption === 'alphabetical') {
-      result.sort((a, b) => a.translation.localeCompare(b.translation))
-    } else if (sortOption === 'random') {
-      // Use Fisher-Yates shuffle with a seeded random
-      const shuffled = [...result]
-      let seed = randomSeed
-      const seededRandom = () => {
-        seed = (seed * 9301 + 49297) % 233280
-        return seed / 233280
-      }
-      for (let i = shuffled.length - 1; i > 0; i--) {
-        const j = Math.floor(seededRandom() * (i + 1))
-        const iItem = shuffled[i]
-        const jItem = shuffled[j]
-        if (iItem !== undefined && jItem !== undefined) {
-          ;[shuffled[i], shuffled[j]] = [jItem, iItem]
-        }
-      }
-      result = shuffled
-    } else if (
-      sortOption === 'most-errors' ||
-      sortOption === 'worst-performance'
-    ) {
-      result.sort((a, b) => {
-        const statsA = getStatistics(a.id)
-        const statsB = getStatistics(b.id)
-
-        if (sortOption === 'most-errors') {
-          return statsB.wrong - statsA.wrong
-        } else {
-          // worst-performance: highest (errors - correct) first
-          const performanceA = statsA.wrong - statsA.correct
-          const performanceB = statsB.wrong - statsB.correct
-          return performanceB - performanceA
-        }
-      })
-    }
-
-    // Apply display count limit
-    if (displayCount !== 'all') {
-      result = result.slice(0, displayCount)
-    }
-
-    return result
-  }, [nouns, sortOption, displayCount, getStatistics, randomSeed])
 
   const handleKeyDown = useCallback(
     (
@@ -326,31 +286,6 @@ export const useNounsPractice = () => {
     },
     [filteredAndSortedNouns, handleValidation]
   )
-
-  const handleRefresh = useCallback(() => {
-    if (sortOption === 'random') {
-      // Update random seed to reshuffle
-      setRandomSeed(Date.now())
-    } else if (
-      sortOption === 'most-errors' ||
-      sortOption === 'worst-performance'
-    ) {
-      // Refetch statistics to get latest data
-      refetchStatistics()
-    }
-  }, [sortOption, refetchStatistics])
-
-  const handleSortChange = useCallback((newSort: SortOption) => {
-    setSortOption(newSort)
-    if (newSort === 'random') {
-      setRandomSeed(Date.now())
-    }
-  }, [])
-
-  const shouldShowRefreshButton =
-    sortOption === 'random' ||
-    sortOption === 'most-errors' ||
-    sortOption === 'worst-performance'
 
   return {
     // Data
