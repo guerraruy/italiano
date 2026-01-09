@@ -78,7 +78,7 @@ export class AuthService extends BaseService {
       const refreshToken = generateRefreshToken(user.id)
 
       // Remove password from response
-      const { password, ...userWithoutPassword } = user
+      const { password: _password, ...userWithoutPassword } = user
 
       return {
         user: userWithoutPassword as UserWithoutPassword,
@@ -135,7 +135,7 @@ export class AuthService extends BaseService {
       const refreshToken = generateRefreshToken(user.id)
 
       // Remove password from response
-      const { password, ...userWithoutPassword } = user
+      const { password: _password, ...userWithoutPassword } = user
 
       return {
         user: userWithoutPassword as UserWithoutPassword,

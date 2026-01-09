@@ -19,7 +19,7 @@ export interface UserProfile {
   updatedAt: string
 }
 
-export interface UserData extends User {}
+export type UserData = User
 
 export interface AuthResponse {
   user: User

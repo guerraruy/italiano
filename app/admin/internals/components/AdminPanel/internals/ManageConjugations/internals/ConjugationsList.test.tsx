@@ -191,18 +191,20 @@ describe('ConjugationsList', () => {
   })
 
   describe('Loading State', () => {
-    it('should display loading spinner when data is loading', () => {
+    it('should display loading skeleton when data is loading', () => {
       const loadingStore = createMockStore({
         status: 'pending',
         data: undefined,
       })
 
-      renderWithProvider(
+      const { container } = renderWithProvider(
         <ConjugationsList onError={mockOnError} onSuccess={mockOnSuccess} />,
         { store: loadingStore }
       )
 
-      expect(screen.getByRole('progressbar')).toBeInTheDocument()
+      // Check for skeleton loaders (MUI Skeleton components)
+      const skeletons = container.querySelectorAll('.MuiSkeleton-root')
+      expect(skeletons.length).toBeGreaterThan(0)
     })
   })
 

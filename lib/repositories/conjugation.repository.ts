@@ -4,10 +4,12 @@
  * Handles all database operations for verb conjugations
  */
 
-import { prisma } from '@/lib/prisma'
-import { BaseRepository } from './base.repository'
 import { Prisma } from '@prisma/client'
 import type { VerbConjugation } from '@prisma/client'
+
+import { prisma } from '@/lib/prisma'
+
+import { BaseRepository } from './base.repository'
 
 type CreateConjugationInput = Prisma.VerbConjugationCreateInput
 type UpdateConjugationInput = Prisma.VerbConjugationUpdateInput

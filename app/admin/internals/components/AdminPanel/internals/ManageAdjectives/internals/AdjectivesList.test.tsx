@@ -77,9 +77,13 @@ describe('AdjectivesList', () => {
       isLoading: true,
     })
 
-    render(<AdjectivesList onError={mockOnError} onSuccess={mockOnSuccess} />)
+    const { container } = render(
+      <AdjectivesList onError={mockOnError} onSuccess={mockOnSuccess} />
+    )
 
-    expect(screen.getByRole('progressbar')).toBeInTheDocument()
+    // SkeletonTable renders MUI Skeleton components
+    const skeletons = container.querySelectorAll('.MuiSkeleton-root')
+    expect(skeletons.length).toBeGreaterThan(0)
   })
 
   it('renders empty state when no adjectives', () => {

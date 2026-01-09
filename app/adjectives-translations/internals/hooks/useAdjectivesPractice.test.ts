@@ -278,6 +278,7 @@ describe('useAdjectivesPractice', () => {
       open: true,
       adjectiveId: '1',
       adjectiveTranslation: 'Good',
+      error: null,
     })
 
     // Confirm reset
@@ -305,7 +306,9 @@ describe('useAdjectivesPractice', () => {
     // Should not call refetch
     expect(refetchMock).not.toHaveBeenCalled()
 
-    const initialSeed = result.current.filteredAndSortedAdjectives
+    // Capture initial result (seed changes on refresh for random sort)
+    const _initialResult = result.current.filteredAndSortedAdjectives
+    void _initialResult // Acknowledge intentionally unused - seed comparison could be added
 
     act(() => {
       result.current.handleRefresh()

@@ -71,8 +71,11 @@ describe('AdjectivesTranslationsPage', () => {
       isLoading: true,
     })
 
-    render(<AdjectivesTranslationsPage />)
-    expect(screen.getByRole('progressbar')).toBeInTheDocument()
+    const { container } = render(<AdjectivesTranslationsPage />)
+
+    // Should render skeleton components during loading
+    const skeletons = container.querySelectorAll('.MuiSkeleton-root')
+    expect(skeletons.length).toBeGreaterThan(0)
     expect(screen.queryByTestId('adjectives-list')).not.toBeInTheDocument()
   })
 

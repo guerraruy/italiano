@@ -9,7 +9,6 @@ import {
   DialogContent,
   DialogActions,
   Button,
-  Typography,
   Alert,
   TextField,
 } from '@mui/material'
@@ -55,7 +54,7 @@ function EditFormContent({
       let parsedConjugation: ConjugationData
       try {
         parsedConjugation = JSON.parse(jsonContent)
-      } catch (err) {
+      } catch {
         setJsonError('Invalid JSON format. Please check your syntax.')
         return
       }

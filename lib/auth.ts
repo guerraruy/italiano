@@ -3,8 +3,9 @@
  * Provides reusable authentication middleware and JWT utilities
  */
 
-import { NextRequest, NextResponse } from 'next/server'
 import { sign, verify } from 'jsonwebtoken'
+import { NextRequest, NextResponse } from 'next/server'
+
 import { env } from './env'
 
 export interface AuthenticatedRequest extends NextRequest {
@@ -35,7 +36,7 @@ export async function authenticate(
     const decoded = verify(token, env.JWT_SECRET) as JWTPayload
 
     return decoded.userId
-  } catch (error) {
+  } catch {
     // Token is invalid or expired
     return null
   }
@@ -146,6 +147,6 @@ export function verifyRefreshToken(token: string): JWTPayload | null {
 export function sanitizeUser<T extends { password?: string }>(
   user: T
 ): Omit<T, 'password'> {
-  const { password, ...userWithoutPassword } = user
+  const { password: _password, ...userWithoutPassword } = user
   return userWithoutPassword
 }

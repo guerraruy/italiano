@@ -5,7 +5,7 @@ import { handleApiError } from '@/lib/errors'
 import { nounService } from '@/lib/services'
 
 // GET /api/nouns - Get all nouns for practice
-export const GET = withAuth(async (request: NextRequest, userId: string) => {
+export const GET = withAuth(async (_request: NextRequest, _userId: string) => {
   try {
     // Use noun service to get all nouns
     const nounsData = await nounService.getAllNouns()
