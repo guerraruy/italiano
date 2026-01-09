@@ -20,4 +20,10 @@ export interface ResetDialogState {
   open: boolean
   adjectiveId: string | null
   adjectiveTranslation: string | null
+  error: string | null
+}
+
+export interface StatisticsError {
+  message: string
+  timestamp: number
 }

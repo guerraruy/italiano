@@ -12,7 +12,12 @@ import {
   DisplayCount,
   VerbTypeFilter,
 } from '../components/VerbItem/internals'
-import { InputValues, ResetDialogState, ValidationState } from '../types'
+import {
+  InputValues,
+  ResetDialogState,
+  StatisticsError,
+  ValidationState,
+} from '../types'
 import { validateAnswer } from '../utils'
 
 export const useVerbsPractice = () => {
@@ -32,7 +37,10 @@ export const useVerbsPractice = () => {
     open: false,
     verbId: null,
     verbTranslation: null,
+    error: null,
   })
+  const [statisticsError, setStatisticsError] =
+    useState<StatisticsError | null>(null)
   const [verbTypeFilter, setVerbTypeFilter] = useState<VerbTypeFilter>('all')
   const [sortOption, setSortOption] = useState<SortOption>('none')
   const [displayCount, setDisplayCount] = useState<DisplayCount>(10)
@@ -70,9 +78,15 @@ export const useVerbsPractice = () => {
         [verbId]: isCorrect ? 'correct' : 'incorrect',
       }))
 
-      // Save statistics to backend asynchronously (fire and forget)
-      updateVerbStatistic({ verbId, correct: isCorrect }).catch((error) => {
-        console.error('Failed to update statistics:', error)
+      // Save statistics to backend asynchronously
+      updateVerbStatistic({ verbId, correct: isCorrect }).catch((err) => {
+        console.error('Failed to update statistics:', err)
+        setStatisticsError({
+          message: 'Failed to save statistics. Your progress may not be saved.',
+          timestamp: Date.now(),
+        })
+        // Auto-clear error after 5 seconds
+        setTimeout(() => setStatisticsError(null), 5000)
       })
     },
     [inputValues, updateVerbStatistic]
@@ -106,6 +120,7 @@ export const useVerbsPractice = () => {
           open: true,
           verbId,
           verbTranslation: verb.translation,
+          error: null,
         })
       }
     },
@@ -117,6 +132,7 @@ export const useVerbsPractice = () => {
       open: false,
       verbId: null,
       verbTranslation: null,
+      error: null,
     })
   }, [])
 
@@ -126,8 +142,12 @@ export const useVerbsPractice = () => {
     try {
       await resetVerbStatistic(resetDialog.verbId).unwrap()
       handleCloseResetDialog()
-    } catch (error) {
-      console.error('Failed to reset statistics:', error)
+    } catch (err) {
+      console.error('Failed to reset statistics:', err)
+      setResetDialog((prev) => ({
+        ...prev,
+        error: 'Failed to reset statistics. Please try again.',
+      }))
     }
   }, [resetDialog.verbId, resetVerbStatistic, handleCloseResetDialog])
 
@@ -280,6 +300,7 @@ export const useVerbsPractice = () => {
     displayCount,
     resetDialog,
     isResetting,
+    statisticsError,
 
     // Refs
     inputRefs,

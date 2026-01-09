@@ -7,12 +7,14 @@ import {
   DialogContentText,
   DialogActions,
   Button,
+  Alert,
 } from '@mui/material'
 
 interface ResetStatisticsDialogProps {
   open: boolean
   verbName: string | null
   isResetting: boolean
+  error?: string | null
   onClose: () => void
   onConfirm: () => void
 }
@@ -21,6 +23,7 @@ export const ResetStatisticsDialog: React.FC<ResetStatisticsDialogProps> = ({
   open,
   verbName,
   isResetting,
+  error,
   onClose,
   onConfirm,
 }) => {
@@ -33,6 +36,11 @@ export const ResetStatisticsDialog: React.FC<ResetStatisticsDialogProps> = ({
     >
       <DialogTitle id="reset-dialog-title">Reset Statistics</DialogTitle>
       <DialogContent>
+        {error && (
+          <Alert severity="error" sx={{ mb: 2 }}>
+            {error}
+          </Alert>
+        )}
         <DialogContentText id="reset-dialog-description">
           Are you sure you want to reset all conjugation statistics for the verb
           &quot;

@@ -10,4 +10,10 @@ export interface ResetDialogState {
   open: boolean
   verbId: string | null
   verbTranslation: string | null
+  error: string | null
+}
+
+export interface StatisticsError {
+  message: string
+  timestamp: number
 }

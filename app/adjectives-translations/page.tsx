@@ -32,6 +32,7 @@ export default function AdjectivesTranslationsPage() {
     displayCount,
     resetDialog,
     isResetting,
+    statisticsError,
     inputRefs,
     handleInputChange,
     handleValidation,
@@ -96,6 +97,12 @@ export default function AdjectivesTranslationsPage() {
       <PageHeader title="Adjectives Translations" />
 
       <ContentPaper elevation={3}>
+        {statisticsError && (
+          <Alert severity="warning" sx={{ mb: 2 }}>
+            {statisticsError.message}
+          </Alert>
+        )}
+
         <Typography
           variant="h6"
           color="text.secondary"
@@ -132,6 +139,7 @@ export default function AdjectivesTranslationsPage() {
         open={resetDialog.open}
         adjectiveTranslation={resetDialog.adjectiveTranslation}
         isResetting={isResetting}
+        error={resetDialog.error}
         onClose={handleCloseResetDialog}
         onConfirm={handleConfirmReset}
       />

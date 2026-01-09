@@ -7,12 +7,14 @@ import {
   DialogContentText,
   DialogActions,
   Button,
+  Alert,
 } from '@mui/material'
 
 interface ResetStatisticsDialogProps {
   open: boolean
   nounTranslation: string | null
   isResetting: boolean
+  error?: string | null
   onClose: () => void
   onConfirm: () => void
 }
@@ -21,6 +23,7 @@ export default function ResetStatisticsDialog({
   open,
   nounTranslation,
   isResetting,
+  error,
   onClose,
   onConfirm,
 }: ResetStatisticsDialogProps) {
@@ -33,6 +36,11 @@ export default function ResetStatisticsDialog({
     >
       <DialogTitle id="reset-dialog-title">Reset Statistics</DialogTitle>
       <DialogContent>
+        {error && (
+          <Alert severity="error" sx={{ mb: 2 }}>
+            {error}
+          </Alert>
+        )}
         <DialogContentText id="reset-dialog-description">
           Are you sure you want to reset all statistics for the noun &quot;
           {nounTranslation}&quot;? This action cannot be undone.

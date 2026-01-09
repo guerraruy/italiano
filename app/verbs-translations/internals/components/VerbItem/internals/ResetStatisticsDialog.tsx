@@ -1,6 +1,7 @@
 import React from 'react'
 
 import {
+  Alert,
   Dialog,
   DialogTitle,
   DialogContent,
@@ -13,6 +14,7 @@ interface ResetStatisticsDialogProps {
   open: boolean
   verbTranslation: string | null
   isResetting: boolean
+  error?: string | null
   onClose: () => void
   onConfirm: () => void
 }
@@ -21,6 +23,7 @@ export default function ResetStatisticsDialog({
   open,
   verbTranslation,
   isResetting,
+  error,
   onClose,
   onConfirm,
 }: ResetStatisticsDialogProps) {
@@ -33,6 +36,11 @@ export default function ResetStatisticsDialog({
     >
       <DialogTitle id="reset-dialog-title">Reset Statistics</DialogTitle>
       <DialogContent>
+        {error && (
+          <Alert severity="error" sx={{ mb: 2 }}>
+            {error}
+          </Alert>
+        )}
         <DialogContentText id="reset-dialog-description">
           Are you sure you want to reset all statistics for the verb &quot;
           {verbTranslation}&quot;? This action cannot be undone.

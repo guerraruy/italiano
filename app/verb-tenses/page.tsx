@@ -37,6 +37,7 @@ export default function VerbTensesPage() {
     validationState,
     resetDialog,
     isResetting,
+    statisticsError,
     inputRefs,
     handleInputChange,
     handleValidation,
@@ -88,6 +89,12 @@ export default function VerbTensesPage() {
       <PageHeader title="Verb Tenses" />
 
       <ContentPaper elevation={3}>
+        {statisticsError && (
+          <Alert severity="warning" sx={{ mb: 2 }}>
+            {statisticsError.message}
+          </Alert>
+        )}
+
         <Typography
           variant="h6"
           color="text.secondary"
@@ -127,6 +134,7 @@ export default function VerbTensesPage() {
         open={resetDialog.open}
         verbName={resetDialog.verbName}
         isResetting={isResetting}
+        error={resetDialog.error}
         onClose={handleCloseResetDialog}
         onConfirm={handleConfirmReset}
       />

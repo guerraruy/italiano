@@ -32,6 +32,7 @@ export default function NounsTranslationsPage() {
     displayCount,
     resetDialog,
     isResetting,
+    statisticsError,
     inputRefsSingular,
     inputRefsPlural,
     handleInputChange,
@@ -87,6 +88,12 @@ export default function NounsTranslationsPage() {
       <PageHeader title="Nouns Translations" />
 
       <ContentPaper elevation={3}>
+        {statisticsError && (
+          <Alert severity="warning" sx={{ mb: 2 }}>
+            {statisticsError.message}
+          </Alert>
+        )}
+
         <Typography
           variant="h6"
           color="text.secondary"
@@ -127,6 +134,7 @@ export default function NounsTranslationsPage() {
         open={resetDialog.open}
         nounTranslation={resetDialog.nounTranslation}
         isResetting={isResetting}
+        error={resetDialog.error}
         onClose={handleCloseResetDialog}
         onConfirm={handleConfirmReset}
       />

@@ -16,4 +16,10 @@ export interface ResetDialogState {
   open: boolean
   nounId: string | null
   nounTranslation: string | null
+  error: string | null
+}
+
+export interface StatisticsError {
+  message: string
+  timestamp: number
 }

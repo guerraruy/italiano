@@ -8,7 +8,12 @@ import {
 } from '@/app/store/api'
 
 import { SortOption, DisplayCount } from '../components/NounItem/internals'
-import { InputValues, ResetDialogState, ValidationState } from '../types'
+import {
+  InputValues,
+  ResetDialogState,
+  StatisticsError,
+  ValidationState,
+} from '../types'
 import { validateAnswer } from '../utils'
 
 export const useNounsPractice = () => {
@@ -28,7 +33,10 @@ export const useNounsPractice = () => {
     open: false,
     nounId: null,
     nounTranslation: null,
+    error: null,
   })
+  const [statisticsError, setStatisticsError] =
+    useState<StatisticsError | null>(null)
   const [sortOption, setSortOption] = useState<SortOption>('none')
   const [displayCount, setDisplayCount] = useState<DisplayCount>(10)
   const [randomSeed, setRandomSeed] = useState(0)
@@ -118,8 +126,14 @@ export const useNounsPractice = () => {
 
       // Only save statistics if both fields have input and saveStatistics is true
       if (saveStatistics && hasSingularInput && hasPluralInput) {
-        updateNounStatistic({ nounId, correct: bothCorrect }).catch((error) => {
-          console.error('Failed to update statistics:', error)
+        updateNounStatistic({ nounId, correct: bothCorrect }).catch((err) => {
+          console.error('Failed to update statistics:', err)
+          setStatisticsError({
+            message:
+              'Failed to save statistics. Your progress may not be saved.',
+            timestamp: Date.now(),
+          })
+          setTimeout(() => setStatisticsError(null), 5000)
         })
       }
     },
@@ -182,6 +196,7 @@ export const useNounsPractice = () => {
           open: true,
           nounId,
           nounTranslation: noun.translation,
+          error: null,
         })
       }
     },
@@ -193,6 +208,7 @@ export const useNounsPractice = () => {
       open: false,
       nounId: null,
       nounTranslation: null,
+      error: null,
     })
   }, [])
 
@@ -202,8 +218,12 @@ export const useNounsPractice = () => {
     try {
       await resetNounStatistic(resetDialog.nounId).unwrap()
       handleCloseResetDialog()
-    } catch (error) {
-      console.error('Failed to reset statistics:', error)
+    } catch (err) {
+      console.error('Failed to reset statistics:', err)
+      setResetDialog((prev) => ({
+        ...prev,
+        error: 'Failed to reset statistics. Please try again.',
+      }))
     }
   }, [resetDialog.nounId, resetNounStatistic, handleCloseResetDialog])
 
@@ -346,6 +366,7 @@ export const useNounsPractice = () => {
     displayCount,
     resetDialog,
     isResetting,
+    statisticsError,
 
     // Refs
     inputRefsSingular,

@@ -33,6 +33,7 @@ export default function VerbsTranslationsPage() {
     displayCount,
     resetDialog,
     isResetting,
+    statisticsError,
     inputRefs,
     handleInputChange,
     handleValidation,
@@ -88,6 +89,12 @@ export default function VerbsTranslationsPage() {
       <PageHeader title="Verbs Translations" />
 
       <ContentPaper elevation={3}>
+        {statisticsError && (
+          <Alert severity="warning" sx={{ mb: 2 }}>
+            {statisticsError.message}
+          </Alert>
+        )}
+
         <Typography
           variant="h6"
           color="text.secondary"
@@ -125,6 +132,7 @@ export default function VerbsTranslationsPage() {
         open={resetDialog.open}
         verbTranslation={resetDialog.verbTranslation}
         isResetting={isResetting}
+        error={resetDialog.error}
         onClose={handleCloseResetDialog}
         onConfirm={handleConfirmReset}
       />

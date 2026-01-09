@@ -13,6 +13,7 @@ import {
   ValidationState,
   InputValues,
   ResetDialogState,
+  StatisticsError,
 } from '../types'
 import { validateAnswer, getFilterStorageKey, createInputKey } from '../utils'
 
@@ -65,7 +66,10 @@ export const useVerbConjugationPractice = () => {
     open: false,
     verbId: null,
     verbName: null,
+    error: null,
   })
+  const [statisticsError, setStatisticsError] =
+    useState<StatisticsError | null>(null)
   const inputRefs = useRef<{ [key: string]: HTMLInputElement | null }>({})
   const lastValidatedRef = useRef<{ [key: string]: number }>({})
 
@@ -184,8 +188,13 @@ export const useVerbConjugationPractice = () => {
         tense,
         person,
         correct: isCorrect,
-      }).catch((error) => {
-        console.error('Failed to update statistics:', error)
+      }).catch((err) => {
+        console.error('Failed to update statistics:', err)
+        setStatisticsError({
+          message: 'Failed to save statistics. Your progress may not be saved.',
+          timestamp: Date.now(),
+        })
+        setTimeout(() => setStatisticsError(null), 5000)
       })
     },
     [inputValues, validationState, updateConjugationStatistic]
@@ -213,6 +222,7 @@ export const useVerbConjugationPractice = () => {
         open: true,
         verbId: selectedVerb.id,
         verbName: selectedVerb.italian,
+        error: null,
       })
     }
   }, [selectedVerb])
@@ -222,6 +232,7 @@ export const useVerbConjugationPractice = () => {
       open: false,
       verbId: null,
       verbName: null,
+      error: null,
     })
   }, [])
 
@@ -232,8 +243,12 @@ export const useVerbConjugationPractice = () => {
       await resetConjugationStatistics(resetDialog.verbId).unwrap()
       handleCloseResetDialog()
       refetchStatistics()
-    } catch (error) {
-      console.error('Failed to reset statistics:', error)
+    } catch (err) {
+      console.error('Failed to reset statistics:', err)
+      setResetDialog((prev) => ({
+        ...prev,
+        error: 'Failed to reset statistics. Please try again.',
+      }))
     }
   }, [
     resetDialog.verbId,
@@ -337,6 +352,7 @@ export const useVerbConjugationPractice = () => {
     validationState,
     resetDialog,
     isResetting,
+    statisticsError,
 
     // Refs
     inputRefs,
