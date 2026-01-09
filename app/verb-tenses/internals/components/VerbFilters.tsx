@@ -49,20 +49,32 @@ const getVerbIcon = (regular: boolean, reflexive: boolean) => {
   if (reflexive) {
     return (
       <Tooltip title="Reflexive">
-        <AutorenewIcon color="secondary" fontSize="small" />
+        <AutorenewIcon
+          color="secondary"
+          fontSize="small"
+          data-testid="reflexive-icon"
+        />
       </Tooltip>
     )
   }
   if (regular) {
     return (
       <Tooltip title="Regular">
-        <RadioButtonCheckedIcon color="info" fontSize="small" />
+        <RadioButtonCheckedIcon
+          color="info"
+          fontSize="small"
+          data-testid="regular-icon"
+        />
       </Tooltip>
     )
   }
   return (
     <Tooltip title="Irregular">
-      <ShowChartIcon color="warning" fontSize="small" />
+      <ShowChartIcon
+        color="warning"
+        fontSize="small"
+        data-testid="irregular-icon"
+      />
     </Tooltip>
   )
 }
