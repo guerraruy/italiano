@@ -8,6 +8,11 @@ interface ErrorResponse {
   error: string
   code?: string
   issues?: Array<{ field: string; message: string }>
+  requestId?: string
+}
+
+function generateRequestId(): string {
+  return `req_${Date.now().toString(36)}_${Math.random().toString(36).substring(2, 9)}`
 }
 
 /**
@@ -45,9 +50,11 @@ export function handleApiError(error: unknown): NextResponse<ErrorResponse> {
   }
 
   // Handle unknown errors
+  const requestId = generateRequestId()
   const message = error instanceof Error ? error.message : 'An error occurred'
 
   logger.error('Unhandled error', {
+    requestId,
     error: message,
     stack: error instanceof Error ? error.stack : undefined,
   })
@@ -56,6 +63,7 @@ export function handleApiError(error: unknown): NextResponse<ErrorResponse> {
     {
       error: 'Internal server error',
       code: 'INTERNAL_ERROR',
+      requestId,
     },
     { status: 500 }
   )
