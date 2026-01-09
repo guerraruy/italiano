@@ -48,21 +48,25 @@ export const useVerbConjugationPractice = () => {
   const [verbTypeFilter, setVerbTypeFilter] = useState<VerbTypeFilter>(() => {
     // Try to load from localStorage on initial mount
     if (typeof window !== 'undefined') {
-      // Try to find any existing filter in localStorage
-      // This is a best-effort attempt - will be properly synced when userId is available
-      const keys = Object.keys(localStorage).filter((key) =>
-        key.startsWith('verbTypeFilter_')
-      )
-      if (keys.length > 0) {
-        const firstKey = keys[0]
-        if (!firstKey) return 'all'
-        const saved = localStorage.getItem(firstKey)
-        if (
-          saved &&
-          ['all', 'regular', 'irregular', 'reflexive'].includes(saved)
-        ) {
-          return saved as VerbTypeFilter
+      try {
+        // Try to find any existing filter in localStorage
+        // This is a best-effort attempt - will be properly synced when userId is available
+        const keys = Object.keys(localStorage).filter((key) =>
+          key.startsWith('verbTypeFilter_')
+        )
+        if (keys.length > 0) {
+          const firstKey = keys[0]
+          if (!firstKey) return 'all'
+          const saved = localStorage.getItem(firstKey)
+          if (
+            saved &&
+            ['all', 'regular', 'irregular', 'reflexive'].includes(saved)
+          ) {
+            return saved as VerbTypeFilter
+          }
         }
+      } catch {
+        // localStorage may throw SecurityError in private browsing mode
       }
     }
     return 'all'
@@ -90,25 +94,29 @@ export const useVerbConjugationPractice = () => {
 
     const storageKey = getFilterStorageKey(userId)
 
-    // If this is a new user (different from last one), load their preference
-    if (lastUserIdRef.current !== userId) {
-      const saved = localStorage.getItem(storageKey)
-      if (
-        saved &&
-        ['all', 'regular', 'irregular', 'reflexive'].includes(saved)
-      ) {
-        // Only update if different from current value
-        if (saved !== verbTypeFilter) {
-          // Using a microtask to avoid synchronous setState in effect
-          Promise.resolve().then(() => {
-            setVerbTypeFilter(saved as VerbTypeFilter)
-          })
+    try {
+      // If this is a new user (different from last one), load their preference
+      if (lastUserIdRef.current !== userId) {
+        const saved = localStorage.getItem(storageKey)
+        if (
+          saved &&
+          ['all', 'regular', 'irregular', 'reflexive'].includes(saved)
+        ) {
+          // Only update if different from current value
+          if (saved !== verbTypeFilter) {
+            // Using a microtask to avoid synchronous setState in effect
+            Promise.resolve().then(() => {
+              setVerbTypeFilter(saved as VerbTypeFilter)
+            })
+          }
         }
+        lastUserIdRef.current = userId
+      } else {
+        // Save current preference
+        localStorage.setItem(storageKey, verbTypeFilter)
       }
-      lastUserIdRef.current = userId
-    } else {
-      // Save current preference
-      localStorage.setItem(storageKey, verbTypeFilter)
+    } catch {
+      // localStorage may throw SecurityError in private browsing mode
     }
   }, [userId, verbTypeFilter])
 
