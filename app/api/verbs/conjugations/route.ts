@@ -12,23 +12,7 @@ export const GET = withAuth(async (request: NextRequest, userId: string) => {
     const nativeLanguage = profile?.nativeLanguage || 'pt-BR'
 
     // Use verb service to get verbs with conjugations
-    const verbsWithConjugationsRaw =
-      await verbService.getVerbsWithConjugations()
-
-    // Transform data to match frontend expectations
-    // Filter out verbs without conjugations and transform the structure
-    type VerbWithConjugations = {
-      id: string
-      italian: string
-      tr_ptBR: string
-      tr_en: string | null
-      regular: boolean
-      reflexive: boolean
-      conjugations: Array<{ conjugation: unknown }>
-    }
-
-    const verbsWithConjugations =
-      verbsWithConjugationsRaw as unknown as VerbWithConjugations[]
+    const verbsWithConjugations = await verbService.getVerbsWithConjugations()
 
     const verbs = verbsWithConjugations
       .filter((verb) => verb.conjugations && verb.conjugations.length > 0)

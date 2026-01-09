@@ -1,10 +1,11 @@
-import { Prisma } from '@prisma/client'
+import type { Prisma } from '@prisma/client'
 import { NextRequest, NextResponse } from 'next/server'
 
 import { withAdmin } from '@/lib/auth'
 import { ConflictError, handleApiError } from '@/lib/errors'
 import { adjectiveRepository } from '@/lib/repositories'
 import { adjectiveService } from '@/lib/services'
+import { fromJsonValue, toJsonInput } from '@/lib/utils'
 import { importAdjectivesSchema } from '@/lib/validation/adjectives'
 
 interface AdjectiveTranslations {
@@ -48,15 +49,12 @@ export async function POST(request: NextRequest) {
 
       const existingAdjectiveMap = new Map<
         string,
-        { italian: string; maschile: unknown; femminile: unknown }
-      >(
-        existingAdjectives.map(
-          (a: { italian: string; maschile: unknown; femminile: unknown }) => [
-            a.italian,
-            a,
-          ]
-        )
-      )
+        {
+          italian: string
+          maschile: Prisma.JsonValue
+          femminile: Prisma.JsonValue
+        }
+      >(existingAdjectives.map((a) => [a.italian, a]))
 
       // Find conflicts
       const conflicts: ConflictAdjective[] = []
@@ -87,8 +85,12 @@ export async function POST(request: NextRequest) {
             conflicts.push({
               italian,
               existing: {
-                maschile: existingAdjective.maschile as AdjectiveGenderForms,
-                femminile: existingAdjective.femminile as AdjectiveGenderForms,
+                maschile: fromJsonValue<AdjectiveGenderForms>(
+                  existingAdjective.maschile
+                ),
+                femminile: fromJsonValue<AdjectiveGenderForms>(
+                  existingAdjective.femminile
+                ),
               },
               new: data,
             })
@@ -97,8 +99,8 @@ export async function POST(request: NextRequest) {
           // New adjective, add to create list
           adjectivesToCreate.push({
             italian,
-            maschile: data.maschile as unknown as Prisma.InputJsonValue,
-            femminile: data.femminile as unknown as Prisma.InputJsonValue,
+            maschile: toJsonInput(data.maschile),
+            femminile: toJsonInput(data.femminile),
           })
         }
       }
@@ -128,8 +130,8 @@ export async function POST(request: NextRequest) {
       // Update existing adjectives
       for (const { italian, data } of adjectivesToUpdate) {
         await adjectiveRepository.updateByItalian(italian, {
-          maschile: data.maschile as unknown as Prisma.InputJsonValue,
-          femminile: data.femminile as unknown as Prisma.InputJsonValue,
+          maschile: toJsonInput(data.maschile),
+          femminile: toJsonInput(data.femminile),
         })
         updated++
       }

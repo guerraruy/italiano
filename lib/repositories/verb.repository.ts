@@ -5,7 +5,7 @@
  */
 
 import { Prisma } from '@prisma/client'
-import type { Verb } from '@prisma/client'
+import type { Verb, VerbConjugation } from '@prisma/client'
 
 import { prisma } from '@/lib/prisma'
 
@@ -13,6 +13,10 @@ import { BaseRepository } from './base.repository'
 
 type CreateVerbInput = Prisma.VerbCreateInput
 type UpdateVerbInput = Prisma.VerbUpdateInput
+
+export type VerbWithConjugations = Verb & {
+  conjugations: VerbConjugation[]
+}
 
 export class VerbRepository extends BaseRepository<
   Verb,
@@ -60,13 +64,13 @@ export class VerbRepository extends BaseRepository<
     where?: Prisma.VerbWhereInput
     skip?: number
     take?: number
-  }) {
+  }): Promise<VerbWithConjugations[]> {
     return this.findMany({
       ...options,
       include: {
         conjugations: true,
       },
-    })
+    }) as Promise<VerbWithConjugations[]>
   }
 
   /**

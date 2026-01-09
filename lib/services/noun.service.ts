@@ -4,10 +4,11 @@
  * Handles noun-related business logic
  */
 
-import type { Noun, Prisma } from '@prisma/client'
+import type { Noun } from '@prisma/client'
 
 import { NotFoundError, DuplicateResourceError } from '@/lib/errors'
 import { nounRepository } from '@/lib/repositories'
+import { toJsonInput } from '@/lib/utils'
 
 import { BaseService } from './base.service'
 
@@ -82,8 +83,8 @@ export class NounService extends BaseService {
       // Update noun
       return await nounRepository.update(nounId, {
         italian: input.italian,
-        singolare: input.singolare as unknown as Prisma.InputJsonValue,
-        plurale: input.plurale as unknown as Prisma.InputJsonValue,
+        singolare: toJsonInput(input.singolare),
+        plurale: toJsonInput(input.plurale),
       })
     } catch (error) {
       return this.handleError('updateNoun', error, { nounId, ...input })

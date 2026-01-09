@@ -7,7 +7,11 @@
 import type { Verb, Prisma } from '@prisma/client'
 
 import { NotFoundError, DuplicateResourceError } from '@/lib/errors'
-import { verbRepository, conjugationRepository } from '@/lib/repositories'
+import {
+  verbRepository,
+  conjugationRepository,
+  type VerbWithConjugations,
+} from '@/lib/repositories'
 
 import { BaseService } from './base.service'
 
@@ -41,7 +45,10 @@ export class VerbService extends BaseService {
    * @param options - Pagination options (skip, take)
    * @returns List of verbs with their conjugations
    */
-  async getVerbsWithConjugations(options?: { skip?: number; take?: number }) {
+  async getVerbsWithConjugations(options?: {
+    skip?: number
+    take?: number
+  }): Promise<VerbWithConjugations[]> {
     try {
       return await verbRepository.findWithConjugations(options)
     } catch (error) {

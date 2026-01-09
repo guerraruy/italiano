@@ -4,10 +4,11 @@
  * Handles adjective-related business logic
  */
 
-import type { Adjective, Prisma } from '@prisma/client'
+import type { Adjective } from '@prisma/client'
 
 import { NotFoundError, DuplicateResourceError } from '@/lib/errors'
 import { adjectiveRepository } from '@/lib/repositories'
+import { toJsonInput } from '@/lib/utils'
 
 import { BaseService } from './base.service'
 
@@ -85,8 +86,8 @@ export class AdjectiveService extends BaseService {
       // Update adjective
       return await adjectiveRepository.update(adjectiveId, {
         italian: input.italian,
-        maschile: input.maschile as unknown as Prisma.InputJsonValue,
-        femminile: input.femminile as unknown as Prisma.InputJsonValue,
+        maschile: toJsonInput(input.maschile),
+        femminile: toJsonInput(input.femminile),
       })
     } catch (error) {
       return this.handleError('updateAdjective', error, {

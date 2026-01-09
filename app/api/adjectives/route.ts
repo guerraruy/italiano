@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { withAuth } from '@/lib/auth'
 import { handleApiError } from '@/lib/errors'
 import { adjectiveService, profileService } from '@/lib/services'
+import { fromJsonValue } from '@/lib/utils'
 
 interface AdjectiveGenderForms {
   singolare: {
@@ -29,8 +30,8 @@ export const GET = withAuth(async (request: NextRequest, userId: string) => {
 
     // Transform adjectives to practice format
     const adjectives = adjectivesData.map((adj) => {
-      const maschile = adj.maschile as unknown as AdjectiveGenderForms
-      const femminile = adj.femminile as unknown as AdjectiveGenderForms
+      const maschile = fromJsonValue<AdjectiveGenderForms>(adj.maschile)
+      const femminile = fromJsonValue<AdjectiveGenderForms>(adj.femminile)
 
       // Get translation based on native language
       const translation =
