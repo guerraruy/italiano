@@ -28,6 +28,9 @@ model User {
   nounStatistics          NounStatistic[]
   adjectiveStatistics     AdjectiveStatistic[]
   conjugationStatistics   ConjugationStatistic[]
+
+  @@index([createdAt]) // For sorting users by registration date
+  @@index([admin]) // For filtering admin users
 }
 
 // User profile with preferences and settings
@@ -53,6 +56,10 @@ model Verb {
   updatedAt    DateTime          @updatedAt
   statistics   VerbStatistic[]
   conjugations VerbConjugation[]
+
+  @@index([regular]) // For filtering regular/irregular verbs
+  @@index([reflexive]) // For filtering reflexive verbs
+  @@index([updatedAt]) // For sorting by last update
 }
 
 // Verb conjugations for all tenses
@@ -66,6 +73,7 @@ model VerbConjugation {
 
   @@unique([verbId])
   @@index([verbId])
+  @@index([updatedAt]) // For sorting by last update
 }
 
 // Statistics for verb practice per user
@@ -84,6 +92,7 @@ model VerbStatistic {
   @@unique([userId, verbId])
   @@index([userId])
   @@index([verbId])
+  @@index([lastPracticed]) // For sorting by last practice date (spaced repetition)
 }
 
 // Statistics for verb conjugation practice per user (per tense/person)
@@ -105,6 +114,7 @@ model ConjugationStatistic {
   @@index([userId])
   @@index([verbId])
   @@index([userId, verbId])
+  @@index([lastPracticed]) // For sorting by last practice date (spaced repetition)
 }
 
 // Italian nouns with translations
@@ -116,6 +126,8 @@ model Noun {
   createdAt   DateTime        @default(now())
   updatedAt   DateTime        @updatedAt
   statistics  NounStatistic[]
+
+  @@index([updatedAt]) // For sorting by last update
 }
 
 // Statistics for noun practice per user
@@ -134,6 +146,7 @@ model NounStatistic {
   @@unique([userId, nounId])
   @@index([userId])
   @@index([nounId])
+  @@index([lastPracticed]) // For sorting by last practice date (spaced repetition)
 }
 
 // Italian adjectives with translations
@@ -145,6 +158,8 @@ model Adjective {
   createdAt   DateTime             @default(now())
   updatedAt   DateTime             @updatedAt
   statistics  AdjectiveStatistic[]
+
+  @@index([updatedAt]) // For sorting by last update
 }
 
 // Statistics for adjective practice per user
@@ -163,4 +178,5 @@ model AdjectiveStatistic {
   @@unique([userId, adjectiveId])
   @@index([userId])
   @@index([adjectiveId])
+  @@index([lastPracticed]) // For sorting by last practice date (spaced repetition)
 }
