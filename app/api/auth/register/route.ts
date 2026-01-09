@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
         message: 'User created successfully',
         user: result.user,
         token: result.accessToken,
-        refreshToken: result.refreshToken,
+        ...(result.refreshToken && { refreshToken: result.refreshToken }),
       },
       { status: 201 }
     )

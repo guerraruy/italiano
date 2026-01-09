@@ -44,7 +44,7 @@ type UserWithoutPassword = Omit<User, 'password'>
 interface AuthResult {
   user: UserWithoutPassword
   accessToken: string
-  refreshToken: string
+  refreshToken: string | null
 }
 
 export class AuthService extends BaseService {
@@ -75,7 +75,7 @@ export class AuthService extends BaseService {
 
       // Generate tokens
       const accessToken = generateAccessToken(user.id)
-      const refreshToken = generateRefreshToken(user.id) || ''
+      const refreshToken = generateRefreshToken(user.id)
 
       // Remove password from response
       const { password, ...userWithoutPassword } = user
@@ -132,7 +132,7 @@ export class AuthService extends BaseService {
 
       // Generate tokens
       const accessToken = generateAccessToken(user.id)
-      const refreshToken = generateRefreshToken(user.id) || ''
+      const refreshToken = generateRefreshToken(user.id)
 
       // Remove password from response
       const { password, ...userWithoutPassword } = user
