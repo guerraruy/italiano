@@ -144,9 +144,9 @@ export async function GET(request: NextRequest) {
   return withAdmin(async () => {
     try {
       // Use noun service to get all nouns
-      const nouns = await nounService.getAllNouns()
+      const { items: nouns, total } = await nounService.getAllNouns()
 
-      return NextResponse.json({ nouns })
+      return NextResponse.json({ nouns, total })
     } catch (error) {
       return handleApiError(error)
     }

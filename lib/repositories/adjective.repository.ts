@@ -45,11 +45,15 @@ export class AdjectiveRepository extends BaseRepository<
   /**
    * Get all adjectives ordered by Italian name
    */
-  async findAllOrdered(): Promise<Adjective[]> {
+  async findAllOrdered(options?: {
+    skip?: number
+    take?: number
+  }): Promise<Adjective[]> {
     return this.findMany({
       orderBy: {
         italian: 'asc',
       },
+      ...options,
     })
   }
 

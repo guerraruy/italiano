@@ -21,12 +21,21 @@ interface AdjectiveGenderForms {
 // GET /api/adjectives - Get all adjectives for practice
 export const GET = withAuth(async (request: NextRequest, userId: string) => {
   try {
+    // Parse pagination parameters
+    const { searchParams } = new URL(request.url)
+    const limit = searchParams.get('limit')
+    const offset = searchParams.get('offset')
+
     // Get user profile to determine native language
     const profile = await profileService.getProfile(userId)
     const nativeLanguage = profile.nativeLanguage
 
-    // Use adjective service to get all adjectives
-    const adjectivesData = await adjectiveService.getAllAdjectives()
+    // Use adjective service to get adjectives with pagination
+    const { items: adjectivesData, total } =
+      await adjectiveService.getAllAdjectives({
+        limit: limit ? parseInt(limit, 10) : undefined,
+        offset: offset ? parseInt(offset, 10) : undefined,
+      })
 
     // Transform adjectives to practice format
     const adjectives = adjectivesData.map((adj) => {
@@ -48,7 +57,17 @@ export const GET = withAuth(async (request: NextRequest, userId: string) => {
       }
     })
 
-    return NextResponse.json({ adjectives }, { status: 200 })
+    return NextResponse.json(
+      {
+        adjectives,
+        pagination: {
+          total,
+          limit: limit ? parseInt(limit, 10) : null,
+          offset: offset ? parseInt(offset, 10) : 0,
+        },
+      },
+      { status: 200 }
+    )
   } catch (error) {
     return handleApiError(error)
   }

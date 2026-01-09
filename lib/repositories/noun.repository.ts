@@ -45,11 +45,15 @@ export class NounRepository extends BaseRepository<
   /**
    * Get all nouns ordered by Italian name
    */
-  async findAllOrdered(): Promise<Noun[]> {
+  async findAllOrdered(options?: {
+    skip?: number
+    take?: number
+  }): Promise<Noun[]> {
     return this.findMany({
       orderBy: {
         italian: 'asc',
       },
+      ...options,
     })
   }
 

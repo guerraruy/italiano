@@ -152,9 +152,10 @@ export async function GET(request: NextRequest) {
   return withAdmin(async () => {
     try {
       // Use adjective service to get all adjectives
-      const adjectives = await adjectiveService.getAllAdjectives()
+      const { items: adjectives, total } =
+        await adjectiveService.getAllAdjectives()
 
-      return NextResponse.json({ adjectives })
+      return NextResponse.json({ adjectives, total })
     } catch (error) {
       return handleApiError(error)
     }

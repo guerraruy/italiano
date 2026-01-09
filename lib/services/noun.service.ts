@@ -30,12 +30,22 @@ export class NounService extends BaseService {
   }
 
   /**
-   * Get all nouns
-   * @returns List of all nouns ordered by Italian name
+   * Get all nouns with optional pagination
+   * @returns List of nouns ordered by Italian name with total count
    */
-  async getAllNouns(): Promise<Noun[]> {
+  async getAllNouns(options?: {
+    limit?: number
+    offset?: number
+  }): Promise<{ items: Noun[]; total: number }> {
     try {
-      return await nounRepository.findAllOrdered()
+      const [items, total] = await Promise.all([
+        nounRepository.findAllOrdered({
+          skip: options?.offset,
+          take: options?.limit,
+        }),
+        nounRepository.count(),
+      ])
+      return { items, total }
     } catch (error) {
       return this.handleError('getAllNouns', error)
     }

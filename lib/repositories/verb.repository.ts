@@ -49,11 +49,15 @@ export class VerbRepository extends BaseRepository<
   /**
    * Get all verbs ordered by Italian name
    */
-  async findAllOrdered(): Promise<Verb[]> {
+  async findAllOrdered(options?: {
+    skip?: number
+    take?: number
+  }): Promise<Verb[]> {
     return this.findMany({
       orderBy: {
         italian: 'asc',
       },
+      ...options,
     })
   }
 

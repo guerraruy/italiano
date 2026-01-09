@@ -29,12 +29,22 @@ export class VerbService extends BaseService {
   }
 
   /**
-   * Get all verbs
-   * @returns List of all verbs ordered by Italian name
+   * Get all verbs with optional pagination
+   * @returns List of verbs ordered by Italian name with total count
    */
-  async getAllVerbs(): Promise<Verb[]> {
+  async getAllVerbs(options?: {
+    limit?: number
+    offset?: number
+  }): Promise<{ items: Verb[]; total: number }> {
     try {
-      return await verbRepository.findAllOrdered()
+      const [items, total] = await Promise.all([
+        verbRepository.findAllOrdered({
+          skip: options?.offset,
+          take: options?.limit,
+        }),
+        verbRepository.count(),
+      ])
+      return { items, total }
     } catch (error) {
       return this.handleError('getAllVerbs', error)
     }

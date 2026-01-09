@@ -142,9 +142,9 @@ export async function GET(request: NextRequest) {
   return withAdmin(async () => {
     try {
       // Use verb service to get all verbs
-      const verbs = await verbService.getAllVerbs()
+      const { items: verbs, total } = await verbService.getAllVerbs()
 
-      return NextResponse.json({ verbs })
+      return NextResponse.json({ verbs, total })
     } catch (error) {
       return handleApiError(error)
     }

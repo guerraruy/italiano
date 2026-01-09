@@ -5,10 +5,18 @@ import { handleApiError } from '@/lib/errors'
 import { nounService } from '@/lib/services'
 
 // GET /api/nouns - Get all nouns for practice
-export const GET = withAuth(async (_request: NextRequest, _userId: string) => {
+export const GET = withAuth(async (request: NextRequest, _userId: string) => {
   try {
-    // Use noun service to get all nouns
-    const nounsData = await nounService.getAllNouns()
+    // Parse pagination parameters
+    const { searchParams } = new URL(request.url)
+    const limit = searchParams.get('limit')
+    const offset = searchParams.get('offset')
+
+    // Use noun service to get nouns with pagination
+    const { items: nounsData, total } = await nounService.getAllNouns({
+      limit: limit ? parseInt(limit, 10) : undefined,
+      offset: offset ? parseInt(offset, 10) : undefined,
+    })
 
     // Transform nouns to practice format
     const nouns = nounsData.map((noun) => {
@@ -24,7 +32,17 @@ export const GET = withAuth(async (_request: NextRequest, _userId: string) => {
       }
     })
 
-    return NextResponse.json({ nouns }, { status: 200 })
+    return NextResponse.json(
+      {
+        nouns,
+        pagination: {
+          total,
+          limit: limit ? parseInt(limit, 10) : null,
+          offset: offset ? parseInt(offset, 10) : 0,
+        },
+      },
+      { status: 200 }
+    )
   } catch (error) {
     return handleApiError(error)
   }

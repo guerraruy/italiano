@@ -35,11 +35,21 @@ export class AdjectiveService extends BaseService {
   }
 
   /**
-   * Get all adjectives
+   * Get all adjectives with optional pagination
    */
-  async getAllAdjectives(): Promise<Adjective[]> {
+  async getAllAdjectives(options?: {
+    limit?: number
+    offset?: number
+  }): Promise<{ items: Adjective[]; total: number }> {
     try {
-      return await adjectiveRepository.findAllOrdered()
+      const [items, total] = await Promise.all([
+        adjectiveRepository.findAllOrdered({
+          skip: options?.offset,
+          take: options?.limit,
+        }),
+        adjectiveRepository.count(),
+      ])
+      return { items, total }
     } catch (error) {
       return this.handleError('getAllAdjectives', error)
     }
