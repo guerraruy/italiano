@@ -20,7 +20,6 @@ import {
   TableHead,
   TableRow,
   Alert,
-  CircularProgress,
   IconButton,
   TextField,
   InputAdornment,
@@ -28,6 +27,7 @@ import {
   Chip,
 } from '@mui/material'
 
+import { SkeletonTable } from '@/app/components/Skeleton'
 import { ImportedVerb, useGetVerbsQuery } from '@/app/store/api'
 
 import { EditVerbDialog, DeleteVerbDialog, ImportVerbs } from './'
@@ -151,9 +151,12 @@ export default function VerbsList({ onError, onSuccess }: VerbsListProps) {
           </Box>
 
           {loadingVerbs ? (
-            <Box display="flex" justifyContent="center" p={3}>
-              <CircularProgress />
-            </Box>
+            <SkeletonTable
+              columns={7}
+              rows={5}
+              showCard={false}
+              showSearch={false}
+            />
           ) : (verbsData?.verbs?.length || 0) === 0 ? (
             <Alert severity="info" icon={<Info />}>
               No verbs in the database yet. Import some using the form above.

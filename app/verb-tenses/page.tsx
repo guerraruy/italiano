@@ -1,14 +1,7 @@
 'use client'
 import React from 'react'
 
-import {
-  Container,
-  Typography,
-  Paper,
-  CircularProgress,
-  Alert,
-  Box,
-} from '@mui/material'
+import { Container, Typography, Paper, Alert } from '@mui/material'
 import { styled } from '@mui/material/styles'
 
 import {
@@ -17,6 +10,7 @@ import {
   ResetStatisticsDialog,
 } from './internals/components'
 import { PageHeader } from '../components/PageHeader'
+import { SkeletonConjugationForm } from '../components/Skeleton'
 import { useVerbConjugationPractice } from './internals/hooks/useVerbConjugationPractice'
 
 const PageContainer = styled(Container)(({ theme }) => ({
@@ -62,14 +56,15 @@ export default function VerbTensesPage() {
       <PageContainer maxWidth="lg">
         <PageHeader title="Verb Tenses" />
         <ContentPaper elevation={3}>
-          <Box
-            display="flex"
-            justifyContent="center"
-            alignItems="center"
-            minHeight="400px"
+          <Typography
+            variant="h6"
+            color="text.secondary"
+            gutterBottom
+            sx={{ mb: 3 }}
           >
-            <CircularProgress />
-          </Box>
+            Practice verb conjugations for all selected tenses
+          </Typography>
+          <SkeletonConjugationForm tenseSections={2} rowsPerSection={6} />
         </ContentPaper>
       </PageContainer>
     )

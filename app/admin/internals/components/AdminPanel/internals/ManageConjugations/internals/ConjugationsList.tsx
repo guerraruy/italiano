@@ -28,7 +28,6 @@ import {
   TableHead,
   TableRow,
   Alert,
-  CircularProgress,
   IconButton,
   TextField,
   InputAdornment,
@@ -36,6 +35,7 @@ import {
   Chip,
 } from '@mui/material'
 
+import { SkeletonTable } from '@/app/components/Skeleton'
 import {
   ConjugationData,
   useGetConjugationsQuery,
@@ -238,9 +238,12 @@ export default function ConjugationsList({
           </Box>
 
           {loadingConjugations ? (
-            <Box display="flex" justifyContent="center" p={3}>
-              <CircularProgress />
-            </Box>
+            <SkeletonTable
+              columns={6}
+              rows={5}
+              showCard={false}
+              showSearch={false}
+            />
           ) : (conjugationsData?.conjugations?.length || 0) === 0 ? (
             <Alert severity="info" icon={<Info />}>
               No conjugations in the database yet. Import some using the form

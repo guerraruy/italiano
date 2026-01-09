@@ -22,12 +22,12 @@ import {
   IconButton,
   Chip,
   Tooltip,
-  CircularProgress,
   TextField,
   InputAdornment,
   TablePagination,
 } from '@mui/material'
 
+import { SkeletonTable } from '@/app/components/Skeleton'
 import { useAuth } from '@/app/contexts/AuthContext'
 import {
   useGetUsersQuery,
@@ -116,14 +116,7 @@ export default function UsersList({ onError, onSuccess }: UsersListProps) {
 
   if (loadingUsers) {
     return (
-      <Box
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        minHeight="400px"
-      >
-        <CircularProgress />
-      </Box>
+      <SkeletonTable columns={6} rows={5} showCard={true} showSearch={true} />
     )
   }
 

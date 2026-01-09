@@ -20,13 +20,13 @@ import {
   TableHead,
   TableRow,
   Alert,
-  CircularProgress,
   IconButton,
   TextField,
   InputAdornment,
   TablePagination,
 } from '@mui/material'
 
+import { SkeletonTable } from '@/app/components/Skeleton'
 import {
   AdjectiveGenderForms,
   ImportedAdjective,
@@ -166,9 +166,12 @@ export default function AdjectivesList({
           </Box>
 
           {loadingAdjectives ? (
-            <Box display="flex" justifyContent="center" p={3}>
-              <CircularProgress />
-            </Box>
+            <SkeletonTable
+              columns={6}
+              rows={5}
+              showCard={false}
+              showSearch={false}
+            />
           ) : (adjectivesData?.adjectives?.length || 0) === 0 ? (
             <Alert severity="info" icon={<Info />}>
               No adjectives in the database yet. Import some using the form

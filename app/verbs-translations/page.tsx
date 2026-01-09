@@ -1,17 +1,11 @@
 'use client'
 import React from 'react'
 
-import {
-  Container,
-  Typography,
-  Box,
-  Paper,
-  CircularProgress,
-  Alert,
-} from '@mui/material'
+import { Container, Typography, Paper, Alert } from '@mui/material'
 import { styled } from '@mui/material/styles'
 
 import { PageHeader } from '../components/PageHeader'
+import { SkeletonFilterBar, SkeletonPracticeList } from '../components/Skeleton'
 import { ResetStatisticsDialog } from './internals/components/VerbItem/internals'
 import { VerbsList } from './internals/components/VerbsList'
 import { useVerbsPractice } from './internals/hooks/useVerbsPractice'
@@ -61,14 +55,16 @@ export default function VerbsTranslationsPage() {
       <PageContainer maxWidth="lg">
         <PageHeader title="Verbs Translations" />
         <ContentPaper elevation={3}>
-          <Box
-            display="flex"
-            justifyContent="center"
-            alignItems="center"
-            minHeight="400px"
+          <Typography
+            variant="h6"
+            color="text.secondary"
+            gutterBottom
+            sx={{ mb: 3 }}
           >
-            <CircularProgress />
-          </Box>
+            Translate each verb from your native language to Italian
+          </Typography>
+          <SkeletonFilterBar showFilters={3} showRefresh />
+          <SkeletonPracticeList count={5} />
         </ContentPaper>
       </PageContainer>
     )
