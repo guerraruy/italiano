@@ -11,19 +11,10 @@ import {
   useResetDialog,
   useSortingAndFiltering,
 } from '@/lib/hooks'
+import { PracticeAdjective } from '@/lib/types'
 
 import { InputValues, ValidationState } from '../types'
 import { validateAnswer } from '../utils'
-
-interface Adjective {
-  id: string
-  italian: string
-  translation: string
-  masculineSingular: string
-  masculinePlural: string
-  feminineSingular: string
-  femininePlural: string
-}
 
 type AdjectiveField = keyof InputValues[string]
 
@@ -76,7 +67,7 @@ export const useAdjectivesPractice = () => {
     handleOpenResetDialog: openResetDialog,
     handleCloseResetDialog,
     handleConfirmReset,
-  } = useResetDialog<Adjective>({
+  } = useResetDialog<PracticeAdjective>({
     getItemLabel: (adjective) => adjective.translation,
     resetStatistic,
   })
@@ -102,7 +93,7 @@ export const useAdjectivesPractice = () => {
     setDisplayCount,
     shouldShowRefreshButton,
   } = useSortingAndFiltering({
-    items: adjectives as Adjective[],
+    items: adjectives as PracticeAdjective[],
     getStatistics,
     refetchStatistics,
   })
@@ -305,7 +296,7 @@ export const useAdjectivesPractice = () => {
     (adjectiveId: string) => {
       const adjective = data?.adjectives.find((a) => a.id === adjectiveId)
       if (adjective) {
-        openResetDialog(adjective as Adjective)
+        openResetDialog(adjective as PracticeAdjective)
       }
     },
     [data?.adjectives, openResetDialog]

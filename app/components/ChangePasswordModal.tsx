@@ -17,6 +17,8 @@ import {
   Alert,
 } from '@mui/material'
 
+import { extractApiErrorMessage } from '@/lib/utils'
+
 import { useChangePasswordMutation } from '../store/api'
 
 interface ChangePasswordModalProps {
@@ -94,9 +96,11 @@ export default function ChangePasswordModal({
       }, 2000)
     } catch (err: unknown) {
       console.error('Change password error:', err)
-      const error = err as { data?: { error?: string } }
       setError(
-        error?.data?.error || 'Failed to change password. Please try again.'
+        extractApiErrorMessage(
+          err,
+          'Failed to change password. Please try again.'
+        )
       )
     }
   }

@@ -11,18 +11,11 @@ import {
   useResetDialog,
   useSortingAndFiltering,
 } from '@/lib/hooks'
+import { PracticeVerb } from '@/lib/types'
 
 import { VerbTypeFilter } from '../components/VerbItem/internals'
 import { InputValues, ValidationState } from '../types'
 import { validateAnswer } from '../utils'
-
-interface Verb {
-  id: string
-  italian: string
-  translation: string
-  reflexive: boolean
-  regular: boolean
-}
 
 export const useVerbsPractice = () => {
   const { data, isLoading, error } = useGetVerbsForPracticeQuery()
@@ -73,7 +66,7 @@ export const useVerbsPractice = () => {
     handleOpenResetDialog: openResetDialog,
     handleCloseResetDialog,
     handleConfirmReset,
-  } = useResetDialog<Verb>({
+  } = useResetDialog<PracticeVerb>({
     getItemLabel: (verb) => verb.translation,
     resetStatistic,
   })
@@ -91,7 +84,7 @@ export const useVerbsPractice = () => {
 
   // Verb type filter function
   const filterFn = useCallback(
-    (verb: Verb) => {
+    (verb: PracticeVerb) => {
       if (verbTypeFilter === 'all') return true
       if (verbTypeFilter === 'reflexive') return verb.reflexive
       if (verbTypeFilter === 'regular') return verb.regular && !verb.reflexive
@@ -112,7 +105,7 @@ export const useVerbsPractice = () => {
     setDisplayCount,
     shouldShowRefreshButton,
   } = useSortingAndFiltering({
-    items: verbs as Verb[],
+    items: verbs as PracticeVerb[],
     getStatistics,
     filterFn,
     refetchStatistics,
@@ -180,7 +173,7 @@ export const useVerbsPractice = () => {
     (verbId: string) => {
       const verb = data?.verbs.find((v) => v.id === verbId)
       if (verb) {
-        openResetDialog(verb as Verb)
+        openResetDialog(verb as PracticeVerb)
       }
     },
     [data?.verbs, openResetDialog]

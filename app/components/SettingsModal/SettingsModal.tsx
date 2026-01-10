@@ -16,6 +16,8 @@ import {
   Alert,
 } from '@mui/material'
 
+import { extractApiErrorMessage } from '@/lib/utils'
+
 import { LanguageSelector, VerbTenseSelector, VERB_TENSES } from './internals'
 import { useGetProfileQuery, useUpdateProfileMutation } from '../../store/api'
 
@@ -103,17 +105,12 @@ export default function SettingsModal({ open, onClose }: SettingsModalProps) {
       }, 1500)
     } catch (err: unknown) {
       console.error('Failed to update profile:', err)
-      const message =
-        err &&
-        typeof err === 'object' &&
-        'data' in err &&
-        err.data &&
-        typeof err.data === 'object' &&
-        'error' in err.data &&
-        typeof err.data.error === 'string'
-          ? err.data.error
-          : 'Failed to update profile. Please try again.'
-      setErrorMessage(message)
+      setErrorMessage(
+        extractApiErrorMessage(
+          err,
+          'Failed to update profile. Please try again.'
+        )
+      )
     }
   }
 

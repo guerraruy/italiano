@@ -11,17 +11,10 @@ import {
   useResetDialog,
   useSortingAndFiltering,
 } from '@/lib/hooks'
+import { PracticeNoun } from '@/lib/types'
 
 import { InputValues, ValidationState } from '../types'
 import { validateAnswer } from '../utils'
-
-interface Noun {
-  id: string
-  translation: string
-  translationPlural: string
-  italian: string
-  italianPlural: string
-}
 
 export const useNounsPractice = () => {
   const { data, isLoading, error } = useGetNounsForPracticeQuery()
@@ -74,7 +67,7 @@ export const useNounsPractice = () => {
     handleOpenResetDialog: openResetDialog,
     handleCloseResetDialog,
     handleConfirmReset,
-  } = useResetDialog<Noun>({
+  } = useResetDialog<PracticeNoun>({
     getItemLabel: (noun) => noun.translation,
     resetStatistic,
   })
@@ -100,7 +93,7 @@ export const useNounsPractice = () => {
     setDisplayCount,
     shouldShowRefreshButton,
   } = useSortingAndFiltering({
-    items: nouns as Noun[],
+    items: nouns as PracticeNoun[],
     getStatistics,
     refetchStatistics,
   })
@@ -247,7 +240,7 @@ export const useNounsPractice = () => {
     (nounId: string) => {
       const noun = data?.nouns.find((n) => n.id === nounId)
       if (noun) {
-        openResetDialog(noun as Noun)
+        openResetDialog(noun as PracticeNoun)
       }
     },
     [data?.nouns, openResetDialog]

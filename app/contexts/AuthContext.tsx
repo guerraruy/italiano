@@ -6,6 +6,8 @@ import {
   ReactNode,
 } from 'react'
 
+import { extractApiErrorMessage } from '@/lib/utils'
+
 import { useLoginMutation, useRegisterMutation } from '../store/api'
 
 interface User {
@@ -112,19 +114,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return { success: true }
     } catch (error: unknown) {
       console.error('Login error:', error)
-      const errorMessage =
-        error &&
-        typeof error === 'object' &&
-        'data' in error &&
-        error.data &&
-        typeof error.data === 'object' &&
-        'error' in error.data &&
-        typeof error.data.error === 'string'
-          ? error.data.error
-          : 'Login failed. Please try again.'
       return {
         success: false,
-        error: errorMessage,
+        error: extractApiErrorMessage(error, 'Login failed. Please try again.'),
       }
     }
   }
@@ -153,19 +145,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return { success: true }
     } catch (error: unknown) {
       console.error('Registration error:', error)
-      const errorMessage =
-        error &&
-        typeof error === 'object' &&
-        'data' in error &&
-        error.data &&
-        typeof error.data === 'object' &&
-        'error' in error.data &&
-        typeof error.data.error === 'string'
-          ? error.data.error
-          : 'Registration failed. Please try again.'
       return {
         success: false,
-        error: errorMessage,
+        error: extractApiErrorMessage(
+          error,
+          'Registration failed. Please try again.'
+        ),
       }
     }
   }
