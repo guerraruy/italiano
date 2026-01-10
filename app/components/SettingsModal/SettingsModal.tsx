@@ -16,6 +16,7 @@ import {
   Alert,
 } from '@mui/material'
 
+import { TIMING, Z_INDEX } from '@/lib/constants'
 import { extractApiErrorMessage } from '@/lib/utils'
 
 import { LanguageSelector, VerbTenseSelector, VERB_TENSES } from './internals'
@@ -102,7 +103,7 @@ export default function SettingsModal({ open, onClose }: SettingsModalProps) {
       setTimeout(() => {
         onClose()
         setSuccessMessage('')
-      }, 1500)
+      }, TIMING.SUCCESS_MODAL_CLOSE_DELAY_MS)
     } catch (err: unknown) {
       console.error('Failed to update profile:', err)
       setErrorMessage(
@@ -127,7 +128,7 @@ export default function SettingsModal({ open, onClose }: SettingsModalProps) {
       maxWidth="sm"
       fullWidth
       sx={{
-        zIndex: 1300,
+        zIndex: Z_INDEX.SETTINGS_MODAL,
         '& .MuiDialog-paper': {
           maxHeight: 'calc(100vh - 100px)',
           marginTop: '64px',

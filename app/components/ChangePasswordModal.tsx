@@ -17,6 +17,7 @@ import {
   Alert,
 } from '@mui/material'
 
+import { TIMING, VALIDATION } from '@/lib/constants'
 import { extractApiErrorMessage } from '@/lib/utils'
 
 import { useChangePasswordMutation } from '../store/api'
@@ -64,8 +65,10 @@ export default function ChangePasswordModal({
       return
     }
 
-    if (newPassword.length < 6) {
-      setError('New password must be at least 6 characters')
+    if (newPassword.length < VALIDATION.MIN_PASSWORD_LENGTH) {
+      setError(
+        `New password must be at least ${VALIDATION.MIN_PASSWORD_LENGTH} characters`
+      )
       return
     }
 
@@ -90,10 +93,10 @@ export default function ChangePasswordModal({
       setNewPassword('')
       setConfirmPassword('')
 
-      // Close modal after 2 seconds
+      // Close modal after success delay
       setTimeout(() => {
         handleClose()
-      }, 2000)
+      }, TIMING.PASSWORD_CHANGE_SUCCESS_DELAY_MS)
     } catch (err: unknown) {
       console.error('Change password error:', err)
       setError(

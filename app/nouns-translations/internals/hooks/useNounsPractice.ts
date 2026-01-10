@@ -6,6 +6,7 @@ import {
   useResetNounStatisticMutation,
   useUpdateNounStatisticMutation,
 } from '@/app/store/api'
+import { TIMING } from '@/lib/constants'
 import {
   useStatisticsError,
   useResetDialog,
@@ -133,10 +134,10 @@ export const useNounsPractice = () => {
       // Check if both fields have input
       if (!userInputs.singular.trim() && !userInputs.plural.trim()) return
 
-      // Prevent duplicate validation within 100ms
+      // Prevent duplicate validation within debounce period
       const now = Date.now()
       const lastValidated = lastValidatedRef.current[nounId] || 0
-      if (now - lastValidated < 100) {
+      if (now - lastValidated < TIMING.VALIDATION_DEBOUNCE_MS) {
         return
       }
       lastValidatedRef.current[nounId] = now

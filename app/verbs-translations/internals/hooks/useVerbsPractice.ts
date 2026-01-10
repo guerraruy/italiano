@@ -6,6 +6,7 @@ import {
   useResetVerbStatisticMutation,
   useUpdateVerbStatisticMutation,
 } from '@/app/store/api'
+import { TIMING } from '@/lib/constants'
 import {
   useStatisticsError,
   useResetDialog,
@@ -125,10 +126,10 @@ export const useVerbsPractice = () => {
       const userInput = inputValues[verbId] || ''
       if (!userInput.trim()) return
 
-      // Prevent duplicate validation within 100ms
+      // Prevent duplicate validation within debounce period
       const now = Date.now()
       const lastValidated = lastValidatedRef.current[verbId] || 0
-      if (now - lastValidated < 100) {
+      if (now - lastValidated < TIMING.VALIDATION_DEBOUNCE_MS) {
         return
       }
       lastValidatedRef.current[verbId] = now

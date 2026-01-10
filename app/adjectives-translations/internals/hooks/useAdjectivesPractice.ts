@@ -6,6 +6,7 @@ import {
   useResetAdjectiveStatisticMutation,
   useUpdateAdjectiveStatisticMutation,
 } from '@/app/store/api'
+import { TIMING } from '@/lib/constants'
 import {
   useStatisticsError,
   useResetDialog,
@@ -132,11 +133,11 @@ export const useAdjectivesPractice = () => {
       const userInput = inputValues[adjectiveId]?.[field] || ''
       if (!userInput.trim()) return
 
-      // Prevent duplicate validation within 100ms
+      // Prevent duplicate validation within debounce period
       const now = Date.now()
       const key = `${adjectiveId}-${field}`
       const lastValidated = lastValidatedRef.current[key] || 0
-      if (now - lastValidated < 100) {
+      if (now - lastValidated < TIMING.VALIDATION_DEBOUNCE_MS) {
         return
       }
       lastValidatedRef.current[key] = now
