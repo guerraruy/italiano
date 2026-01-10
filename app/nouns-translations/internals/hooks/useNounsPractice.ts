@@ -18,6 +18,7 @@ import { validateAnswer } from '../utils'
 interface Noun {
   id: string
   translation: string
+  translationPlural: string
   italian: string
   italianPlural: string
 }

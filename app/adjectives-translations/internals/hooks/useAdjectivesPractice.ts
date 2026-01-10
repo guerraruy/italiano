@@ -17,6 +17,7 @@ import { validateAnswer } from '../utils'
 
 interface Adjective {
   id: string
+  italian: string
   translation: string
   masculineSingular: string
   masculinePlural: string

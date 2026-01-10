@@ -18,6 +18,7 @@ import { validateAnswer } from '../utils'
 
 interface Verb {
   id: string
+  italian: string
   translation: string
   reflexive: boolean
   regular: boolean
