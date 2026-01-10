@@ -5,19 +5,71 @@
  */
 
 import { Prisma } from '@prisma/client'
+import type { PrismaClient } from '@prisma/client'
 
 import { logger } from '@/lib/logger'
 
+/**
+ * Represents a Prisma model delegate with the standard CRUD operations.
+ *
+ * This interface uses function overloads to be compatible with Prisma's complex
+ * generic delegates. The first overload accepts unknown args (for our base
+ * repository calls), while Prisma's more specific overloads take precedence
+ * in concrete repositories.
+ *
+ * Note: Prisma doesn't export a common base interface for model delegates, making
+ * it impossible to type this without some type loosening. This approach is safer
+ * than using `any` because:
+ * 1. Method names must exist on the delegate
+ * 2. Return types maintain Promise structure
+ * 3. Concrete repositories use actual Prisma delegate types with full type safety
+ */
+interface PrismaModelDelegate {
+  findUnique(args: unknown): PromiseLike<unknown>
+  findMany(args?: unknown): PromiseLike<unknown[]>
+  create(args: unknown): PromiseLike<unknown>
+  createMany(args: unknown): PromiseLike<{ count: number }>
+  update(args: unknown): PromiseLike<unknown>
+  updateMany(args: unknown): PromiseLike<{ count: number }>
+  delete(args: unknown): PromiseLike<unknown>
+  deleteMany(args: unknown): PromiseLike<{ count: number }>
+  count(args?: unknown): PromiseLike<number>
+}
+
+/**
+ * Type alias for the model delegate used in the base repository.
+ * Exported for use in testing or extension scenarios.
+ */
+export type { PrismaModelDelegate }
+
+/**
+ * Type helper to get the model delegate type from a PrismaClient instance.
+ * Usage: type UserDelegate = ModelDelegate<'user'>
+ */
+export type ModelDelegate<K extends keyof PrismaClient> = PrismaClient[K]
+
+/**
+ * Base repository class providing common CRUD operations for Prisma models.
+ *
+ * The model property is typed as PrismaModelDelegate which provides structural
+ * type checking while being compatible with any Prisma delegate. Concrete
+ * repositories should assign their specific Prisma delegate (e.g., prisma.user).
+ *
+ * @template T - The entity type returned by queries
+ * @template CreateInput - The input type for create operations
+ * @template UpdateInput - The input type for update operations
+ */
 export abstract class BaseRepository<T, CreateInput, UpdateInput> {
   protected abstract modelName: Prisma.ModelName
-  // Prisma model delegates have complex generic types that can't be easily typed
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  protected abstract model: any
+  protected abstract model: PrismaModelDelegate
 
   /**
    * Find a single record by ID
    */
-  async findById(id: string, include?: object): Promise<T | null> {
+  async findById(
+    id: string,
+    include?: Record<string, unknown>
+  ): Promise<T | null> {
     try {
       return (await this.model.findUnique({
         where: { id },
@@ -32,7 +84,10 @@ export abstract class BaseRepository<T, CreateInput, UpdateInput> {
   /**
    * Find a single record by unique field
    */
-  async findUnique(where: object, include?: object): Promise<T | null> {
+  async findUnique(
+    where: Record<string, unknown>,
+    include?: Record<string, unknown>
+  ): Promise<T | null> {
     try {
       return (await this.model.findUnique({
         where,
@@ -48,9 +103,9 @@ export abstract class BaseRepository<T, CreateInput, UpdateInput> {
    * Find many records
    */
   async findMany(options?: {
-    where?: object
-    include?: object
-    orderBy?: object
+    where?: Record<string, unknown>
+    include?: Record<string, unknown>
+    orderBy?: Record<string, unknown>
     skip?: number
     take?: number
   }): Promise<T[]> {
@@ -65,7 +120,10 @@ export abstract class BaseRepository<T, CreateInput, UpdateInput> {
   /**
    * Create a new record
    */
-  async create(data: CreateInput, include?: object): Promise<T> {
+  async create(
+    data: CreateInput,
+    include?: Record<string, unknown>
+  ): Promise<T> {
     try {
       return (await this.model.create({
         data,
@@ -95,7 +153,11 @@ export abstract class BaseRepository<T, CreateInput, UpdateInput> {
   /**
    * Update a record
    */
-  async update(id: string, data: UpdateInput, include?: object): Promise<T> {
+  async update(
+    id: string,
+    data: UpdateInput,
+    include?: Record<string, unknown>
+  ): Promise<T> {
     try {
       return (await this.model.update({
         where: { id },
@@ -112,7 +174,7 @@ export abstract class BaseRepository<T, CreateInput, UpdateInput> {
    * Update many records
    */
   async updateMany(
-    where: object,
+    where: Record<string, unknown>,
     data: Partial<UpdateInput>
   ): Promise<{ count: number }> {
     try {
@@ -146,7 +208,7 @@ export abstract class BaseRepository<T, CreateInput, UpdateInput> {
   /**
    * Delete many records
    */
-  async deleteMany(where: object): Promise<{ count: number }> {
+  async deleteMany(where: Record<string, unknown>): Promise<{ count: number }> {
     try {
       return await this.model.deleteMany({
         where,
@@ -160,7 +222,7 @@ export abstract class BaseRepository<T, CreateInput, UpdateInput> {
   /**
    * Count records
    */
-  async count(where?: object): Promise<number> {
+  async count(where?: Record<string, unknown>): Promise<number> {
     try {
       return await this.model.count({
         ...(where && { where }),
@@ -174,7 +236,7 @@ export abstract class BaseRepository<T, CreateInput, UpdateInput> {
   /**
    * Check if a record exists
    */
-  async exists(where: object): Promise<boolean> {
+  async exists(where: Record<string, unknown>): Promise<boolean> {
     try {
       const count = await this.model.count({ where })
       return count > 0
