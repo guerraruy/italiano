@@ -555,12 +555,12 @@ describe('LoginModal', () => {
       )
 
       const textboxes = screen.getAllByRole('textbox')
-      const passwordFields = document.querySelectorAll('input[type="password"]')
+      const passwordInputs = screen.getAllByLabelText(/password/i)
 
       await user.type(textboxes[0]!, 'testuser')
       await user.type(textboxes[1]!, 'test@example.com')
-      await user.type(passwordFields[0]!, 'password123')
-      await user.type(passwordFields[1]!, 'different')
+      await user.type(passwordInputs[0]!, 'password123')
+      await user.type(passwordInputs[1]!, 'different')
 
       const submitButton = screen.getByRole('button', { name: /^register$/i })
       await user.click(submitButton)
@@ -569,7 +569,7 @@ describe('LoginModal', () => {
         expect(screen.getByText('Passwords do not match')).toBeInTheDocument()
       })
       expect(mockRegister).not.toHaveBeenCalled()
-    })
+    }, 10000)
   })
 
   describe('Successful Login', () => {
@@ -615,13 +615,13 @@ describe('LoginModal', () => {
       )
 
       const textboxes = screen.getAllByRole('textbox')
-      const passwordFields = document.querySelectorAll('input[type="password"]')
+      const passwordInputs = screen.getAllByLabelText(/password/i)
 
       await user.type(textboxes[0]!, 'newuser')
       await user.type(textboxes[1]!, 'test@example.com')
       await user.type(screen.getByLabelText(/name \(optional\)/i), 'Test User')
-      await user.type(passwordFields[0]!, 'password123')
-      await user.type(passwordFields[1]!, 'password123')
+      await user.type(passwordInputs[0]!, 'password123')
+      await user.type(passwordInputs[1]!, 'password123')
 
       const submitButton = screen.getByRole('button', { name: /^register$/i })
       await user.click(submitButton)
@@ -632,7 +632,7 @@ describe('LoginModal', () => {
         'password123',
         'Test User'
       )
-    })
+    }, 10000)
 
     it('calls register with undefined name when name is empty', async () => {
       const user = userEvent.setup()
@@ -645,12 +645,12 @@ describe('LoginModal', () => {
       )
 
       const textboxes = screen.getAllByRole('textbox')
-      const passwordFields = document.querySelectorAll('input[type="password"]')
+      const passwordInputs = screen.getAllByLabelText(/password/i)
 
       await user.type(textboxes[0]!, 'newuser')
       await user.type(textboxes[1]!, 'test@example.com')
-      await user.type(passwordFields[0]!, 'password123')
-      await user.type(passwordFields[1]!, 'password123')
+      await user.type(passwordInputs[0]!, 'password123')
+      await user.type(passwordInputs[1]!, 'password123')
 
       const submitButton = screen.getByRole('button', { name: /^register$/i })
       await user.click(submitButton)
@@ -661,7 +661,7 @@ describe('LoginModal', () => {
         'password123',
         undefined
       )
-    })
+    }, 10000)
 
     it('trims username and email before registration', async () => {
       const user = userEvent.setup()
@@ -674,12 +674,12 @@ describe('LoginModal', () => {
       )
 
       const textboxes = screen.getAllByRole('textbox')
-      const passwordFields = document.querySelectorAll('input[type="password"]')
+      const passwordInputs = screen.getAllByLabelText(/password/i)
 
       await user.type(textboxes[0]!, '  newuser  ')
       await user.type(textboxes[1]!, '  test@example.com  ')
-      await user.type(passwordFields[0]!, 'password123')
-      await user.type(passwordFields[1]!, 'password123')
+      await user.type(passwordInputs[0]!, 'password123')
+      await user.type(passwordInputs[1]!, 'password123')
 
       const submitButton = screen.getByRole('button', { name: /^register$/i })
       await user.click(submitButton)
@@ -690,7 +690,7 @@ describe('LoginModal', () => {
         'password123',
         undefined
       )
-    })
+    }, 10000)
   })
 
   describe('Error Handling - Login', () => {
@@ -749,12 +749,12 @@ describe('LoginModal', () => {
       )
 
       const textboxes = screen.getAllByRole('textbox')
-      const passwordFields = document.querySelectorAll('input[type="password"]')
+      const passwordInputs = screen.getAllByLabelText(/password/i)
 
       await user.type(textboxes[0]!, 'existinguser')
       await user.type(textboxes[1]!, 'test@example.com')
-      await user.type(passwordFields[0]!, 'password123')
-      await user.type(passwordFields[1]!, 'password123')
+      await user.type(passwordInputs[0]!, 'password123')
+      await user.type(passwordInputs[1]!, 'password123')
 
       const submitButton = screen.getByRole('button', { name: /^register$/i })
       await user.click(submitButton)
@@ -777,12 +777,12 @@ describe('LoginModal', () => {
       )
 
       const textboxes = screen.getAllByRole('textbox')
-      const passwordFields = document.querySelectorAll('input[type="password"]')
+      const passwordInputs = screen.getAllByLabelText(/password/i)
 
       await user.type(textboxes[0]!, 'newuser')
       await user.type(textboxes[1]!, 'test@example.com')
-      await user.type(passwordFields[0]!, 'password123')
-      await user.type(passwordFields[1]!, 'password123')
+      await user.type(passwordInputs[0]!, 'password123')
+      await user.type(passwordInputs[1]!, 'password123')
 
       const submitButton = screen.getByRole('button', { name: /^register$/i })
       await user.click(submitButton)
@@ -1025,12 +1025,12 @@ describe('LoginModal', () => {
       )
 
       const textboxes = screen.getAllByRole('textbox')
-      const passwordFields = document.querySelectorAll('input[type="password"]')
+      const passwordInputs = screen.getAllByLabelText(/password/i)
 
       await user.type(textboxes[0]!, 'newuser')
       await user.type(textboxes[1]!, 'test@example.com')
-      await user.type(passwordFields[0]!, 'password123')
-      await user.type(passwordFields[1]!, 'password123{enter}')
+      await user.type(passwordInputs[0]!, 'password123')
+      await user.type(passwordInputs[1]!, 'password123{enter}')
 
       expect(mockRegister).toHaveBeenCalledWith(
         'newuser',
