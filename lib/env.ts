@@ -22,6 +22,18 @@ const envSchema = z.object({
 
 // Validate environment variables at module load time
 function validateEnv() {
+  // Skip validation during CI builds (e.g., for type checking only)
+  if (process.env.SKIP_ENV_VALIDATION === 'true') {
+    return {
+      NODE_ENV: process.env.NODE_ENV || 'development',
+      DATABASE_URL: process.env.DATABASE_URL || '',
+      JWT_SECRET: process.env.JWT_SECRET || '',
+      JWT_REFRESH_SECRET: process.env.JWT_REFRESH_SECRET,
+      JWT_EXPIRES_IN: process.env.JWT_EXPIRES_IN || '7d',
+      JWT_REFRESH_EXPIRES_IN: process.env.JWT_REFRESH_EXPIRES_IN || '30d',
+    } as z.infer<typeof envSchema>
+  }
+
   try {
     return envSchema.parse(process.env)
   } catch (error) {
