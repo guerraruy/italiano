@@ -109,5 +109,6 @@ jobs:
       - name: Build application
         run: npm run build
         env:
-          # Skip database connection during build
+          # Provide placeholder DATABASE_URL for Prisma client initialization during build
+          DATABASE_URL: postgresql://localhost:5432/placeholder
           SKIP_ENV_VALIDATION: true
