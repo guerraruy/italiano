@@ -64,7 +64,23 @@ export function useSortingAndFiltering<TItem extends PracticeItem>({
     return map
   }, [items, getStatistics])
 
+  // Snapshot of statistics used for sorting - only updates on sort change or refresh
+  // This prevents reordering while the user is practicing
+  const [sortingSnapshot, setSortingSnapshot] = useState<
+    Map<string, Statistics>
+  >(() => new Map())
+
+  // Helper to capture current statistics snapshot
+  const captureSnapshot = useCallback(() => {
+    const map = new Map<string, Statistics>()
+    items.forEach((item) => {
+      map.set(item.id, getStatistics(item.id))
+    })
+    setSortingSnapshot(map)
+  }, [items, getStatistics])
+
   // Apply filters, sorting, and limit
+  // Uses sortingSnapshot for statistics-based sorts to prevent reordering during practice
   const filteredAndSortedItems = useMemo(() => {
     // Apply custom filter if provided
     let result = filterFn ? items.filter(filterFn) : [...items]
@@ -78,9 +94,10 @@ export function useSortingAndFiltering<TItem extends PracticeItem>({
       sortOption === 'most-errors' ||
       sortOption === 'worst-performance'
     ) {
+      // Use snapshot for stable sorting - prevents reordering while practicing
       result.sort((a, b) => {
-        const statsA = statisticsMap.get(a.id) || { correct: 0, wrong: 0 }
-        const statsB = statisticsMap.get(b.id) || { correct: 0, wrong: 0 }
+        const statsA = sortingSnapshot.get(a.id) || { correct: 0, wrong: 0 }
+        const statsB = sortingSnapshot.get(b.id) || { correct: 0, wrong: 0 }
 
         if (sortOption === 'most-errors') {
           return statsB.wrong - statsA.wrong
@@ -99,7 +116,7 @@ export function useSortingAndFiltering<TItem extends PracticeItem>({
     }
 
     return result
-  }, [items, filterFn, sortOption, displayCount, statisticsMap, randomSeed])
+  }, [items, filterFn, sortOption, displayCount, sortingSnapshot, randomSeed])
 
   const handleRefresh = useCallback(() => {
     if (sortOption === 'random') {
@@ -109,17 +126,25 @@ export function useSortingAndFiltering<TItem extends PracticeItem>({
       sortOption === 'most-errors' ||
       sortOption === 'worst-performance'
     ) {
-      // Refetch statistics to get latest data
+      // Capture a new snapshot to re-sort with current statistics
+      captureSnapshot()
+      // Also refetch from backend if available
       refetchStatistics?.()
     }
-  }, [sortOption, refetchStatistics])
+  }, [sortOption, captureSnapshot, refetchStatistics])
 
-  const handleSortChange = useCallback((newSort: SortOption) => {
-    setSortOption(newSort)
-    if (newSort === 'random') {
-      setRandomSeed(Date.now())
-    }
-  }, [])
+  const handleSortChange = useCallback(
+    (newSort: SortOption) => {
+      setSortOption(newSort)
+      if (newSort === 'random') {
+        setRandomSeed(Date.now())
+      } else if (newSort === 'most-errors' || newSort === 'worst-performance') {
+        // Capture snapshot when switching to statistics-based sorts
+        captureSnapshot()
+      }
+    },
+    [captureSnapshot]
+  )
 
   const shouldShowRefreshButton =
     sortOption === 'random' ||
