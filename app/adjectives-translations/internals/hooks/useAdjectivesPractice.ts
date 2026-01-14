@@ -89,8 +89,8 @@ export const useAdjectivesPractice = () => {
     sortOption,
     displayCount,
     filteredAndSortedItems: filteredAndSortedAdjectives,
-    handleRefresh,
-    handleSortChange,
+    handleRefresh: baseHandleRefresh,
+    handleSortChange: baseHandleSortChange,
     setDisplayCount,
     shouldShowRefreshButton,
   } = useSortingAndFiltering({
@@ -98,6 +98,23 @@ export const useAdjectivesPractice = () => {
     getStatistics,
     refetchStatistics,
   })
+
+  // Wrap refresh handler to also clear input/validation state
+  const handleRefresh = useCallback(() => {
+    baseHandleRefresh()
+    setInputValues({})
+    setValidationState({})
+  }, [baseHandleRefresh])
+
+  // Wrap sort change handler to also clear input/validation state
+  const handleSortChange = useCallback(
+    (newSort: Parameters<typeof baseHandleSortChange>[0]) => {
+      baseHandleSortChange(newSort)
+      setInputValues({})
+      setValidationState({})
+    },
+    [baseHandleSortChange]
+  )
 
   const handleInputChange = useCallback(
     (adjectiveId: string, field: AdjectiveField, value: string) => {

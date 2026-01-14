@@ -101,8 +101,8 @@ export const useVerbsPractice = () => {
     sortOption,
     displayCount,
     filteredAndSortedItems: filteredAndSortedVerbs,
-    handleRefresh,
-    handleSortChange,
+    handleRefresh: baseHandleRefresh,
+    handleSortChange: baseHandleSortChange,
     setDisplayCount,
     shouldShowRefreshButton,
   } = useSortingAndFiltering({
@@ -111,6 +111,23 @@ export const useVerbsPractice = () => {
     filterFn,
     refetchStatistics,
   })
+
+  // Wrap refresh handler to also clear input/validation state
+  const handleRefresh = useCallback(() => {
+    baseHandleRefresh()
+    setInputValues({})
+    setValidationState({})
+  }, [baseHandleRefresh])
+
+  // Wrap sort change handler to also clear input/validation state
+  const handleSortChange = useCallback(
+    (newSort: Parameters<typeof baseHandleSortChange>[0]) => {
+      baseHandleSortChange(newSort)
+      setInputValues({})
+      setValidationState({})
+    },
+    [baseHandleSortChange]
+  )
 
   const handleInputChange = useCallback((verbId: string, value: string) => {
     setInputValues((prev) => ({ ...prev, [verbId]: value }))
