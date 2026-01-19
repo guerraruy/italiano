@@ -5,6 +5,7 @@ import {
   useGetVerbStatisticsQuery,
   useResetVerbStatisticMutation,
   useUpdateVerbStatisticMutation,
+  useGetProfileQuery,
 } from '@/app/store/api'
 import { TIMING } from '@/lib/constants'
 import {
@@ -25,12 +26,14 @@ export const useVerbsPractice = () => {
       refetchOnMountOrArgChange: false,
       refetchOnFocus: false,
     })
+  const { data: profileData } = useGetProfileQuery()
   const [updateVerbStatistic] = useUpdateVerbStatisticMutation()
   const [resetVerbStatisticMutation] = useResetVerbStatisticMutation()
 
   const [inputValues, setInputValues] = useState<InputValues>({})
   const [validationState, setValidationState] = useState<ValidationState>({})
   const [verbTypeFilter, setVerbTypeFilter] = useState<VerbTypeFilter>('all')
+  const [excludeMastered, setExcludeMastered] = useState<boolean>(true)
 
   const inputRefs = useRef<{ [key: string]: HTMLInputElement | null }>({})
   const lastValidatedRef = useRef<{ [key: string]: number }>({})
@@ -83,17 +86,29 @@ export const useVerbsPractice = () => {
     [resetDialogState]
   )
 
+  // Get mastery threshold from profile
+  const masteryThreshold = profileData?.profile?.masteryThreshold ?? 10
+
   // Verb type filter function
   const filterFn = useCallback(
     (verb: PracticeVerb) => {
-      if (verbTypeFilter === 'all') return true
-      if (verbTypeFilter === 'reflexive') return verb.reflexive
-      if (verbTypeFilter === 'regular') return verb.regular && !verb.reflexive
-      if (verbTypeFilter === 'irregular')
-        return !verb.regular && !verb.reflexive
+      // Verb type filter
+      if (verbTypeFilter === 'reflexive' && !verb.reflexive) return false
+      if (verbTypeFilter === 'regular' && (!verb.regular || verb.reflexive))
+        return false
+      if (verbTypeFilter === 'irregular' && (verb.regular || verb.reflexive))
+        return false
+
+      // Mastery exclusion filter
+      if (excludeMastered) {
+        const stats = getStatistics(verb.id)
+        const netScore = stats.correct - stats.wrong
+        if (netScore >= masteryThreshold) return false
+      }
+
       return true
     },
-    [verbTypeFilter]
+    [verbTypeFilter, excludeMastered, masteryThreshold, getStatistics]
   )
 
   // Use shared sorting and filtering hook
@@ -239,6 +254,8 @@ export const useVerbsPractice = () => {
     resetDialog,
     isResetting,
     statisticsError,
+    excludeMastered,
+    masteryThreshold,
 
     // Refs
     inputRefs,
@@ -256,6 +273,7 @@ export const useVerbsPractice = () => {
     handleSortChange,
     setVerbTypeFilter,
     setDisplayCount,
+    setExcludeMastered,
 
     // Computed
     getStatistics,

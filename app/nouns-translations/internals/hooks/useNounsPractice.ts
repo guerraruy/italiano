@@ -5,6 +5,7 @@ import {
   useGetNounStatisticsQuery,
   useResetNounStatisticMutation,
   useUpdateNounStatisticMutation,
+  useGetProfileQuery,
 } from '@/app/store/api'
 import { TIMING } from '@/lib/constants'
 import {
@@ -24,11 +25,13 @@ export const useNounsPractice = () => {
       refetchOnMountOrArgChange: false,
       refetchOnFocus: false,
     })
+  const { data: profileData } = useGetProfileQuery()
   const [updateNounStatistic] = useUpdateNounStatisticMutation()
   const [resetNounStatisticMutation] = useResetNounStatisticMutation()
 
   const [inputValues, setInputValues] = useState<InputValues>({})
   const [validationState, setValidationState] = useState<ValidationState>({})
+  const [excludeMastered, setExcludeMastered] = useState<boolean>(true)
 
   const inputRefsSingular = useRef<{ [key: string]: HTMLInputElement | null }>(
     {}
@@ -84,6 +87,22 @@ export const useNounsPractice = () => {
     [resetDialogState]
   )
 
+  // Get mastery threshold from profile
+  const masteryThreshold = profileData?.profile?.masteryThreshold ?? 10
+
+  // Mastery exclusion filter function
+  const filterFn = useCallback(
+    (noun: PracticeNoun) => {
+      if (excludeMastered) {
+        const stats = getStatistics(noun.id)
+        const netScore = stats.correct - stats.wrong
+        if (netScore >= masteryThreshold) return false
+      }
+      return true
+    },
+    [excludeMastered, masteryThreshold, getStatistics]
+  )
+
   // Use shared sorting and filtering hook
   const {
     sortOption,
@@ -96,6 +115,7 @@ export const useNounsPractice = () => {
   } = useSortingAndFiltering({
     items: nouns as PracticeNoun[],
     getStatistics,
+    filterFn,
     refetchStatistics,
   })
 
@@ -311,6 +331,8 @@ export const useNounsPractice = () => {
     validationState,
     sortOption,
     displayCount,
+    excludeMastered,
+    masteryThreshold,
     resetDialog,
     isResetting,
     statisticsError,
@@ -331,6 +353,7 @@ export const useNounsPractice = () => {
     handleRefresh,
     handleSortChange,
     setDisplayCount,
+    setExcludeMastered,
 
     // Computed
     getStatistics,

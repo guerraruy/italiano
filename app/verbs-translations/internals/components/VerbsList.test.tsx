@@ -74,6 +74,8 @@ describe('VerbsList', () => {
     verbTypeFilter: 'all' as VerbTypeFilter,
     sortOption: 'none' as SortOption,
     displayCount: 'all' as DisplayCount,
+    excludeMastered: true,
+    masteryThreshold: 10,
     shouldShowRefreshButton: true,
     getStatistics: jest.fn().mockReturnValue({ correct: 0, wrong: 0 }),
     onInputChange: jest.fn(),
@@ -85,6 +87,7 @@ describe('VerbsList', () => {
     onVerbTypeChange: jest.fn(),
     onSortChange: jest.fn(),
     onDisplayCountChange: jest.fn(),
+    onExcludeMasteredChange: jest.fn(),
     onRefresh: jest.fn(),
     inputRef: jest.fn().mockReturnValue(jest.fn()),
   }

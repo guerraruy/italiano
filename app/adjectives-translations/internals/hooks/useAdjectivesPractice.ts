@@ -5,6 +5,7 @@ import {
   useGetAdjectiveStatisticsQuery,
   useResetAdjectiveStatisticMutation,
   useUpdateAdjectiveStatisticMutation,
+  useGetProfileQuery,
 } from '@/app/store/api'
 import { TIMING } from '@/lib/constants'
 import {
@@ -26,11 +27,13 @@ export const useAdjectivesPractice = () => {
       refetchOnMountOrArgChange: false,
       refetchOnFocus: false,
     })
+  const { data: profileData } = useGetProfileQuery()
   const [updateAdjectiveStatistic] = useUpdateAdjectiveStatisticMutation()
   const [resetAdjectiveStatisticMutation] = useResetAdjectiveStatisticMutation()
 
   const [inputValues, setInputValues] = useState<InputValues>({})
   const [validationState, setValidationState] = useState<ValidationState>({})
+  const [excludeMastered, setExcludeMastered] = useState<boolean>(true)
   const [, startTransition] = useTransition()
 
   const inputRefs = useRef<{ [key: string]: HTMLInputElement | null }>({})
@@ -84,6 +87,22 @@ export const useAdjectivesPractice = () => {
     [resetDialogState]
   )
 
+  // Get mastery threshold from profile
+  const masteryThreshold = profileData?.profile?.masteryThreshold ?? 10
+
+  // Mastery exclusion filter function
+  const filterFn = useCallback(
+    (adjective: PracticeAdjective) => {
+      if (excludeMastered) {
+        const stats = getStatistics(adjective.id)
+        const netScore = stats.correct - stats.wrong
+        if (netScore >= masteryThreshold) return false
+      }
+      return true
+    },
+    [excludeMastered, masteryThreshold, getStatistics]
+  )
+
   // Use shared sorting and filtering hook
   const {
     sortOption,
@@ -96,6 +115,7 @@ export const useAdjectivesPractice = () => {
   } = useSortingAndFiltering({
     items: adjectives as PracticeAdjective[],
     getStatistics,
+    filterFn,
     refetchStatistics,
   })
 
@@ -386,6 +406,8 @@ export const useAdjectivesPractice = () => {
     validationState,
     sortOption,
     displayCount,
+    excludeMastered,
+    masteryThreshold,
     resetDialog,
     isResetting,
     statisticsError,
@@ -405,6 +427,7 @@ export const useAdjectivesPractice = () => {
     handleRefresh,
     handleSortChange,
     setDisplayCount,
+    setExcludeMastered,
 
     // Computed
     getStatistics,

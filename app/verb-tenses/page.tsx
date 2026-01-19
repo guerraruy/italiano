@@ -35,6 +35,8 @@ export default function VerbTensesPage() {
     selectedVerbId,
     inputValues,
     validationState,
+    excludeMastered,
+    masteryThreshold,
     resetDialog,
     isResetting,
     statisticsError,
@@ -49,6 +51,7 @@ export default function VerbTensesPage() {
     handleKeyDown,
     handleVerbTypeFilterChange,
     handleVerbSelection,
+    setExcludeMastered,
     getStatistics,
   } = useVerbConjugationPractice()
 
@@ -109,8 +112,11 @@ export default function VerbTensesPage() {
           selectedVerbId={selectedVerbId}
           filteredVerbs={filteredVerbs}
           hasSelectedVerb={!!selectedVerb}
+          excludeMastered={excludeMastered}
+          masteryThreshold={masteryThreshold}
           onVerbTypeFilterChange={handleVerbTypeFilterChange}
           onVerbSelection={handleVerbSelection}
+          onExcludeMasteredChange={setExcludeMastered}
           onResetStatistics={handleOpenResetDialog}
         />
 

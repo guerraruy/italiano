@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { render, screen, fireEvent } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
 import '@testing-library/jest-dom'
@@ -10,8 +10,11 @@ describe('FilterControls', () => {
   const defaultProps = {
     sortOption: 'none' as SortOption,
     displayCount: 10 as DisplayCount,
+    excludeMastered: true,
+    masteryThreshold: 10,
     onSortChange: jest.fn(),
     onDisplayCountChange: jest.fn(),
+    onExcludeMasteredChange: jest.fn(),
     onRefresh: jest.fn(),
     showRefreshButton: true,
     displayedCount: 10,

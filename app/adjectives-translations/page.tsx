@@ -30,6 +30,8 @@ export default function AdjectivesTranslationsPage() {
     validationState,
     sortOption,
     displayCount,
+    excludeMastered,
+    masteryThreshold,
     resetDialog,
     isResetting,
     statisticsError,
@@ -45,6 +47,7 @@ export default function AdjectivesTranslationsPage() {
     handleRefresh,
     handleSortChange,
     setDisplayCount,
+    setExcludeMastered,
     getStatistics,
     shouldShowRefreshButton,
   } = useAdjectivesPractice()
@@ -120,6 +123,8 @@ export default function AdjectivesTranslationsPage() {
           validationState={validationState}
           sortOption={sortOption}
           displayCount={displayCount}
+          excludeMastered={excludeMastered}
+          masteryThreshold={masteryThreshold}
           shouldShowRefreshButton={shouldShowRefreshButton}
           getStatistics={getStatistics}
           onInputChange={handleInputChange}
@@ -130,6 +135,7 @@ export default function AdjectivesTranslationsPage() {
           onKeyDown={handleKeyDown}
           onSortChange={handleSortChange}
           onDisplayCountChange={setDisplayCount}
+          onExcludeMasteredChange={setExcludeMastered}
           onRefresh={handleRefresh}
           setInputRef={setInputRef}
         />

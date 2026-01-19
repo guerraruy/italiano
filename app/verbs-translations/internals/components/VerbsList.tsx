@@ -27,6 +27,8 @@ interface VerbsListProps {
   verbTypeFilter: VerbTypeFilter
   sortOption: SortOption
   displayCount: DisplayCount
+  excludeMastered: boolean
+  masteryThreshold: number
   shouldShowRefreshButton: boolean
   getStatistics: (verbId: string) => { correct: number; wrong: number }
   onInputChange: (verbId: string, value: string) => void
@@ -43,6 +45,7 @@ interface VerbsListProps {
   onVerbTypeChange: (filter: VerbTypeFilter) => void
   onSortChange: (newSort: SortOption) => void
   onDisplayCountChange: (count: DisplayCount) => void
+  onExcludeMasteredChange: (value: boolean) => void
   onRefresh: () => void
   inputRef: (verbId: string) => (el: HTMLInputElement | null) => void
 }
@@ -55,6 +58,8 @@ export const VerbsList: React.FC<VerbsListProps> = ({
   verbTypeFilter,
   sortOption,
   displayCount,
+  excludeMastered,
+  masteryThreshold,
   shouldShowRefreshButton,
   getStatistics,
   onInputChange,
@@ -66,6 +71,7 @@ export const VerbsList: React.FC<VerbsListProps> = ({
   onVerbTypeChange,
   onSortChange,
   onDisplayCountChange,
+  onExcludeMasteredChange,
   onRefresh,
   inputRef,
 }) => {
@@ -83,9 +89,12 @@ export const VerbsList: React.FC<VerbsListProps> = ({
         verbTypeFilter={verbTypeFilter}
         sortOption={sortOption}
         displayCount={displayCount}
+        excludeMastered={excludeMastered}
+        masteryThreshold={masteryThreshold}
         onVerbTypeChange={onVerbTypeChange}
         onSortChange={onSortChange}
         onDisplayCountChange={onDisplayCountChange}
+        onExcludeMasteredChange={onExcludeMasteredChange}
         onRefresh={onRefresh}
         showRefreshButton={shouldShowRefreshButton}
         displayedCount={filteredAndSortedVerbs.length}

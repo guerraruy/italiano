@@ -75,6 +75,7 @@ export const useVerbConjugationPractice = () => {
   const [selectedVerbId, setSelectedVerbId] = useState<string>('')
   const [inputValues, setInputValues] = useState<InputValues>({})
   const [validationState, setValidationState] = useState<ValidationState>({})
+  const [excludeMastered, setExcludeMastered] = useState<boolean>(true)
   const [resetDialog, setResetDialog] = useState<ResetDialogState>({
     open: false,
     verbId: null,
@@ -128,18 +129,73 @@ export const useVerbConjugationPractice = () => {
     [profileData?.profile?.enabledVerbTenses]
   )
 
-  // Filter verbs by type
-  const filteredVerbs = useMemo(() => {
-    if (verbTypeFilter === 'all') return verbs
+  // Get mastery threshold from profile
+  const masteryThreshold = profileData?.profile?.masteryThreshold ?? 10
 
-    return verbs.filter((verb) => {
-      if (verbTypeFilter === 'reflexive') return verb.reflexive
-      if (verbTypeFilter === 'regular') return verb.regular && !verb.reflexive
-      if (verbTypeFilter === 'irregular')
-        return !verb.regular && !verb.reflexive
+  // Helper to check if all conjugations for a verb are mastered
+  const isVerbMastered = useCallback(
+    (verb: Verb) => {
+      if (!statisticsData?.statistics) return false
+
+      const conjugation = verb.conjugation
+      if (!conjugation) return false
+
+      // Check each enabled tense
+      for (const tenseKey of enabledVerbTenses) {
+        const [mood, tense] = tenseKey.split('.')
+        if (!mood || !tense) continue
+
+        const moodData = conjugation[mood]
+        if (!moodData || !moodData[tense]) continue
+
+        const tenseData = moodData[tense]
+
+        if (typeof tenseData === 'string') {
+          // Simple form
+          const key = `${verb.id}:${mood}:${tense}:form`
+          const stats = statisticsData.statistics[key]
+          const netScore =
+            (stats?.correctAttempts || 0) - (stats?.wrongAttempts || 0)
+          if (netScore < masteryThreshold) return false
+        } else {
+          // Person-based conjugations
+          for (const person of Object.keys(tenseData)) {
+            const key = `${verb.id}:${mood}:${tense}:${person}`
+            const stats = statisticsData.statistics[key]
+            const netScore =
+              (stats?.correctAttempts || 0) - (stats?.wrongAttempts || 0)
+            if (netScore < masteryThreshold) return false
+          }
+        }
+      }
+
       return true
-    })
-  }, [verbs, verbTypeFilter])
+    },
+    [enabledVerbTenses, masteryThreshold, statisticsData]
+  )
+
+  // Filter verbs by type and mastery
+  const filteredVerbs = useMemo(() => {
+    let result = verbs
+
+    // Filter by verb type
+    if (verbTypeFilter !== 'all') {
+      result = result.filter((verb) => {
+        if (verbTypeFilter === 'reflexive') return verb.reflexive
+        if (verbTypeFilter === 'regular') return verb.regular && !verb.reflexive
+        if (verbTypeFilter === 'irregular')
+          return !verb.regular && !verb.reflexive
+        return true
+      })
+    }
+
+    // Filter out mastered verbs
+    if (excludeMastered) {
+      result = result.filter((verb) => !isVerbMastered(verb))
+    }
+
+    return result
+  }, [verbs, verbTypeFilter, excludeMastered, isVerbMastered])
 
   // Get selected verb
   const selectedVerb = useMemo(
@@ -365,6 +421,8 @@ export const useVerbConjugationPractice = () => {
     selectedVerbId,
     inputValues,
     validationState,
+    excludeMastered,
+    masteryThreshold,
     resetDialog,
     isResetting,
     statisticsError,
@@ -383,6 +441,7 @@ export const useVerbConjugationPractice = () => {
     handleKeyDown,
     handleVerbTypeFilterChange,
     handleVerbSelection,
+    setExcludeMastered,
 
     // Computed
     getStatistics,

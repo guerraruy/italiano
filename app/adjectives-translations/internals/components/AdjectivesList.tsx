@@ -27,6 +27,8 @@ interface AdjectivesListProps {
   validationState: ValidationState
   sortOption: SortOption
   displayCount: DisplayCount
+  excludeMastered: boolean
+  masteryThreshold: number
   shouldShowRefreshButton: boolean
   getStatistics: (adjectiveId: string) => { correct: number; wrong: number }
   onInputChange: (
@@ -50,6 +52,7 @@ interface AdjectivesListProps {
   ) => void
   onSortChange: (newSort: SortOption) => void
   onDisplayCountChange: (count: DisplayCount) => void
+  onExcludeMasteredChange: (value: boolean) => void
   onRefresh: () => void
   setInputRef: (
     adjectiveId: string,
@@ -64,6 +67,8 @@ export const AdjectivesList: React.FC<AdjectivesListProps> = ({
   validationState,
   sortOption,
   displayCount,
+  excludeMastered,
+  masteryThreshold,
   shouldShowRefreshButton,
   getStatistics,
   onInputChange,
@@ -74,6 +79,7 @@ export const AdjectivesList: React.FC<AdjectivesListProps> = ({
   onKeyDown,
   onSortChange,
   onDisplayCountChange,
+  onExcludeMasteredChange,
   onRefresh,
   setInputRef,
 }) => {
@@ -91,8 +97,11 @@ export const AdjectivesList: React.FC<AdjectivesListProps> = ({
       <FilterControls
         sortOption={sortOption}
         displayCount={displayCount}
+        excludeMastered={excludeMastered}
+        masteryThreshold={masteryThreshold}
         onSortChange={onSortChange}
         onDisplayCountChange={onDisplayCountChange}
+        onExcludeMasteredChange={onExcludeMasteredChange}
         onRefresh={onRefresh}
         showRefreshButton={shouldShowRefreshButton}
         displayedCount={filteredAndSortedAdjectives.length}

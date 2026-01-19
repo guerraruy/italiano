@@ -25,6 +25,8 @@ interface NounsListProps {
   validationState: ValidationState
   sortOption: SortOption
   displayCount: DisplayCount
+  excludeMastered: boolean
+  masteryThreshold: number
   shouldShowRefreshButton: boolean
   getStatistics: (nounId: string) => { correct: number; wrong: number }
   onInputChange: (
@@ -44,6 +46,7 @@ interface NounsListProps {
   ) => void
   onSortChange: (newSort: SortOption) => void
   onDisplayCountChange: (count: DisplayCount) => void
+  onExcludeMasteredChange: (value: boolean) => void
   onRefresh: () => void
   inputRefSingular: (nounId: string) => (el: HTMLInputElement | null) => void
   inputRefPlural: (nounId: string) => (el: HTMLInputElement | null) => void
@@ -56,6 +59,8 @@ export const NounsList: React.FC<NounsListProps> = ({
   validationState,
   sortOption,
   displayCount,
+  excludeMastered,
+  masteryThreshold,
   shouldShowRefreshButton,
   getStatistics,
   onInputChange,
@@ -66,6 +71,7 @@ export const NounsList: React.FC<NounsListProps> = ({
   onKeyDown,
   onSortChange,
   onDisplayCountChange,
+  onExcludeMasteredChange,
   onRefresh,
   inputRefSingular,
   inputRefPlural,
@@ -83,8 +89,11 @@ export const NounsList: React.FC<NounsListProps> = ({
       <FilterControls
         sortOption={sortOption}
         displayCount={displayCount}
+        excludeMastered={excludeMastered}
+        masteryThreshold={masteryThreshold}
         onSortChange={onSortChange}
         onDisplayCountChange={onDisplayCountChange}
+        onExcludeMasteredChange={onExcludeMasteredChange}
         onRefresh={onRefresh}
         showRefreshButton={shouldShowRefreshButton}
         displayedCount={filteredAndSortedNouns.length}

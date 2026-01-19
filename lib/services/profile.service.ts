@@ -13,6 +13,7 @@ import { BaseService } from './base.service'
 interface UpdateProfileInput {
   nativeLanguage?: 'pt-BR' | 'en'
   enabledVerbTenses?: string[]
+  masteryThreshold?: number
 }
 
 export class ProfileService extends BaseService {

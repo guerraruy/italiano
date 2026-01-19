@@ -84,6 +84,8 @@ describe('AdjectivesList', () => {
     } as ValidationState,
     sortOption: 'alphabetical_asc' as SortOption,
     displayCount: 'all' as DisplayCount,
+    excludeMastered: true,
+    masteryThreshold: 10,
     shouldShowRefreshButton: true,
     getStatistics: jest.fn().mockReturnValue({ correct: 0, wrong: 0 }),
     onInputChange: jest.fn(),
@@ -94,6 +96,7 @@ describe('AdjectivesList', () => {
     onKeyDown: jest.fn(),
     onSortChange: jest.fn(),
     onDisplayCountChange: jest.fn(),
+    onExcludeMasteredChange: jest.fn(),
     onRefresh: jest.fn(),
     setInputRef: jest.fn(),
   }

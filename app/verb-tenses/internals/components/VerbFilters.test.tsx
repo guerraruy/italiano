@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { render, screen, fireEvent, within } from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
 import { VerbFilters } from './VerbFilters'
@@ -36,8 +36,11 @@ describe('VerbFilters', () => {
     selectedVerbId: '',
     filteredVerbs: mockVerbs,
     hasSelectedVerb: false,
+    excludeMastered: true,
+    masteryThreshold: 10,
     onVerbTypeFilterChange: jest.fn(),
     onVerbSelection: jest.fn(),
+    onExcludeMasteredChange: jest.fn(),
     onResetStatistics: jest.fn(),
   }
 

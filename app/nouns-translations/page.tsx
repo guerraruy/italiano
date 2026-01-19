@@ -30,6 +30,8 @@ export default function NounsTranslationsPage() {
     validationState,
     sortOption,
     displayCount,
+    excludeMastered,
+    masteryThreshold,
     resetDialog,
     isResetting,
     statisticsError,
@@ -46,6 +48,7 @@ export default function NounsTranslationsPage() {
     handleRefresh,
     handleSortChange,
     setDisplayCount,
+    setExcludeMastered,
     getStatistics,
     shouldShowRefreshButton,
   } = useNounsPractice()
@@ -110,6 +113,8 @@ export default function NounsTranslationsPage() {
           validationState={validationState}
           sortOption={sortOption}
           displayCount={displayCount}
+          excludeMastered={excludeMastered}
+          masteryThreshold={masteryThreshold}
           shouldShowRefreshButton={shouldShowRefreshButton}
           getStatistics={getStatistics}
           onInputChange={handleInputChange}
@@ -120,6 +125,7 @@ export default function NounsTranslationsPage() {
           onKeyDown={handleKeyDown}
           onSortChange={handleSortChange}
           onDisplayCountChange={setDisplayCount}
+          onExcludeMasteredChange={setExcludeMastered}
           onRefresh={handleRefresh}
           inputRefSingular={(nounId) => (el) =>
             (inputRefsSingular.current[nounId] = el)

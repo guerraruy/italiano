@@ -31,6 +31,8 @@ export default function VerbsTranslationsPage() {
     verbTypeFilter,
     sortOption,
     displayCount,
+    excludeMastered,
+    masteryThreshold,
     resetDialog,
     isResetting,
     statisticsError,
@@ -47,6 +49,7 @@ export default function VerbsTranslationsPage() {
     handleSortChange,
     setVerbTypeFilter,
     setDisplayCount,
+    setExcludeMastered,
     getStatistics,
     shouldShowRefreshButton,
   } = useVerbsPractice()
@@ -112,6 +115,8 @@ export default function VerbsTranslationsPage() {
           verbTypeFilter={verbTypeFilter}
           sortOption={sortOption}
           displayCount={displayCount}
+          excludeMastered={excludeMastered}
+          masteryThreshold={masteryThreshold}
           shouldShowRefreshButton={shouldShowRefreshButton}
           getStatistics={getStatistics}
           onInputChange={handleInputChange}
@@ -123,6 +128,7 @@ export default function VerbsTranslationsPage() {
           onVerbTypeChange={setVerbTypeFilter}
           onSortChange={handleSortChange}
           onDisplayCountChange={setDisplayCount}
+          onExcludeMasteredChange={setExcludeMastered}
           onRefresh={handleRefresh}
           inputRef={(verbId) => (el) => (inputRefs.current[verbId] = el)}
         />

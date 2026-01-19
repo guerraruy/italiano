@@ -14,6 +14,9 @@ import {
   Divider,
   CircularProgress,
   Alert,
+  TextField,
+  FormControl,
+  FormLabel,
 } from '@mui/material'
 
 import { TIMING, Z_INDEX } from '@/lib/constants'
@@ -42,6 +45,7 @@ export default function SettingsModal({ open, onClose }: SettingsModalProps) {
   const [nativeLanguage, setNativeLanguage] = useState<'pt-BR' | 'en'>('pt-BR')
   const [enabledVerbTenses, setEnabledVerbTenses] =
     useState<string[]>(DEFAULT_VERB_TENSES)
+  const [masteryThreshold, setMasteryThreshold] = useState<number>(10)
   const [successMessage, setSuccessMessage] = useState('')
   const [errorMessage, setErrorMessage] = useState('')
 
@@ -50,6 +54,7 @@ export default function SettingsModal({ open, onClose }: SettingsModalProps) {
     setEnabledVerbTenses(
       data?.profile?.enabledVerbTenses || DEFAULT_VERB_TENSES
     )
+    setMasteryThreshold(data?.profile?.masteryThreshold ?? 10)
     setSuccessMessage('')
     setErrorMessage('')
   }
@@ -97,7 +102,11 @@ export default function SettingsModal({ open, onClose }: SettingsModalProps) {
       setSuccessMessage('')
       setErrorMessage('')
 
-      await updateProfile({ nativeLanguage, enabledVerbTenses }).unwrap()
+      await updateProfile({
+        nativeLanguage,
+        enabledVerbTenses,
+        masteryThreshold,
+      }).unwrap()
 
       setSuccessMessage('Profile updated successfully!')
       setTimeout(() => {
@@ -170,6 +179,38 @@ export default function SettingsModal({ open, onClose }: SettingsModalProps) {
                 onTenseToggle={handleVerbTenseToggle}
                 onCategoryToggle={handleCategoryToggle}
               />
+
+              <Divider sx={{ my: 2 }} />
+
+              <FormControl component="fieldset" fullWidth>
+                <FormLabel
+                  component="legend"
+                  sx={{ fontSize: '14px', fontWeight: 500, mb: 1 }}
+                >
+                  Mastery Threshold
+                </FormLabel>
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  sx={{ mb: 1.5, fontSize: '13px' }}
+                >
+                  Words with (correct answers − errors) ≥ this value can be
+                  excluded from practice when the filter is enabled.
+                </Typography>
+                <TextField
+                  type="number"
+                  value={masteryThreshold}
+                  onChange={(e) => {
+                    const value = parseInt(e.target.value, 10)
+                    if (!isNaN(value) && value >= 1 && value <= 100) {
+                      setMasteryThreshold(value)
+                    }
+                  }}
+                  slotProps={{ htmlInput: { min: 1, max: 100 } }}
+                  size="small"
+                  sx={{ width: 100 }}
+                />
+              </FormControl>
 
               {successMessage && (
                 <Alert

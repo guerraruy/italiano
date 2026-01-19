@@ -10,6 +10,8 @@ import {
   IconButton,
   Tooltip,
   Typography,
+  FormControlLabel,
+  Checkbox,
 } from '@mui/material'
 import { styled } from '@mui/material/styles'
 
@@ -36,9 +38,12 @@ interface FilterControlsProps {
   verbTypeFilter: VerbTypeFilter
   sortOption: SortOption
   displayCount: DisplayCount
+  excludeMastered: boolean
+  masteryThreshold: number
   onVerbTypeChange: (value: VerbTypeFilter) => void
   onSortChange: (value: SortOption) => void
   onDisplayCountChange: (value: DisplayCount) => void
+  onExcludeMasteredChange: (value: boolean) => void
   onRefresh: () => void
   showRefreshButton: boolean
   displayedCount: number
@@ -49,9 +54,12 @@ export default function FilterControls({
   verbTypeFilter,
   sortOption,
   displayCount,
+  excludeMastered,
+  masteryThreshold,
   onVerbTypeChange,
   onSortChange,
   onDisplayCountChange,
+  onExcludeMasteredChange,
   onRefresh,
   showRefreshButton,
   displayedCount,
@@ -120,6 +128,22 @@ export default function FilterControls({
           </IconButton>
         </Tooltip>
       )}
+
+      <Tooltip
+        title={`Exclude words with (correct - errors) >= ${masteryThreshold}`}
+      >
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={excludeMastered}
+              onChange={(e) => onExcludeMasteredChange(e.target.checked)}
+              size="small"
+            />
+          }
+          label="Exclude mastered"
+          sx={{ ml: 1 }}
+        />
+      </Tooltip>
 
       <Typography variant="body2" color="text.secondary" sx={{ ml: 1 }}>
         Showing {displayedCount} of {totalCount} verbs

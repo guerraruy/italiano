@@ -15,6 +15,7 @@ export interface UserProfile {
   userId: string
   nativeLanguage: 'pt-BR' | 'en'
   enabledVerbTenses: string[]
+  masteryThreshold: number
   createdAt: string
   updatedAt: string
 }
@@ -70,7 +71,11 @@ export const authApi = baseApi.injectEndpoints({
     }),
     updateProfile: builder.mutation<
       { message: string; profile: UserProfile },
-      { nativeLanguage?: 'pt-BR' | 'en'; enabledVerbTenses?: string[] }
+      {
+        nativeLanguage?: 'pt-BR' | 'en'
+        enabledVerbTenses?: string[]
+        masteryThreshold?: number
+      }
     >({
       query: (data) => ({
         url: '/profile',

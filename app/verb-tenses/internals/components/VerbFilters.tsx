@@ -13,6 +13,8 @@ import {
   IconButton,
   Tooltip,
   Typography,
+  FormControlLabel,
+  Checkbox,
 } from '@mui/material'
 import { styled } from '@mui/material/styles'
 
@@ -39,8 +41,11 @@ interface VerbFiltersProps {
   selectedVerbId: string
   filteredVerbs: Verb[]
   hasSelectedVerb: boolean
+  excludeMastered: boolean
+  masteryThreshold: number
   onVerbTypeFilterChange: (filter: VerbTypeFilter) => void
   onVerbSelection: (verbId: string) => void
+  onExcludeMasteredChange: (value: boolean) => void
   onResetStatistics: () => void
 }
 
@@ -84,8 +89,11 @@ export const VerbFilters: React.FC<VerbFiltersProps> = ({
   selectedVerbId,
   filteredVerbs,
   hasSelectedVerb,
+  excludeMastered,
+  masteryThreshold,
   onVerbTypeFilterChange,
   onVerbSelection,
+  onExcludeMasteredChange,
   onResetStatistics,
 }) => {
   return (
@@ -140,6 +148,22 @@ export const VerbFilters: React.FC<VerbFiltersProps> = ({
           </IconButton>
         </Tooltip>
       )}
+
+      <Tooltip
+        title={`Exclude verbs with all conjugations mastered (correct - errors >= ${masteryThreshold})`}
+      >
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={excludeMastered}
+              onChange={(e) => onExcludeMasteredChange(e.target.checked)}
+              size="small"
+            />
+          }
+          label="Exclude mastered"
+          sx={{ ml: 1 }}
+        />
+      </Tooltip>
 
       <Typography variant="body2" color="text.secondary" sx={{ ml: 1 }}>
         {filteredVerbs.length} verb{filteredVerbs.length !== 1 ? 's' : ''}{' '}

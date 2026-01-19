@@ -13,8 +13,11 @@ describe('FilterControls', () => {
   const defaultProps = {
     sortOption: 'none' as SortOption,
     displayCount: 10 as DisplayCount,
+    excludeMastered: true,
+    masteryThreshold: 10,
     onSortChange: jest.fn(),
     onDisplayCountChange: jest.fn(),
+    onExcludeMasteredChange: jest.fn(),
     onRefresh: jest.fn(),
     showRefreshButton: true,
     displayedCount: 10,
