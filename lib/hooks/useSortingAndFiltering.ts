@@ -70,20 +70,45 @@ export function useSortingAndFiltering<TItem extends PracticeItem>({
     Map<string, Statistics>
   >(() => new Map())
 
-  // Helper to capture current statistics snapshot
+  // Snapshot of item IDs that pass the filter - only updates on sort change or refresh
+  // This prevents items from disappearing while the user is practicing (e.g., when mastered)
+  const [filterSnapshot, setFilterSnapshot] = useState<Set<string> | null>(null)
+
+  // Helper to capture current statistics and filter snapshots
   const captureSnapshot = useCallback(() => {
     const map = new Map<string, Statistics>()
     items.forEach((item) => {
       map.set(item.id, getStatistics(item.id))
     })
     setSortingSnapshot(map)
-  }, [items, getStatistics])
+
+    // Capture filter snapshot - which items pass the filter right now
+    if (filterFn) {
+      const passingIds = new Set<string>()
+      items.forEach((item) => {
+        if (filterFn(item)) {
+          passingIds.add(item.id)
+        }
+      })
+      setFilterSnapshot(passingIds)
+    }
+  }, [items, getStatistics, filterFn])
 
   // Apply filters, sorting, and limit
   // Uses sortingSnapshot for statistics-based sorts to prevent reordering during practice
+  // Uses filterSnapshot to prevent items from disappearing during practice
   const filteredAndSortedItems = useMemo(() => {
-    // Apply custom filter if provided
-    let result = filterFn ? items.filter(filterFn) : [...items]
+    // Apply filtering using snapshot if available, otherwise use live filterFn
+    let result: TItem[]
+    if (filterSnapshot !== null) {
+      // Use snapshot to prevent items from disappearing during practice
+      result = items.filter((item) => filterSnapshot.has(item.id))
+    } else if (filterFn) {
+      // Initial render before snapshot captured - use live filter
+      result = items.filter(filterFn)
+    } else {
+      result = [...items]
+    }
 
     // Apply sorting
     if (sortOption === 'alphabetical') {
@@ -116,31 +141,36 @@ export function useSortingAndFiltering<TItem extends PracticeItem>({
     }
 
     return result
-  }, [items, filterFn, sortOption, displayCount, sortingSnapshot, randomSeed])
+  }, [
+    items,
+    filterSnapshot,
+    filterFn,
+    sortOption,
+    displayCount,
+    sortingSnapshot,
+    randomSeed,
+  ])
 
   const handleRefresh = useCallback(() => {
+    // Always capture snapshot to update filter (e.g., remove newly mastered items)
+    captureSnapshot()
+    // Also refetch from backend if available
+    refetchStatistics?.()
+
     if (sortOption === 'random') {
       // Update random seed to reshuffle
       setRandomSeed(Date.now())
-    } else if (
-      sortOption === 'most-errors' ||
-      sortOption === 'worst-performance'
-    ) {
-      // Capture a new snapshot to re-sort with current statistics
-      captureSnapshot()
-      // Also refetch from backend if available
-      refetchStatistics?.()
     }
   }, [sortOption, captureSnapshot, refetchStatistics])
 
   const handleSortChange = useCallback(
     (newSort: SortOption) => {
       setSortOption(newSort)
+      // Always capture snapshot when changing sort to update filter
+      captureSnapshot()
+
       if (newSort === 'random') {
         setRandomSeed(Date.now())
-      } else if (newSort === 'most-errors' || newSort === 'worst-performance') {
-        // Capture snapshot when switching to statistics-based sorts
-        captureSnapshot()
       }
     },
     [captureSnapshot]

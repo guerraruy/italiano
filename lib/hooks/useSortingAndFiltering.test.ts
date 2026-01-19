@@ -633,7 +633,7 @@ describe('useSortingAndFiltering', () => {
       expect(mockRefetchStatistics).toHaveBeenCalledTimes(1)
     })
 
-    it('should not call refetchStatistics when refreshing with alphabetical sort', () => {
+    it('should call refetchStatistics when refreshing with alphabetical sort to update filter', () => {
       const { result } = renderHook(() =>
         useSortingAndFiltering({
           items: mockItems,
@@ -646,14 +646,17 @@ describe('useSortingAndFiltering', () => {
         result.current.handleSortChange('alphabetical')
       })
 
+      mockRefetchStatistics.mockClear()
+
       act(() => {
         result.current.handleRefresh()
       })
 
-      expect(mockRefetchStatistics).not.toHaveBeenCalled()
+      // Refresh always calls refetchStatistics to update filter snapshot
+      expect(mockRefetchStatistics).toHaveBeenCalledTimes(1)
     })
 
-    it('should not call refetchStatistics when refreshing with none sort', () => {
+    it('should call refetchStatistics when refreshing with none sort to update filter', () => {
       const { result } = renderHook(() =>
         useSortingAndFiltering({
           items: mockItems,
@@ -662,11 +665,14 @@ describe('useSortingAndFiltering', () => {
         })
       )
 
+      mockRefetchStatistics.mockClear()
+
       act(() => {
         result.current.handleRefresh()
       })
 
-      expect(mockRefetchStatistics).not.toHaveBeenCalled()
+      // Refresh always calls refetchStatistics to update filter snapshot
+      expect(mockRefetchStatistics).toHaveBeenCalledTimes(1)
     })
 
     it('should not throw if refetchStatistics is not provided', () => {
