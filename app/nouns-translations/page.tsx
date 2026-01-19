@@ -51,6 +51,7 @@ export default function NounsTranslationsPage() {
     setExcludeMastered,
     getStatistics,
     shouldShowRefreshButton,
+    masteredCount,
   } = useNounsPractice()
 
   if (isLoading) {
@@ -115,6 +116,7 @@ export default function NounsTranslationsPage() {
           displayCount={displayCount}
           excludeMastered={excludeMastered}
           masteryThreshold={masteryThreshold}
+          masteredCount={masteredCount}
           shouldShowRefreshButton={shouldShowRefreshButton}
           getStatistics={getStatistics}
           onInputChange={handleInputChange}

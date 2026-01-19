@@ -72,7 +72,12 @@ export function useSortingAndFiltering<TItem extends PracticeItem>({
 
   // Snapshot of item IDs that pass the filter - only updates on sort change or refresh
   // This prevents items from disappearing while the user is practicing (e.g., when mastered)
-  const [filterSnapshot, setFilterSnapshot] = useState<Set<string> | null>(null)
+  // Initialize with a "needs initialization" marker (empty set with special handling)
+  const [filterSnapshot, setFilterSnapshot] = useState<Set<string>>(
+    () => new Set()
+  )
+  const [filterSnapshotInitialized, setFilterSnapshotInitialized] =
+    useState(false)
 
   // Helper to capture current statistics and filter snapshots
   const captureSnapshot = useCallback(() => {
@@ -91,20 +96,40 @@ export function useSortingAndFiltering<TItem extends PracticeItem>({
         }
       })
       setFilterSnapshot(passingIds)
+      setFilterSnapshotInitialized(true)
     }
   }, [items, getStatistics, filterFn])
+
+  // Compute initial filter result (memoized, only recomputes when items change, not filterFn)
+  // This provides a stable initial filter before user triggers refresh/sort change
+  const initialFilteredIds = useMemo(() => {
+    if (filterSnapshotInitialized) return null // Don't compute if we already have a snapshot
+    if (!filterFn || items.length === 0) return null
+    const passingIds = new Set<string>()
+    items.forEach((item) => {
+      if (filterFn(item)) {
+        passingIds.add(item.id)
+      }
+    })
+    return passingIds
+    // Intentionally exclude filterFn from deps to keep initial filter stable
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [items, filterSnapshotInitialized])
 
   // Apply filters, sorting, and limit
   // Uses sortingSnapshot for statistics-based sorts to prevent reordering during practice
   // Uses filterSnapshot to prevent items from disappearing during practice
   const filteredAndSortedItems = useMemo(() => {
-    // Apply filtering using snapshot if available, otherwise use live filterFn
+    // Apply filtering using snapshot if available
     let result: TItem[]
-    if (filterSnapshot !== null) {
-      // Use snapshot to prevent items from disappearing during practice
+    if (filterSnapshotInitialized) {
+      // Use snapshot from state (set via refresh/sort change)
       result = items.filter((item) => filterSnapshot.has(item.id))
+    } else if (initialFilteredIds !== null) {
+      // Use stable initial filter (doesn't change when filterFn changes)
+      result = items.filter((item) => initialFilteredIds.has(item.id))
     } else if (filterFn) {
-      // Initial render before snapshot captured - use live filter
+      // Fallback: use live filter (only happens briefly before initial filter computes)
       result = items.filter(filterFn)
     } else {
       result = [...items]
@@ -144,6 +169,8 @@ export function useSortingAndFiltering<TItem extends PracticeItem>({
   }, [
     items,
     filterSnapshot,
+    filterSnapshotInitialized,
+    initialFilteredIds,
     filterFn,
     sortOption,
     displayCount,

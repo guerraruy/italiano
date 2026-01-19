@@ -52,6 +52,7 @@ export default function VerbsTranslationsPage() {
     setExcludeMastered,
     getStatistics,
     shouldShowRefreshButton,
+    masteredCount,
   } = useVerbsPractice()
 
   if (isLoading) {
@@ -117,6 +118,7 @@ export default function VerbsTranslationsPage() {
           displayCount={displayCount}
           excludeMastered={excludeMastered}
           masteryThreshold={masteryThreshold}
+          masteredCount={masteredCount}
           shouldShowRefreshButton={shouldShowRefreshButton}
           getStatistics={getStatistics}
           onInputChange={handleInputChange}

@@ -90,6 +90,15 @@ export const useAdjectivesPractice = () => {
   // Get mastery threshold from profile
   const masteryThreshold = profileData?.profile?.masteryThreshold ?? 10
 
+  // Calculate mastered count
+  const masteredCount = useMemo(() => {
+    return adjectives.filter((adjective) => {
+      const stats = getStatistics(adjective.id)
+      const netScore = stats.correct - stats.wrong
+      return netScore >= masteryThreshold
+    }).length
+  }, [adjectives, getStatistics, masteryThreshold])
+
   // Mastery exclusion filter function
   const filterFn = useCallback(
     (adjective: PracticeAdjective) => {
@@ -432,5 +441,6 @@ export const useAdjectivesPractice = () => {
     // Computed
     getStatistics,
     shouldShowRefreshButton,
+    masteredCount,
   }
 }

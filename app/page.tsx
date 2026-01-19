@@ -90,9 +90,9 @@ export default function Home() {
   return (
     <PageContainer maxWidth="lg">
       <HeroSection>
-        <IconWrapper>
+        {/* <IconWrapper>
           <HomeIcon fontSize="inherit" />
-        </IconWrapper>
+        </IconWrapper> */}
         <Typography variant="h2" component="h1" gutterBottom fontWeight="bold">
           Welcome to Italiano
         </Typography>

@@ -50,6 +50,7 @@ export default function AdjectivesTranslationsPage() {
     setExcludeMastered,
     getStatistics,
     shouldShowRefreshButton,
+    masteredCount,
   } = useAdjectivesPractice()
 
   const setInputRef = React.useCallback(
@@ -125,6 +126,7 @@ export default function AdjectivesTranslationsPage() {
           displayCount={displayCount}
           excludeMastered={excludeMastered}
           masteryThreshold={masteryThreshold}
+          masteredCount={masteredCount}
           shouldShowRefreshButton={shouldShowRefreshButton}
           getStatistics={getStatistics}
           onInputChange={handleInputChange}

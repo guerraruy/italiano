@@ -89,6 +89,15 @@ export const useVerbsPractice = () => {
   // Get mastery threshold from profile
   const masteryThreshold = profileData?.profile?.masteryThreshold ?? 10
 
+  // Calculate mastered count
+  const masteredCount = useMemo(() => {
+    return verbs.filter((verb) => {
+      const stats = getStatistics(verb.id)
+      const netScore = stats.correct - stats.wrong
+      return netScore >= masteryThreshold
+    }).length
+  }, [verbs, getStatistics, masteryThreshold])
+
   // Verb type filter function
   const filterFn = useCallback(
     (verb: PracticeVerb) => {
@@ -278,5 +287,6 @@ export const useVerbsPractice = () => {
     // Computed
     getStatistics,
     shouldShowRefreshButton,
+    masteredCount,
   }
 }

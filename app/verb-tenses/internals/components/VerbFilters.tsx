@@ -43,6 +43,7 @@ interface VerbFiltersProps {
   hasSelectedVerb: boolean
   excludeMastered: boolean
   masteryThreshold: number
+  masteredCount: number
   onVerbTypeFilterChange: (filter: VerbTypeFilter) => void
   onVerbSelection: (verbId: string) => void
   onExcludeMasteredChange: (value: boolean) => void
@@ -91,6 +92,7 @@ export const VerbFilters: React.FC<VerbFiltersProps> = ({
   hasSelectedVerb,
   excludeMastered,
   masteryThreshold,
+  masteredCount,
   onVerbTypeFilterChange,
   onVerbSelection,
   onExcludeMasteredChange,
@@ -160,7 +162,7 @@ export const VerbFilters: React.FC<VerbFiltersProps> = ({
               size="small"
             />
           }
-          label="Exclude mastered"
+          label={`Exclude mastered (${masteredCount})`}
           sx={{ ml: 1 }}
         />
       </Tooltip>

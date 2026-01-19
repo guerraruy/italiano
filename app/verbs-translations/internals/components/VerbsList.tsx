@@ -29,6 +29,7 @@ interface VerbsListProps {
   displayCount: DisplayCount
   excludeMastered: boolean
   masteryThreshold: number
+  masteredCount: number
   shouldShowRefreshButton: boolean
   getStatistics: (verbId: string) => { correct: number; wrong: number }
   onInputChange: (verbId: string, value: string) => void
@@ -60,6 +61,7 @@ export const VerbsList: React.FC<VerbsListProps> = ({
   displayCount,
   excludeMastered,
   masteryThreshold,
+  masteredCount,
   shouldShowRefreshButton,
   getStatistics,
   onInputChange,
@@ -91,6 +93,7 @@ export const VerbsList: React.FC<VerbsListProps> = ({
         displayCount={displayCount}
         excludeMastered={excludeMastered}
         masteryThreshold={masteryThreshold}
+        masteredCount={masteredCount}
         onVerbTypeChange={onVerbTypeChange}
         onSortChange={onSortChange}
         onDisplayCountChange={onDisplayCountChange}

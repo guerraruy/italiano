@@ -53,6 +53,7 @@ export default function VerbTensesPage() {
     handleVerbSelection,
     setExcludeMastered,
     getStatistics,
+    masteredCount,
   } = useVerbConjugationPractice()
 
   if (isLoading) {
@@ -114,6 +115,7 @@ export default function VerbTensesPage() {
           hasSelectedVerb={!!selectedVerb}
           excludeMastered={excludeMastered}
           masteryThreshold={masteryThreshold}
+          masteredCount={masteredCount}
           onVerbTypeFilterChange={handleVerbTypeFilterChange}
           onVerbSelection={handleVerbSelection}
           onExcludeMasteredChange={setExcludeMastered}

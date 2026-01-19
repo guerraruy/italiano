@@ -37,6 +37,7 @@ interface FilterControlsProps {
   displayCount: DisplayCount
   excludeMastered: boolean
   masteryThreshold: number
+  masteredCount: number
   onSortChange: (value: SortOption) => void
   onDisplayCountChange: (value: DisplayCount) => void
   onExcludeMasteredChange: (value: boolean) => void
@@ -51,6 +52,7 @@ export default function FilterControls({
   displayCount,
   excludeMastered,
   masteryThreshold,
+  masteredCount,
   onSortChange,
   onDisplayCountChange,
   onExcludeMasteredChange,
@@ -118,7 +120,7 @@ export default function FilterControls({
               size="small"
             />
           }
-          label="Exclude mastered"
+          label={`Exclude mastered (${masteredCount})`}
           sx={{ ml: 1 }}
         />
       </Tooltip>

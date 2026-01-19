@@ -27,6 +27,7 @@ interface NounsListProps {
   displayCount: DisplayCount
   excludeMastered: boolean
   masteryThreshold: number
+  masteredCount: number
   shouldShowRefreshButton: boolean
   getStatistics: (nounId: string) => { correct: number; wrong: number }
   onInputChange: (
@@ -61,6 +62,7 @@ export const NounsList: React.FC<NounsListProps> = ({
   displayCount,
   excludeMastered,
   masteryThreshold,
+  masteredCount,
   shouldShowRefreshButton,
   getStatistics,
   onInputChange,
@@ -91,6 +93,7 @@ export const NounsList: React.FC<NounsListProps> = ({
         displayCount={displayCount}
         excludeMastered={excludeMastered}
         masteryThreshold={masteryThreshold}
+        masteredCount={masteredCount}
         onSortChange={onSortChange}
         onDisplayCountChange={onDisplayCountChange}
         onExcludeMasteredChange={onExcludeMasteredChange}

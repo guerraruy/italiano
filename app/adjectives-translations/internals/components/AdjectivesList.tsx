@@ -29,6 +29,7 @@ interface AdjectivesListProps {
   displayCount: DisplayCount
   excludeMastered: boolean
   masteryThreshold: number
+  masteredCount: number
   shouldShowRefreshButton: boolean
   getStatistics: (adjectiveId: string) => { correct: number; wrong: number }
   onInputChange: (
@@ -69,6 +70,7 @@ export const AdjectivesList: React.FC<AdjectivesListProps> = ({
   displayCount,
   excludeMastered,
   masteryThreshold,
+  masteredCount,
   shouldShowRefreshButton,
   getStatistics,
   onInputChange,
@@ -99,6 +101,7 @@ export const AdjectivesList: React.FC<AdjectivesListProps> = ({
         displayCount={displayCount}
         excludeMastered={excludeMastered}
         masteryThreshold={masteryThreshold}
+        masteredCount={masteredCount}
         onSortChange={onSortChange}
         onDisplayCountChange={onDisplayCountChange}
         onExcludeMasteredChange={onExcludeMasteredChange}

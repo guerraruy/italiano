@@ -174,6 +174,11 @@ export const useVerbConjugationPractice = () => {
     [enabledVerbTenses, masteryThreshold, statisticsData]
   )
 
+  // Calculate mastered count
+  const masteredCount = useMemo(() => {
+    return verbs.filter((verb) => isVerbMastered(verb)).length
+  }, [verbs, isVerbMastered])
+
   // Filter verbs by type and mastery
   const filteredVerbs = useMemo(() => {
     let result = verbs
@@ -445,5 +450,6 @@ export const useVerbConjugationPractice = () => {
 
     // Computed
     getStatistics,
+    masteredCount,
   }
 }

@@ -90,6 +90,15 @@ export const useNounsPractice = () => {
   // Get mastery threshold from profile
   const masteryThreshold = profileData?.profile?.masteryThreshold ?? 10
 
+  // Calculate mastered count
+  const masteredCount = useMemo(() => {
+    return nouns.filter((noun) => {
+      const stats = getStatistics(noun.id)
+      const netScore = stats.correct - stats.wrong
+      return netScore >= masteryThreshold
+    }).length
+  }, [nouns, getStatistics, masteryThreshold])
+
   // Mastery exclusion filter function
   const filterFn = useCallback(
     (noun: PracticeNoun) => {
@@ -358,5 +367,6 @@ export const useNounsPractice = () => {
     // Computed
     getStatistics,
     shouldShowRefreshButton,
+    masteredCount,
   }
 }
