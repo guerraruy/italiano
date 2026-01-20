@@ -216,13 +216,16 @@ export default function ImportConjugations({
   return (
     <>
       <Tooltip title="Import Conjugations from JSON">
-        <IconButton
-          color="primary"
-          onClick={() => setShowImportDialog(true)}
-          disabled={isLoading}
-        >
-          <CloudUpload />
-        </IconButton>
+        <span>
+          <IconButton
+            color="primary"
+            onClick={() => setShowImportDialog(true)}
+            disabled={isLoading}
+            aria-label="Import Conjugations from JSON"
+          >
+            <CloudUpload />
+          </IconButton>
+        </span>
       </Tooltip>
 
       <ImportDialog

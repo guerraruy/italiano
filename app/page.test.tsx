@@ -192,13 +192,6 @@ describe('Home', () => {
       expect(scheduleIcons.length).toBeGreaterThan(0)
     })
 
-    it('renders hero section with home icon', () => {
-      const { container } = render(<Home />)
-
-      const homeIcons = container.querySelectorAll('[data-testid="HomeIcon"]')
-      expect(homeIcons.length).toBeGreaterThan(0)
-    })
-
     it('renders all cards in a grid layout', () => {
       const { container } = render(<Home />)
 

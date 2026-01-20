@@ -15,6 +15,7 @@ import {
 } from '@mui/material'
 
 import { Statistics } from '@/app/components/Statistics'
+import { usePracticeActions } from '@/app/contexts'
 
 import { VerbListItem, VerbInfo, IconBox, InputActionsBox } from './styled'
 
@@ -30,17 +31,6 @@ interface VerbItemProps {
   inputValue: string
   validationState: 'correct' | 'incorrect' | null
   statistics: { correct: number; wrong: number }
-  onInputChange: (verbId: string, value: string) => void
-  onValidation: (verbId: string, correctAnswer: string) => void
-  onClearInput: (verbId: string) => void
-  onShowAnswer: (verbId: string, correctAnswer: string) => void
-  onResetStatistics: (verbId: string) => void
-  onKeyDown: (
-    e: React.KeyboardEvent,
-    verbId: string,
-    correctAnswer: string,
-    index: number
-  ) => void
   inputRef: (el: HTMLInputElement | null) => void
 }
 
@@ -50,14 +40,16 @@ const VerbItem = ({
   inputValue,
   validationState,
   statistics,
-  onInputChange,
-  onValidation,
-  onClearInput,
-  onShowAnswer,
-  onResetStatistics,
-  onKeyDown,
   inputRef,
 }: VerbItemProps) => {
+  const {
+    onInputChange,
+    onValidation,
+    onClearInput,
+    onShowAnswer,
+    onResetStatistics,
+    onKeyDown,
+  } = usePracticeActions()
   const inputStyle = useMemo(() => {
     if (validationState === 'correct') {
       return {
@@ -159,14 +151,17 @@ const VerbItem = ({
       <Statistics correct={statistics.correct} wrong={statistics.wrong} />
 
       <Tooltip title="Reset statistics">
-        <IconButton
-          size="small"
-          onClick={() => onResetStatistics(verb.id)}
-          color="default"
-          disabled={statistics.correct === 0 && statistics.wrong === 0}
-        >
-          <DeleteSweepIcon fontSize="small" />
-        </IconButton>
+        <span>
+          <IconButton
+            size="small"
+            onClick={() => onResetStatistics(verb.id)}
+            color="default"
+            disabled={statistics.correct === 0 && statistics.wrong === 0}
+            aria-label="Reset statistics"
+          >
+            <DeleteSweepIcon fontSize="small" />
+          </IconButton>
+        </span>
       </Tooltip>
     </VerbListItem>
   )

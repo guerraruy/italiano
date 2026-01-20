@@ -1,10 +1,16 @@
-import React from 'react'
+import React, { ReactNode } from 'react'
 
 import { ThemeProvider, createTheme } from '@mui/material/styles'
 import { render, screen, fireEvent } from '@testing-library/react'
 
 import '@testing-library/jest-dom'
 import { Statistics } from '@/app/components/Statistics'
+import {
+  PracticeActionsProvider,
+  PracticeFiltersProvider,
+  PracticeActionsContextType,
+  PracticeFiltersContextType,
+} from '@/app/contexts'
 
 import VerbItem from './VerbItem'
 
@@ -22,8 +28,44 @@ const MockedStatistics = jest.mocked(Statistics)
 
 const theme = createTheme()
 
+// Mock context values
+const mockActionsContext: PracticeActionsContextType = {
+  onInputChange: jest.fn(),
+  onValidation: jest.fn(),
+  onClearInput: jest.fn(),
+  onShowAnswer: jest.fn(),
+  onResetStatistics: jest.fn(),
+  onKeyDown: jest.fn(),
+  getStatistics: jest.fn().mockReturnValue({ correct: 0, wrong: 0 }),
+  getInputRef: jest.fn().mockReturnValue(jest.fn()),
+}
+
+const mockFiltersContext: PracticeFiltersContextType = {
+  sortOption: 'none',
+  displayCount: 'all',
+  excludeMastered: false,
+  masteryThreshold: 10,
+  masteredCount: 0,
+  shouldShowRefreshButton: false,
+  displayedCount: 1,
+  totalCount: 1,
+  onSortChange: jest.fn(),
+  onDisplayCountChange: jest.fn(),
+  onExcludeMasteredChange: jest.fn(),
+  onRefresh: jest.fn(),
+}
+
 const renderWithTheme = (ui: React.ReactElement) => {
-  return render(<ThemeProvider theme={theme}>{ui}</ThemeProvider>)
+  const Wrapper = ({ children }: { children: ReactNode }) => (
+    <ThemeProvider theme={theme}>
+      <PracticeFiltersProvider value={mockFiltersContext}>
+        <PracticeActionsProvider value={mockActionsContext}>
+          {children}
+        </PracticeActionsProvider>
+      </PracticeFiltersProvider>
+    </ThemeProvider>
+  )
+  return render(ui, { wrapper: Wrapper })
 }
 
 describe('VerbItem', () => {
@@ -37,23 +79,13 @@ describe('VerbItem', () => {
 
   const defaultStatistics = { correct: 0, wrong: 0 }
 
-  const mockHandlers = {
-    onInputChange: jest.fn(),
-    onValidation: jest.fn(),
-    onClearInput: jest.fn(),
-    onShowAnswer: jest.fn(),
-    onResetStatistics: jest.fn(),
-    onKeyDown: jest.fn(),
-    inputRef: jest.fn(),
-  }
-
   const defaultProps = {
     verb: mockVerb,
     index: 0,
     inputValue: '',
     validationState: null as 'correct' | 'incorrect' | null,
     statistics: defaultStatistics,
-    ...mockHandlers,
+    inputRef: jest.fn(),
   }
 
   beforeEach(() => {
@@ -239,7 +271,7 @@ describe('VerbItem', () => {
         )
         fireEvent.change(input, { target: { value: 'parlare' } })
 
-        expect(mockHandlers.onInputChange).toHaveBeenCalledWith(
+        expect(mockActionsContext.onInputChange).toHaveBeenCalledWith(
           'verb-1',
           'parlare'
         )
@@ -253,7 +285,10 @@ describe('VerbItem', () => {
         )
         fireEvent.change(input, { target: { value: '' } })
 
-        expect(mockHandlers.onInputChange).toHaveBeenCalledWith('verb-1', '')
+        expect(mockActionsContext.onInputChange).toHaveBeenCalledWith(
+          'verb-1',
+          ''
+        )
       })
     })
 
@@ -266,7 +301,7 @@ describe('VerbItem', () => {
         )
         fireEvent.blur(input)
 
-        expect(mockHandlers.onValidation).toHaveBeenCalledWith(
+        expect(mockActionsContext.onValidation).toHaveBeenCalledWith(
           'verb-1',
           'parlare'
         )
@@ -282,7 +317,7 @@ describe('VerbItem', () => {
         )
         fireEvent.keyDown(input, { key: 'Enter' })
 
-        expect(mockHandlers.onKeyDown).toHaveBeenCalledWith(
+        expect(mockActionsContext.onKeyDown).toHaveBeenCalledWith(
           expect.objectContaining({ key: 'Enter' }),
           'verb-1',
           'parlare',
@@ -298,7 +333,7 @@ describe('VerbItem', () => {
         )
         fireEvent.keyDown(input, { key: 'Tab' })
 
-        expect(mockHandlers.onKeyDown).toHaveBeenCalledWith(
+        expect(mockActionsContext.onKeyDown).toHaveBeenCalledWith(
           expect.objectContaining({ key: 'Tab' }),
           'verb-1',
           'parlare',
@@ -314,7 +349,7 @@ describe('VerbItem', () => {
         const clearButton = screen.getByRole('button', { name: /clear field/i })
         fireEvent.click(clearButton)
 
-        expect(mockHandlers.onClearInput).toHaveBeenCalledWith('verb-1')
+        expect(mockActionsContext.onClearInput).toHaveBeenCalledWith('verb-1')
       })
     })
 
@@ -327,7 +362,7 @@ describe('VerbItem', () => {
         })
         fireEvent.click(showAnswerButton)
 
-        expect(mockHandlers.onShowAnswer).toHaveBeenCalledWith(
+        expect(mockActionsContext.onShowAnswer).toHaveBeenCalledWith(
           'verb-1',
           'parlare'
         )
@@ -345,7 +380,9 @@ describe('VerbItem', () => {
         })
         fireEvent.click(resetButton)
 
-        expect(mockHandlers.onResetStatistics).toHaveBeenCalledWith('verb-1')
+        expect(mockActionsContext.onResetStatistics).toHaveBeenCalledWith(
+          'verb-1'
+        )
       })
     })
   })
@@ -355,7 +392,7 @@ describe('VerbItem', () => {
       renderWithTheme(<VerbItem {...defaultProps} />)
 
       // The ref callback should be passed to the input
-      expect(mockHandlers.inputRef).toBeDefined()
+      expect(defaultProps.inputRef).toBeDefined()
     })
   })
 
@@ -473,7 +510,7 @@ describe('VerbItem', () => {
       })
       fireEvent.click(showAnswerButton)
 
-      expect(mockHandlers.onShowAnswer).toHaveBeenCalledWith(
+      expect(mockActionsContext.onShowAnswer).toHaveBeenCalledWith(
         'custom-verb-id',
         'dormire'
       )
@@ -495,7 +532,7 @@ describe('VerbItem', () => {
       )
       fireEvent.blur(input)
 
-      expect(mockHandlers.onValidation).toHaveBeenCalledWith(
+      expect(mockActionsContext.onValidation).toHaveBeenCalledWith(
         'verb-3',
         'correre'
       )
@@ -511,7 +548,7 @@ describe('VerbItem', () => {
       )
       fireEvent.keyDown(input, { key: 'Enter' })
 
-      expect(mockHandlers.onKeyDown).toHaveBeenCalledWith(
+      expect(mockActionsContext.onKeyDown).toHaveBeenCalledWith(
         expect.any(Object),
         'verb-1',
         'parlare',

@@ -2,13 +2,11 @@ import React from 'react'
 
 import { List, Alert } from '@mui/material'
 
+import { usePracticeActions } from '@/app/contexts'
+
 import { InputValues, ValidationState } from '../types'
 import { AdjectiveItem } from './AdjectiveItem'
-import {
-  FilterControls,
-  SortOption,
-  DisplayCount,
-} from './AdjectiveItem/internals'
+import { FilterControls } from './AdjectiveItem/internals'
 
 interface Adjective {
   id: string
@@ -25,40 +23,6 @@ interface AdjectivesListProps {
   filteredAndSortedAdjectives: Adjective[]
   inputValues: InputValues
   validationState: ValidationState
-  sortOption: SortOption
-  displayCount: DisplayCount
-  excludeMastered: boolean
-  masteryThreshold: number
-  masteredCount: number
-  shouldShowRefreshButton: boolean
-  getStatistics: (adjectiveId: string) => { correct: number; wrong: number }
-  onInputChange: (
-    adjectiveId: string,
-    field: keyof InputValues[string],
-    value: string
-  ) => void
-  onValidation: (
-    adjectiveId: string,
-    field: keyof InputValues[string],
-    correctAnswer: string
-  ) => void
-  onClearInput: (adjectiveId: string, field?: keyof InputValues[string]) => void
-  onShowAnswer: (adjectiveId: string) => void
-  onResetStatistics: (adjectiveId: string) => void
-  onKeyDown: (
-    e: React.KeyboardEvent,
-    adjectiveId: string,
-    field: keyof InputValues[string],
-    currentIndex: number
-  ) => void
-  onSortChange: (newSort: SortOption) => void
-  onDisplayCountChange: (count: DisplayCount) => void
-  onExcludeMasteredChange: (value: boolean) => void
-  onRefresh: () => void
-  setInputRef: (
-    adjectiveId: string,
-    field: keyof InputValues[string]
-  ) => (el: HTMLInputElement | null) => void
 }
 
 export const AdjectivesList: React.FC<AdjectivesListProps> = ({
@@ -66,25 +30,8 @@ export const AdjectivesList: React.FC<AdjectivesListProps> = ({
   filteredAndSortedAdjectives,
   inputValues,
   validationState,
-  sortOption,
-  displayCount,
-  excludeMastered,
-  masteryThreshold,
-  masteredCount,
-  shouldShowRefreshButton,
-  getStatistics,
-  onInputChange,
-  onValidation,
-  onClearInput,
-  onShowAnswer,
-  onResetStatistics,
-  onKeyDown,
-  onSortChange,
-  onDisplayCountChange,
-  onExcludeMasteredChange,
-  onRefresh,
-  setInputRef,
 }) => {
+  const { getStatistics, getInputRef } = usePracticeActions()
   if (adjectives.length === 0) {
     return (
       <Alert severity="info">
@@ -96,20 +43,7 @@ export const AdjectivesList: React.FC<AdjectivesListProps> = ({
 
   return (
     <>
-      <FilterControls
-        sortOption={sortOption}
-        displayCount={displayCount}
-        excludeMastered={excludeMastered}
-        masteryThreshold={masteryThreshold}
-        masteredCount={masteredCount}
-        onSortChange={onSortChange}
-        onDisplayCountChange={onDisplayCountChange}
-        onExcludeMasteredChange={onExcludeMasteredChange}
-        onRefresh={onRefresh}
-        showRefreshButton={shouldShowRefreshButton}
-        displayedCount={filteredAndSortedAdjectives.length}
-        totalCount={adjectives.length}
-      />
+      <FilterControls />
 
       <List>
         {filteredAndSortedAdjectives.map((adjective, index) => (
@@ -134,13 +68,19 @@ export const AdjectivesList: React.FC<AdjectivesListProps> = ({
               }
             }
             statistics={getStatistics(adjective.id)}
-            onInputChange={onInputChange}
-            onValidation={onValidation}
-            onClearInput={onClearInput}
-            onShowAnswer={onShowAnswer}
-            onResetStatistics={onResetStatistics}
-            onKeyDown={onKeyDown}
-            setInputRef={setInputRef}
+            inputRefMasculineSingular={getInputRef(
+              adjective.id,
+              'masculineSingular'
+            )}
+            inputRefMasculinePlural={getInputRef(
+              adjective.id,
+              'masculinePlural'
+            )}
+            inputRefFeminineSingular={getInputRef(
+              adjective.id,
+              'feminineSingular'
+            )}
+            inputRefFemininePlural={getInputRef(adjective.id, 'femininePlural')}
           />
         ))}
       </List>

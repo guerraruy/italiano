@@ -1,10 +1,17 @@
-import React from 'react'
+import React, { ReactNode } from 'react'
 
 import { render, screen } from '@testing-library/react'
 
 import '@testing-library/jest-dom'
+import {
+  PracticeActionsProvider,
+  PracticeFiltersProvider,
+  PracticeActionsContextType,
+  PracticeFiltersContextType,
+} from '@/app/contexts'
+
 import { InputValues, ValidationState } from '../types'
-import { SortOption, DisplayCount, VerbTypeFilter } from './VerbItem/internals'
+import { VerbTypeFilter } from './VerbItem/internals'
 import { VerbsList } from './VerbsList'
 
 // Mock child components
@@ -31,27 +38,49 @@ jest.mock('./VerbItem', () => ({
 }))
 
 jest.mock('./VerbItem/internals', () => ({
-  FilterControls: ({
-    displayedCount,
-    totalCount,
-  }: {
-    displayedCount: number
-    totalCount: number
-  }) => (
-    <div data-testid="filter-controls">
-      FilterControls: {displayedCount}/{totalCount}
-    </div>
-  ),
-  SortOption: {
-    NONE: 'none',
-  },
-  DisplayCount: {
-    ALL: 'all',
-  },
+  FilterControls: () => <div data-testid="filter-controls">FilterControls</div>,
   VerbTypeFilter: {
     ALL: 'all',
   },
 }))
+
+// Test wrapper with context providers
+const mockActionsContext: PracticeActionsContextType = {
+  onInputChange: jest.fn(),
+  onValidation: jest.fn(),
+  onClearInput: jest.fn(),
+  onShowAnswer: jest.fn(),
+  onResetStatistics: jest.fn(),
+  onKeyDown: jest.fn(),
+  getStatistics: jest.fn().mockReturnValue({ correct: 0, wrong: 0 }),
+  getInputRef: jest.fn().mockReturnValue(jest.fn()),
+}
+
+const mockFiltersContext: PracticeFiltersContextType = {
+  sortOption: 'none',
+  displayCount: 'all',
+  excludeMastered: false,
+  masteryThreshold: 10,
+  masteredCount: 0,
+  shouldShowRefreshButton: false,
+  displayedCount: 1,
+  totalCount: 1,
+  onSortChange: jest.fn(),
+  onDisplayCountChange: jest.fn(),
+  onExcludeMasteredChange: jest.fn(),
+  onRefresh: jest.fn(),
+}
+
+const TestWrapper = ({ children }: { children: ReactNode }) => (
+  <PracticeFiltersProvider value={mockFiltersContext}>
+    <PracticeActionsProvider value={mockActionsContext}>
+      {children}
+    </PracticeActionsProvider>
+  </PracticeFiltersProvider>
+)
+
+const renderWithProviders = (ui: React.ReactElement) =>
+  render(ui, { wrapper: TestWrapper })
 
 describe('VerbsList', () => {
   const mockVerb = {
@@ -72,24 +101,7 @@ describe('VerbsList', () => {
       verb1: 'correct',
     } as ValidationState,
     verbTypeFilter: 'all' as VerbTypeFilter,
-    sortOption: 'none' as SortOption,
-    displayCount: 'all' as DisplayCount,
-    excludeMastered: true,
-    masteryThreshold: 10,
-    shouldShowRefreshButton: true,
-    getStatistics: jest.fn().mockReturnValue({ correct: 0, wrong: 0 }),
-    onInputChange: jest.fn(),
-    onValidation: jest.fn(),
-    onClearInput: jest.fn(),
-    onShowAnswer: jest.fn(),
-    onResetStatistics: jest.fn(),
-    onKeyDown: jest.fn(),
     onVerbTypeChange: jest.fn(),
-    onSortChange: jest.fn(),
-    onDisplayCountChange: jest.fn(),
-    onExcludeMasteredChange: jest.fn(),
-    onRefresh: jest.fn(),
-    inputRef: jest.fn().mockReturnValue(jest.fn()),
   }
 
   beforeEach(() => {
@@ -97,7 +109,7 @@ describe('VerbsList', () => {
   })
 
   it('renders "No verbs available" alert when verbs array is empty', () => {
-    render(
+    renderWithProviders(
       <VerbsList {...defaultProps} verbs={[]} filteredAndSortedVerbs={[]} />
     )
 
@@ -110,7 +122,7 @@ describe('VerbsList', () => {
   })
 
   it('renders FilterControls and VerbItem components when verbs are present', () => {
-    render(<VerbsList {...defaultProps} />)
+    renderWithProviders(<VerbsList {...defaultProps} />)
 
     expect(screen.getByTestId('filter-controls')).toBeInTheDocument()
     expect(screen.getByTestId('verb-item-verb1')).toBeInTheDocument()
@@ -119,34 +131,28 @@ describe('VerbsList', () => {
     ).toBeInTheDocument()
   })
 
-  it('passes correct props to FilterControls', () => {
-    const props = {
-      ...defaultProps,
-      verbs: [mockVerb, { ...mockVerb, id: 'verb2', translation: 'to eat' }],
-      filteredAndSortedVerbs: [mockVerb],
-    }
+  it('renders FilterControls component', () => {
+    renderWithProviders(<VerbsList {...defaultProps} />)
 
-    render(<VerbsList {...props} />)
-
-    expect(screen.getByText('FilterControls: 1/2')).toBeInTheDocument()
+    expect(screen.getByTestId('filter-controls')).toBeInTheDocument()
   })
 
   it('provides default inputValue when missing', () => {
-    render(<VerbsList {...defaultProps} inputValues={{}} />)
+    renderWithProviders(<VerbsList {...defaultProps} inputValues={{}} />)
 
     const inputDiv = screen.getByTestId('input-verb1')
     expect(inputDiv).toHaveTextContent('')
   })
 
   it('provides default validationState when missing', () => {
-    render(<VerbsList {...defaultProps} validationState={{}} />)
+    renderWithProviders(<VerbsList {...defaultProps} validationState={{}} />)
 
     const validationDiv = screen.getByTestId('validation-verb1')
     expect(validationDiv).toHaveTextContent('null')
   })
 
   it('provides default inputValue and validationState when both are missing', () => {
-    render(
+    renderWithProviders(
       <VerbsList {...defaultProps} inputValues={{}} validationState={{}} />
     )
 
@@ -176,7 +182,7 @@ describe('VerbsList', () => {
       },
     ]
 
-    render(
+    renderWithProviders(
       <VerbsList
         {...defaultProps}
         verbs={verbs}
@@ -206,7 +212,7 @@ describe('VerbsList', () => {
       },
     ]
 
-    render(
+    renderWithProviders(
       <VerbsList
         {...defaultProps}
         verbs={verbs}
@@ -232,7 +238,7 @@ describe('VerbsList', () => {
       },
     ]
 
-    render(
+    renderWithProviders(
       <VerbsList
         {...defaultProps}
         verbs={verbs}
@@ -240,12 +246,12 @@ describe('VerbsList', () => {
       />
     )
 
-    expect(defaultProps.getStatistics).toHaveBeenCalledWith('verb1')
-    expect(defaultProps.getStatistics).toHaveBeenCalledWith('verb2')
-    expect(defaultProps.getStatistics).toHaveBeenCalledTimes(2)
+    expect(mockActionsContext.getStatistics).toHaveBeenCalledWith('verb1')
+    expect(mockActionsContext.getStatistics).toHaveBeenCalledWith('verb2')
+    expect(mockActionsContext.getStatistics).toHaveBeenCalledTimes(2)
   })
 
-  it('calls inputRef for each verb', () => {
+  it('calls getInputRef for each verb', () => {
     const verbs = [
       mockVerb,
       {
@@ -257,7 +263,7 @@ describe('VerbsList', () => {
       },
     ]
 
-    render(
+    renderWithProviders(
       <VerbsList
         {...defaultProps}
         verbs={verbs}
@@ -265,8 +271,8 @@ describe('VerbsList', () => {
       />
     )
 
-    expect(defaultProps.inputRef).toHaveBeenCalledWith('verb1')
-    expect(defaultProps.inputRef).toHaveBeenCalledWith('verb2')
+    expect(mockActionsContext.getInputRef).toHaveBeenCalledWith('verb1')
+    expect(mockActionsContext.getInputRef).toHaveBeenCalledWith('verb2')
   })
 
   it('renders verbs with different types correctly', () => {
@@ -294,7 +300,7 @@ describe('VerbsList', () => {
       },
     ]
 
-    render(
+    renderWithProviders(
       <VerbsList
         {...defaultProps}
         verbs={verbs}
@@ -324,7 +330,7 @@ describe('VerbsList', () => {
       verb2: 'mangiare',
     }
 
-    render(
+    renderWithProviders(
       <VerbsList
         {...defaultProps}
         verbs={verbs}
@@ -354,7 +360,7 @@ describe('VerbsList', () => {
       verb2: 'incorrect' as const,
     }
 
-    render(
+    renderWithProviders(
       <VerbsList
         {...defaultProps}
         verbs={verbs}
@@ -398,7 +404,7 @@ describe('VerbsList', () => {
       },
     ]
 
-    render(
+    renderWithProviders(
       <VerbsList
         {...defaultProps}
         verbs={allVerbs}
@@ -409,6 +415,5 @@ describe('VerbsList', () => {
     expect(screen.queryByTestId('verb-item-verb1')).not.toBeInTheDocument()
     expect(screen.getByTestId('verb-item-verb2')).toBeInTheDocument()
     expect(screen.queryByTestId('verb-item-verb3')).not.toBeInTheDocument()
-    expect(screen.getByText('FilterControls: 1/3')).toBeInTheDocument()
   })
 })

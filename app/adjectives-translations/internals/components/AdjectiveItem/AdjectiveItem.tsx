@@ -4,6 +4,7 @@ import DeleteSweepIcon from '@mui/icons-material/DeleteSweep'
 import { Box, IconButton, Tooltip, Typography } from '@mui/material'
 
 import { Statistics } from '@/app/components/Statistics'
+import { usePracticeActions } from '@/app/contexts'
 
 import { GenderInputColumn, AdjectiveActions } from './internals'
 import { AdjectiveListItem, AdjectiveInfo } from './styled'
@@ -30,29 +31,10 @@ interface AdjectiveItemProps {
   inputValues: InputValues[string]
   validationState: ValidationState
   statistics: { correct: number; wrong: number }
-  onInputChange: (
-    adjectiveId: string,
-    field: keyof InputValues[string],
-    value: string
-  ) => void
-  onValidation: (
-    adjectiveId: string,
-    field: keyof InputValues[string],
-    correctAnswer: string
-  ) => void
-  onClearInput: (adjectiveId: string, field?: keyof InputValues[string]) => void
-  onShowAnswer: (adjectiveId: string) => void
-  onResetStatistics: (adjectiveId: string) => void
-  onKeyDown: (
-    e: React.KeyboardEvent,
-    adjectiveId: string,
-    field: keyof InputValues[string],
-    index: number
-  ) => void
-  setInputRef: (
-    adjectiveId: string,
-    field: keyof InputValues[string]
-  ) => (el: HTMLInputElement | null) => void
+  inputRefMasculineSingular: (el: HTMLInputElement | null) => void
+  inputRefMasculinePlural: (el: HTMLInputElement | null) => void
+  inputRefFeminineSingular: (el: HTMLInputElement | null) => void
+  inputRefFemininePlural: (el: HTMLInputElement | null) => void
 }
 
 const AdjectiveItem = ({
@@ -61,14 +43,12 @@ const AdjectiveItem = ({
   inputValues,
   validationState,
   statistics,
-  onInputChange,
-  onValidation,
-  onClearInput,
-  onShowAnswer,
-  onResetStatistics,
-  onKeyDown,
-  setInputRef,
+  inputRefMasculineSingular,
+  inputRefMasculinePlural,
+  inputRefFeminineSingular,
+  inputRefFemininePlural,
 }: AdjectiveItemProps) => {
+  const { onClearInput, onShowAnswer, onResetStatistics } = usePracticeActions()
   const hasStatistics = statistics.correct > 0 || statistics.wrong > 0
 
   return (
@@ -130,11 +110,8 @@ const AdjectiveItem = ({
             pluralValidation={validationState.masculinePlural}
             adjectiveId={adjective.id}
             index={index}
-            onInputChange={onInputChange}
-            onValidation={onValidation}
-            onClearInput={onClearInput}
-            onKeyDown={onKeyDown}
-            setInputRef={setInputRef}
+            singularInputRef={inputRefMasculineSingular}
+            pluralInputRef={inputRefMasculinePlural}
           />
 
           <GenderInputColumn
@@ -149,11 +126,8 @@ const AdjectiveItem = ({
             pluralValidation={validationState.femininePlural}
             adjectiveId={adjective.id}
             index={index}
-            onInputChange={onInputChange}
-            onValidation={onValidation}
-            onClearInput={onClearInput}
-            onKeyDown={onKeyDown}
-            setInputRef={setInputRef}
+            singularInputRef={inputRefFeminineSingular}
+            pluralInputRef={inputRefFemininePlural}
           />
         </Box>
       </Box>
@@ -177,15 +151,18 @@ const AdjectiveItem = ({
 
       {/* Desktop reset button */}
       <Tooltip title="Reset statistics">
-        <IconButton
-          size="small"
-          onClick={() => onResetStatistics(adjective.id)}
-          color="default"
-          disabled={!hasStatistics}
-          sx={{ display: { xs: 'none', md: 'inline-flex' } }}
-        >
-          <DeleteSweepIcon fontSize="small" />
-        </IconButton>
+        <span>
+          <IconButton
+            size="small"
+            onClick={() => onResetStatistics(adjective.id)}
+            color="default"
+            disabled={!hasStatistics}
+            sx={{ display: { xs: 'none', md: 'inline-flex' } }}
+            aria-label="Reset statistics"
+          >
+            <DeleteSweepIcon fontSize="small" />
+          </IconButton>
+        </span>
       </Tooltip>
     </AdjectiveListItem>
   )

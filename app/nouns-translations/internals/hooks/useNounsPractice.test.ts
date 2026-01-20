@@ -5,6 +5,7 @@ import {
   useGetNounStatisticsQuery,
   useUpdateNounStatisticMutation,
   useResetNounStatisticMutation,
+  useGetProfileQuery,
 } from '@/app/store/api'
 
 import { useNounsPractice } from './useNounsPractice'
@@ -15,6 +16,7 @@ jest.mock('@/app/store/api', () => ({
   useGetNounStatisticsQuery: jest.fn(),
   useUpdateNounStatisticMutation: jest.fn(),
   useResetNounStatisticMutation: jest.fn(),
+  useGetProfileQuery: jest.fn(),
 }))
 
 describe('useNounsPractice', () => {
@@ -66,6 +68,11 @@ describe('useNounsPractice', () => {
     ;(useGetNounStatisticsQuery as jest.Mock).mockReturnValue({
       data: mockStatistics,
       refetch: mockRefetch,
+    })
+    ;(useGetProfileQuery as jest.Mock).mockReturnValue({
+      data: { profile: { masteryThreshold: 10 } },
+      isLoading: false,
+      error: null,
     })
 
     // Default return value for updateNounStatistic - returns a promise with catch method
@@ -824,6 +831,9 @@ describe('useNounsPractice', () => {
         result.current.handleSortChange('random')
       })
 
+      // Clear mock after sort change to isolate refresh behavior
+      mockRefetch.mockClear()
+
       jest.spyOn(Date, 'now').mockReturnValue(5000)
       act(() => {
         result.current.handleRefresh()
@@ -840,6 +850,9 @@ describe('useNounsPractice', () => {
         result.current.handleSortChange('most-errors')
       })
 
+      // Clear mock after sort change to isolate refresh behavior
+      mockRefetch.mockClear()
+
       act(() => {
         result.current.handleRefresh()
       })
@@ -854,6 +867,9 @@ describe('useNounsPractice', () => {
         result.current.handleSortChange('worst-performance')
       })
 
+      // Clear mock after sort change to isolate refresh behavior
+      mockRefetch.mockClear()
+
       act(() => {
         result.current.handleRefresh()
       })
@@ -861,18 +877,22 @@ describe('useNounsPractice', () => {
       expect(mockRefetch).toHaveBeenCalled()
     })
 
-    it('should not refetch when refreshing with alphabetical sort', () => {
+    it('should refetch when refreshing with alphabetical sort', () => {
       const { result } = renderHook(() => useNounsPractice())
 
       act(() => {
         result.current.handleSortChange('alphabetical')
       })
 
+      // Clear mock after sort change to isolate refresh behavior
+      mockRefetch.mockClear()
+
       act(() => {
         result.current.handleRefresh()
       })
 
-      expect(mockRefetch).not.toHaveBeenCalled()
+      // Always refetches to update filter (e.g., remove newly mastered items)
+      expect(mockRefetch).toHaveBeenCalled()
     })
   })
 

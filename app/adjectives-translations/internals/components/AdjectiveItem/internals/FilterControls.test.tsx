@@ -1,64 +1,88 @@
-import React from 'react'
+import React, { ReactNode } from 'react'
 
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
 import '@testing-library/jest-dom'
-import FilterControls, {
-  type DisplayCount,
-  type SortOption,
-} from './FilterControls'
+import {
+  PracticeFiltersProvider,
+  PracticeFiltersContextType,
+} from '@/app/contexts'
+
+import FilterControls from './FilterControls'
+
+// Mock context with customizable values
+const createMockFiltersContext = (
+  overrides: Partial<PracticeFiltersContextType> = {}
+): PracticeFiltersContextType => ({
+  sortOption: 'none',
+  displayCount: 10,
+  excludeMastered: true,
+  masteryThreshold: 10,
+  masteredCount: 0,
+  shouldShowRefreshButton: true,
+  displayedCount: 10,
+  totalCount: 50,
+  onSortChange: jest.fn(),
+  onDisplayCountChange: jest.fn(),
+  onExcludeMasteredChange: jest.fn(),
+  onRefresh: jest.fn(),
+  ...overrides,
+})
+
+const renderWithContext = (
+  ui: React.ReactElement,
+  contextOverrides: Partial<PracticeFiltersContextType> = {}
+) => {
+  const mockContext = createMockFiltersContext(contextOverrides)
+  const Wrapper = ({ children }: { children: ReactNode }) => (
+    <PracticeFiltersProvider value={mockContext}>
+      {children}
+    </PracticeFiltersProvider>
+  )
+  return { ...render(ui, { wrapper: Wrapper }), mockContext }
+}
 
 describe('FilterControls', () => {
-  const defaultProps = {
-    sortOption: 'none' as SortOption,
-    displayCount: 10 as DisplayCount,
-    excludeMastered: true,
-    masteryThreshold: 10,
-    onSortChange: jest.fn(),
-    onDisplayCountChange: jest.fn(),
-    onExcludeMasteredChange: jest.fn(),
-    onRefresh: jest.fn(),
-    showRefreshButton: true,
-    displayedCount: 10,
-    totalCount: 50,
-  }
-
   beforeEach(() => {
     jest.clearAllMocks()
   })
 
   describe('Rendering', () => {
     it('should render the sort dropdown', () => {
-      render(<FilterControls {...defaultProps} />)
+      renderWithContext(<FilterControls />)
 
       expect(screen.getByLabelText('Sort By')).toBeInTheDocument()
     })
 
     it('should render the display count dropdown', () => {
-      render(<FilterControls {...defaultProps} />)
+      renderWithContext(<FilterControls />)
 
       expect(screen.getByLabelText('Display')).toBeInTheDocument()
     })
 
     it('should render the count text', () => {
-      render(<FilterControls {...defaultProps} />)
+      renderWithContext(<FilterControls />)
 
       expect(
         screen.getByText('Showing 10 of 50 adjectives')
       ).toBeInTheDocument()
     })
 
-    it('should render refresh button when showRefreshButton is true', () => {
-      render(<FilterControls {...defaultProps} />)
+    it('should render refresh button when shouldShowRefreshButton is true', () => {
+      renderWithContext(<FilterControls />, {
+        shouldShowRefreshButton: true,
+      })
 
       expect(
         screen.getByRole('button', { name: /refresh list/i })
       ).toBeInTheDocument()
     })
 
-    it('should not render refresh button when showRefreshButton is false', () => {
-      render(<FilterControls {...defaultProps} showRefreshButton={false} />)
+    it('should not render refresh button when shouldShowRefreshButton is false', () => {
+      renderWithContext(<FilterControls />, {
+        shouldShowRefreshButton: false,
+      })
 
       expect(
         screen.queryByRole('button', { name: /refresh list/i })
@@ -66,9 +90,10 @@ describe('FilterControls', () => {
     })
 
     it('should display correct count when all adjectives are shown', () => {
-      render(
-        <FilterControls {...defaultProps} displayedCount={50} totalCount={50} />
-      )
+      renderWithContext(<FilterControls />, {
+        displayedCount: 50,
+        totalCount: 50,
+      })
 
       expect(
         screen.getByText('Showing 50 of 50 adjectives')
@@ -76,9 +101,10 @@ describe('FilterControls', () => {
     })
 
     it('should display correct count when filtered', () => {
-      render(
-        <FilterControls {...defaultProps} displayedCount={5} totalCount={100} />
-      )
+      renderWithContext(<FilterControls />, {
+        displayedCount: 5,
+        totalCount: 100,
+      })
 
       expect(
         screen.getByText('Showing 5 of 100 adjectives')
@@ -88,7 +114,9 @@ describe('FilterControls', () => {
 
   describe('Sort Dropdown', () => {
     it('should display the current sort option as "None"', () => {
-      render(<FilterControls {...defaultProps} sortOption="none" />)
+      renderWithContext(<FilterControls />, {
+        sortOption: 'none',
+      })
 
       expect(
         screen.getByRole('combobox', { name: 'Sort By' })
@@ -96,7 +124,9 @@ describe('FilterControls', () => {
     })
 
     it('should display "Alphabetical" when sortOption is alphabetical', () => {
-      render(<FilterControls {...defaultProps} sortOption="alphabetical" />)
+      renderWithContext(<FilterControls />, {
+        sortOption: 'alphabetical',
+      })
 
       expect(
         screen.getByRole('combobox', { name: 'Sort By' })
@@ -104,7 +134,9 @@ describe('FilterControls', () => {
     })
 
     it('should display "Random" when sortOption is random', () => {
-      render(<FilterControls {...defaultProps} sortOption="random" />)
+      renderWithContext(<FilterControls />, {
+        sortOption: 'random',
+      })
 
       expect(
         screen.getByRole('combobox', { name: 'Sort By' })
@@ -112,7 +144,9 @@ describe('FilterControls', () => {
     })
 
     it('should display "Most Errors" when sortOption is most-errors', () => {
-      render(<FilterControls {...defaultProps} sortOption="most-errors" />)
+      renderWithContext(<FilterControls />, {
+        sortOption: 'most-errors',
+      })
 
       expect(
         screen.getByRole('combobox', { name: 'Sort By' })
@@ -120,9 +154,9 @@ describe('FilterControls', () => {
     })
 
     it('should display "Worst Performance" when sortOption is worst-performance', () => {
-      render(
-        <FilterControls {...defaultProps} sortOption="worst-performance" />
-      )
+      renderWithContext(<FilterControls />, {
+        sortOption: 'worst-performance',
+      })
 
       expect(
         screen.getByRole('combobox', { name: 'Sort By' })
@@ -131,7 +165,7 @@ describe('FilterControls', () => {
 
     it('should have all sort options available when opened', async () => {
       const user = userEvent.setup()
-      render(<FilterControls {...defaultProps} />)
+      renderWithContext(<FilterControls />)
 
       const sortSelect = screen.getByRole('combobox', { name: 'Sort By' })
       await user.click(sortSelect)
@@ -151,7 +185,7 @@ describe('FilterControls', () => {
 
     it('should call onSortChange with "alphabetical" when selected', async () => {
       const user = userEvent.setup()
-      render(<FilterControls {...defaultProps} />)
+      const { mockContext } = renderWithContext(<FilterControls />)
 
       const sortSelect = screen.getByRole('combobox', { name: 'Sort By' })
       await user.click(sortSelect)
@@ -161,13 +195,13 @@ describe('FilterControls', () => {
       })
       await user.click(alphabeticalOption)
 
-      expect(defaultProps.onSortChange).toHaveBeenCalledTimes(1)
-      expect(defaultProps.onSortChange).toHaveBeenCalledWith('alphabetical')
+      expect(mockContext.onSortChange).toHaveBeenCalledTimes(1)
+      expect(mockContext.onSortChange).toHaveBeenCalledWith('alphabetical')
     })
 
     it('should call onSortChange with "random" when selected', async () => {
       const user = userEvent.setup()
-      render(<FilterControls {...defaultProps} />)
+      const { mockContext } = renderWithContext(<FilterControls />)
 
       const sortSelect = screen.getByRole('combobox', { name: 'Sort By' })
       await user.click(sortSelect)
@@ -175,13 +209,13 @@ describe('FilterControls', () => {
       const randomOption = screen.getByRole('option', { name: 'Random' })
       await user.click(randomOption)
 
-      expect(defaultProps.onSortChange).toHaveBeenCalledTimes(1)
-      expect(defaultProps.onSortChange).toHaveBeenCalledWith('random')
+      expect(mockContext.onSortChange).toHaveBeenCalledTimes(1)
+      expect(mockContext.onSortChange).toHaveBeenCalledWith('random')
     })
 
     it('should call onSortChange with "most-errors" when selected', async () => {
       const user = userEvent.setup()
-      render(<FilterControls {...defaultProps} />)
+      const { mockContext } = renderWithContext(<FilterControls />)
 
       const sortSelect = screen.getByRole('combobox', { name: 'Sort By' })
       await user.click(sortSelect)
@@ -191,13 +225,13 @@ describe('FilterControls', () => {
       })
       await user.click(mostErrorsOption)
 
-      expect(defaultProps.onSortChange).toHaveBeenCalledTimes(1)
-      expect(defaultProps.onSortChange).toHaveBeenCalledWith('most-errors')
+      expect(mockContext.onSortChange).toHaveBeenCalledTimes(1)
+      expect(mockContext.onSortChange).toHaveBeenCalledWith('most-errors')
     })
 
     it('should call onSortChange with "worst-performance" when selected', async () => {
       const user = userEvent.setup()
-      render(<FilterControls {...defaultProps} />)
+      const { mockContext } = renderWithContext(<FilterControls />)
 
       const sortSelect = screen.getByRole('combobox', { name: 'Sort By' })
       await user.click(sortSelect)
@@ -207,15 +241,15 @@ describe('FilterControls', () => {
       })
       await user.click(worstPerformanceOption)
 
-      expect(defaultProps.onSortChange).toHaveBeenCalledTimes(1)
-      expect(defaultProps.onSortChange).toHaveBeenCalledWith(
-        'worst-performance'
-      )
+      expect(mockContext.onSortChange).toHaveBeenCalledTimes(1)
+      expect(mockContext.onSortChange).toHaveBeenCalledWith('worst-performance')
     })
 
     it('should call onSortChange with "none" when selected', async () => {
       const user = userEvent.setup()
-      render(<FilterControls {...defaultProps} sortOption="alphabetical" />)
+      const { mockContext } = renderWithContext(<FilterControls />, {
+        sortOption: 'alphabetical',
+      })
 
       const sortSelect = screen.getByRole('combobox', { name: 'Sort By' })
       await user.click(sortSelect)
@@ -223,14 +257,16 @@ describe('FilterControls', () => {
       const noneOption = screen.getByRole('option', { name: 'None' })
       await user.click(noneOption)
 
-      expect(defaultProps.onSortChange).toHaveBeenCalledTimes(1)
-      expect(defaultProps.onSortChange).toHaveBeenCalledWith('none')
+      expect(mockContext.onSortChange).toHaveBeenCalledTimes(1)
+      expect(mockContext.onSortChange).toHaveBeenCalledWith('none')
     })
   })
 
   describe('Display Count Dropdown', () => {
     it('should display "10 adjectives" when displayCount is 10', () => {
-      render(<FilterControls {...defaultProps} displayCount={10} />)
+      renderWithContext(<FilterControls />, {
+        displayCount: 10,
+      })
 
       expect(
         screen.getByRole('combobox', { name: 'Display' })
@@ -238,7 +274,9 @@ describe('FilterControls', () => {
     })
 
     it('should display "20 adjectives" when displayCount is 20', () => {
-      render(<FilterControls {...defaultProps} displayCount={20} />)
+      renderWithContext(<FilterControls />, {
+        displayCount: 20,
+      })
 
       expect(
         screen.getByRole('combobox', { name: 'Display' })
@@ -246,7 +284,9 @@ describe('FilterControls', () => {
     })
 
     it('should display "30 adjectives" when displayCount is 30', () => {
-      render(<FilterControls {...defaultProps} displayCount={30} />)
+      renderWithContext(<FilterControls />, {
+        displayCount: 30,
+      })
 
       expect(
         screen.getByRole('combobox', { name: 'Display' })
@@ -254,7 +294,9 @@ describe('FilterControls', () => {
     })
 
     it('should display "All adjectives" when displayCount is all', () => {
-      render(<FilterControls {...defaultProps} displayCount="all" />)
+      renderWithContext(<FilterControls />, {
+        displayCount: 'all',
+      })
 
       expect(
         screen.getByRole('combobox', { name: 'Display' })
@@ -263,7 +305,7 @@ describe('FilterControls', () => {
 
     it('should have all display count options available when opened', async () => {
       const user = userEvent.setup()
-      render(<FilterControls {...defaultProps} />)
+      renderWithContext(<FilterControls />)
 
       const displaySelect = screen.getByRole('combobox', { name: 'Display' })
       await user.click(displaySelect)
@@ -284,7 +326,9 @@ describe('FilterControls', () => {
 
     it('should call onDisplayCountChange with 10 when selected', async () => {
       const user = userEvent.setup()
-      render(<FilterControls {...defaultProps} displayCount={20} />)
+      const { mockContext } = renderWithContext(<FilterControls />, {
+        displayCount: 20,
+      })
 
       const displaySelect = screen.getByRole('combobox', { name: 'Display' })
       await user.click(displaySelect)
@@ -292,13 +336,13 @@ describe('FilterControls', () => {
       const option10 = screen.getByRole('option', { name: '10 adjectives' })
       await user.click(option10)
 
-      expect(defaultProps.onDisplayCountChange).toHaveBeenCalledTimes(1)
-      expect(defaultProps.onDisplayCountChange).toHaveBeenCalledWith(10)
+      expect(mockContext.onDisplayCountChange).toHaveBeenCalledTimes(1)
+      expect(mockContext.onDisplayCountChange).toHaveBeenCalledWith(10)
     })
 
     it('should call onDisplayCountChange with 20 when selected', async () => {
       const user = userEvent.setup()
-      render(<FilterControls {...defaultProps} />)
+      const { mockContext } = renderWithContext(<FilterControls />)
 
       const displaySelect = screen.getByRole('combobox', { name: 'Display' })
       await user.click(displaySelect)
@@ -306,13 +350,13 @@ describe('FilterControls', () => {
       const option20 = screen.getByRole('option', { name: '20 adjectives' })
       await user.click(option20)
 
-      expect(defaultProps.onDisplayCountChange).toHaveBeenCalledTimes(1)
-      expect(defaultProps.onDisplayCountChange).toHaveBeenCalledWith(20)
+      expect(mockContext.onDisplayCountChange).toHaveBeenCalledTimes(1)
+      expect(mockContext.onDisplayCountChange).toHaveBeenCalledWith(20)
     })
 
     it('should call onDisplayCountChange with 30 when selected', async () => {
       const user = userEvent.setup()
-      render(<FilterControls {...defaultProps} />)
+      const { mockContext } = renderWithContext(<FilterControls />)
 
       const displaySelect = screen.getByRole('combobox', { name: 'Display' })
       await user.click(displaySelect)
@@ -320,13 +364,13 @@ describe('FilterControls', () => {
       const option30 = screen.getByRole('option', { name: '30 adjectives' })
       await user.click(option30)
 
-      expect(defaultProps.onDisplayCountChange).toHaveBeenCalledTimes(1)
-      expect(defaultProps.onDisplayCountChange).toHaveBeenCalledWith(30)
+      expect(mockContext.onDisplayCountChange).toHaveBeenCalledTimes(1)
+      expect(mockContext.onDisplayCountChange).toHaveBeenCalledWith(30)
     })
 
     it('should call onDisplayCountChange with "all" when selected', async () => {
       const user = userEvent.setup()
-      render(<FilterControls {...defaultProps} />)
+      const { mockContext } = renderWithContext(<FilterControls />)
 
       const displaySelect = screen.getByRole('combobox', { name: 'Display' })
       await user.click(displaySelect)
@@ -334,40 +378,48 @@ describe('FilterControls', () => {
       const optionAll = screen.getByRole('option', { name: 'All adjectives' })
       await user.click(optionAll)
 
-      expect(defaultProps.onDisplayCountChange).toHaveBeenCalledTimes(1)
-      expect(defaultProps.onDisplayCountChange).toHaveBeenCalledWith('all')
+      expect(mockContext.onDisplayCountChange).toHaveBeenCalledTimes(1)
+      expect(mockContext.onDisplayCountChange).toHaveBeenCalledWith('all')
     })
   })
 
   describe('Refresh Button', () => {
     it('should call onRefresh when clicked', async () => {
       const user = userEvent.setup()
-      render(<FilterControls {...defaultProps} />)
+      const { mockContext } = renderWithContext(<FilterControls />, {
+        shouldShowRefreshButton: true,
+      })
 
       const refreshButton = screen.getByRole('button', {
         name: /refresh list/i,
       })
       await user.click(refreshButton)
 
-      expect(defaultProps.onRefresh).toHaveBeenCalledTimes(1)
+      expect(mockContext.onRefresh).toHaveBeenCalledTimes(1)
     })
 
     it('should render refresh button with primary color', () => {
-      render(<FilterControls {...defaultProps} />)
+      renderWithContext(<FilterControls />, {
+        shouldShowRefreshButton: true,
+      })
 
       const button = screen.getByRole('button', { name: /refresh list/i })
       expect(button).toHaveClass('MuiIconButton-colorPrimary')
     })
 
     it('should render refresh button with small size', () => {
-      render(<FilterControls {...defaultProps} />)
+      renderWithContext(<FilterControls />, {
+        shouldShowRefreshButton: true,
+      })
 
       const button = screen.getByRole('button', { name: /refresh list/i })
       expect(button).toHaveClass('MuiIconButton-sizeSmall')
     })
 
     it('should render refresh icon', () => {
-      render(<FilterControls {...defaultProps} />)
+      renderWithContext(<FilterControls />, {
+        shouldShowRefreshButton: true,
+      })
 
       const button = screen.getByRole('button', { name: /refresh list/i })
       expect(button.querySelector('svg')).toBeInTheDocument()
@@ -375,18 +427,22 @@ describe('FilterControls', () => {
 
     it('should handle multiple clicks on refresh button', async () => {
       const user = userEvent.setup()
-      render(<FilterControls {...defaultProps} />)
+      const { mockContext } = renderWithContext(<FilterControls />, {
+        shouldShowRefreshButton: true,
+      })
 
       const button = screen.getByRole('button', { name: /refresh list/i })
       await user.click(button)
       await user.click(button)
       await user.click(button)
 
-      expect(defaultProps.onRefresh).toHaveBeenCalledTimes(3)
+      expect(mockContext.onRefresh).toHaveBeenCalledTimes(3)
     })
 
     it('should have the correct aria-label', () => {
-      render(<FilterControls {...defaultProps} />)
+      renderWithContext(<FilterControls />, {
+        shouldShowRefreshButton: true,
+      })
 
       const refreshButton = screen.getByRole('button', {
         name: /refresh list/i,
@@ -397,50 +453,28 @@ describe('FilterControls', () => {
 
   describe('Count Display', () => {
     it('should display correct counts', () => {
-      render(<FilterControls {...defaultProps} />)
+      renderWithContext(<FilterControls />)
 
       expect(
         screen.getByText('Showing 10 of 50 adjectives')
-      ).toBeInTheDocument()
-    })
-
-    it('should update counts when props change', () => {
-      const { rerender } = render(<FilterControls {...defaultProps} />)
-
-      expect(
-        screen.getByText('Showing 10 of 50 adjectives')
-      ).toBeInTheDocument()
-
-      rerender(
-        <FilterControls
-          {...defaultProps}
-          displayedCount={25}
-          totalCount={100}
-        />
-      )
-
-      expect(
-        screen.getByText('Showing 25 of 100 adjectives')
       ).toBeInTheDocument()
     })
 
     it('should display zero counts correctly', () => {
-      render(
-        <FilterControls {...defaultProps} displayedCount={0} totalCount={0} />
-      )
+      renderWithContext(<FilterControls />, {
+        displayedCount: 0,
+        totalCount: 0,
+      })
 
       expect(screen.getByText('Showing 0 of 0 adjectives')).toBeInTheDocument()
     })
 
     it('should display when all items are shown', () => {
-      render(
-        <FilterControls
-          {...defaultProps}
-          displayedCount={50}
-          totalCount={50}
-          displayCount="all"
-        />
-      )
+      renderWithContext(<FilterControls />, {
+        displayedCount: 50,
+        totalCount: 50,
+        displayCount: 'all',
+      })
 
       expect(
         screen.getByText('Showing 50 of 50 adjectives')
@@ -450,14 +484,14 @@ describe('FilterControls', () => {
 
   describe('Layout', () => {
     it('should render controls in a flex container', () => {
-      const { container } = render(<FilterControls {...defaultProps} />)
+      const { container } = renderWithContext(<FilterControls />)
 
       const filterBox = container.querySelector('.MuiBox-root')
       expect(filterBox).toBeInTheDocument()
     })
 
     it('should render controls with proper spacing', () => {
-      render(<FilterControls {...defaultProps} />)
+      renderWithContext(<FilterControls />)
 
       const sortControl = screen
         .getByLabelText('Sort By')
@@ -473,7 +507,7 @@ describe('FilterControls', () => {
 
   describe('Accessibility', () => {
     it('should have proper labels for sort dropdown', () => {
-      render(<FilterControls {...defaultProps} />)
+      renderWithContext(<FilterControls />)
 
       expect(screen.getByLabelText('Sort By')).toBeInTheDocument()
       expect(
@@ -482,7 +516,7 @@ describe('FilterControls', () => {
     })
 
     it('should have proper labels for display dropdown', () => {
-      render(<FilterControls {...defaultProps} />)
+      renderWithContext(<FilterControls />)
 
       expect(screen.getByLabelText('Display')).toBeInTheDocument()
       expect(
@@ -491,7 +525,9 @@ describe('FilterControls', () => {
     })
 
     it('should have proper label for refresh button', () => {
-      render(<FilterControls {...defaultProps} />)
+      renderWithContext(<FilterControls />, {
+        shouldShowRefreshButton: true,
+      })
 
       expect(
         screen.getByRole('button', { name: /refresh list/i })
@@ -499,14 +535,16 @@ describe('FilterControls', () => {
     })
 
     it('should have accessible button role for refresh', () => {
-      render(<FilterControls {...defaultProps} />)
+      renderWithContext(<FilterControls />, {
+        shouldShowRefreshButton: true,
+      })
 
       const button = screen.getByRole('button', { name: /refresh list/i })
       expect(button).toHaveAttribute('type', 'button')
     })
 
     it('should have proper ARIA labels for select elements', () => {
-      render(<FilterControls {...defaultProps} />)
+      renderWithContext(<FilterControls />)
 
       const sortSelect = screen.getByLabelText('Sort By')
       const displaySelect = screen.getByLabelText('Display')
@@ -518,13 +556,10 @@ describe('FilterControls', () => {
 
   describe('Edge Cases', () => {
     it('should handle large count numbers', () => {
-      render(
-        <FilterControls
-          {...defaultProps}
-          displayedCount={9999}
-          totalCount={10000}
-        />
-      )
+      renderWithContext(<FilterControls />, {
+        displayedCount: 9999,
+        totalCount: 10000,
+      })
 
       expect(
         screen.getByText('Showing 9999 of 10000 adjectives')
@@ -532,27 +567,30 @@ describe('FilterControls', () => {
     })
 
     it('should handle single adjective count', () => {
-      render(
-        <FilterControls {...defaultProps} displayedCount={1} totalCount={1} />
-      )
+      renderWithContext(<FilterControls />, {
+        displayedCount: 1,
+        totalCount: 1,
+      })
 
       expect(screen.getByText('Showing 1 of 1 adjectives')).toBeInTheDocument()
     })
 
     it('should not call callbacks when dropdown is opened without selection', async () => {
       const user = userEvent.setup()
-      render(<FilterControls {...defaultProps} />)
+      const { mockContext } = renderWithContext(<FilterControls />)
 
       const sortSelect = screen.getByRole('combobox', { name: 'Sort By' })
       await user.click(sortSelect)
 
-      expect(defaultProps.onSortChange).not.toHaveBeenCalled()
+      expect(mockContext.onSortChange).not.toHaveBeenCalled()
     })
   })
 
   describe('Component Integration', () => {
     it('should render all components together correctly', () => {
-      render(<FilterControls {...defaultProps} />)
+      renderWithContext(<FilterControls />, {
+        shouldShowRefreshButton: true,
+      })
 
       expect(screen.getByLabelText('Sort By')).toBeInTheDocument()
       expect(screen.getByLabelText('Display')).toBeInTheDocument()
@@ -565,7 +603,9 @@ describe('FilterControls', () => {
     })
 
     it('should work correctly without refresh button', () => {
-      render(<FilterControls {...defaultProps} showRefreshButton={false} />)
+      renderWithContext(<FilterControls />, {
+        shouldShowRefreshButton: false,
+      })
 
       expect(screen.getByLabelText('Sort By')).toBeInTheDocument()
       expect(screen.getByLabelText('Display')).toBeInTheDocument()
@@ -575,46 +615,6 @@ describe('FilterControls', () => {
       expect(
         screen.getByText('Showing 10 of 50 adjectives')
       ).toBeInTheDocument()
-    })
-  })
-
-  describe('Props Updates', () => {
-    it('should update when sortOption prop changes', () => {
-      const { rerender } = render(<FilterControls {...defaultProps} />)
-
-      let select = screen.getByRole('combobox', { name: 'Sort By' })
-      expect(select).toHaveTextContent('None')
-
-      rerender(<FilterControls {...defaultProps} sortOption="alphabetical" />)
-
-      select = screen.getByRole('combobox', { name: 'Sort By' })
-      expect(select).toHaveTextContent('Alphabetical')
-    })
-
-    it('should update when displayCount prop changes', () => {
-      const { rerender } = render(<FilterControls {...defaultProps} />)
-
-      let select = screen.getByRole('combobox', { name: 'Display' })
-      expect(select).toHaveTextContent('10 adjectives')
-
-      rerender(<FilterControls {...defaultProps} displayCount={30} />)
-
-      select = screen.getByRole('combobox', { name: 'Display' })
-      expect(select).toHaveTextContent('30 adjectives')
-    })
-
-    it('should toggle refresh button when showRefreshButton changes', () => {
-      const { rerender } = render(<FilterControls {...defaultProps} />)
-
-      expect(
-        screen.getByRole('button', { name: /refresh list/i })
-      ).toBeInTheDocument()
-
-      rerender(<FilterControls {...defaultProps} showRefreshButton={false} />)
-
-      expect(
-        screen.queryByRole('button', { name: /refresh list/i })
-      ).not.toBeInTheDocument()
     })
   })
 })

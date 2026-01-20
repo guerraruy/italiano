@@ -188,13 +188,16 @@ export default function ImportNouns({ onError, onSuccess }: ImportNounsProps) {
   return (
     <>
       <Tooltip title="Import Nouns from JSON">
-        <IconButton
-          color="primary"
-          onClick={() => setShowImportDialog(true)}
-          disabled={isLoading}
-        >
-          <CloudUpload />
-        </IconButton>
+        <span>
+          <IconButton
+            color="primary"
+            onClick={() => setShowImportDialog(true)}
+            disabled={isLoading}
+            aria-label="Import Nouns from JSON"
+          >
+            <CloudUpload />
+          </IconButton>
+        </span>
       </Tooltip>
 
       <ImportDialog

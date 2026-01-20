@@ -13,6 +13,7 @@ import {
 } from '@mui/material'
 
 import { Statistics } from '@/app/components/Statistics'
+import { usePracticeActions } from '@/app/contexts'
 
 import { NounInfo, NounListItem } from './styled'
 
@@ -31,21 +32,6 @@ interface NounItemProps {
     plural: 'correct' | 'incorrect' | null
   }
   statistics: { correct: number; wrong: number }
-  onInputChange: (
-    nounId: string,
-    field: 'singular' | 'plural',
-    value: string
-  ) => void
-  onValidation: (nounId: string, saveStatistics?: boolean) => void
-  onClearInput: (nounId: string, field: 'singular' | 'plural') => void
-  onShowAnswer: (nounId: string) => void
-  onResetStatistics: (nounId: string) => void
-  onKeyDown: (
-    e: React.KeyboardEvent,
-    nounId: string,
-    field: 'singular' | 'plural',
-    index: number
-  ) => void
   inputRefSingular: (el: HTMLInputElement | null) => void
   inputRefPlural: (el: HTMLInputElement | null) => void
 }
@@ -56,15 +42,17 @@ const NounItem = ({
   inputValues,
   validationState,
   statistics,
-  onInputChange,
-  onValidation,
-  onClearInput,
-  onShowAnswer,
-  onResetStatistics,
-  onKeyDown,
   inputRefSingular,
   inputRefPlural,
 }: NounItemProps) => {
+  const {
+    onInputChange,
+    onValidation,
+    onClearInput,
+    onShowAnswer,
+    onResetStatistics,
+    onKeyDown,
+  } = usePracticeActions()
   const getInputStyle = useCallback((state: 'correct' | 'incorrect' | null) => {
     if (state === 'correct') {
       return {
@@ -190,14 +178,17 @@ const NounItem = ({
       <Statistics correct={statistics.correct} wrong={statistics.wrong} />
 
       <Tooltip title="Reset statistics">
-        <IconButton
-          size="small"
-          onClick={() => onResetStatistics(noun.id)}
-          color="default"
-          disabled={statistics.correct === 0 && statistics.wrong === 0}
-        >
-          <DeleteSweepIcon fontSize="small" />
-        </IconButton>
+        <span>
+          <IconButton
+            size="small"
+            onClick={() => onResetStatistics(noun.id)}
+            color="default"
+            disabled={statistics.correct === 0 && statistics.wrong === 0}
+            aria-label="Reset statistics"
+          >
+            <DeleteSweepIcon fontSize="small" />
+          </IconButton>
+        </span>
       </Tooltip>
     </NounListItem>
   )

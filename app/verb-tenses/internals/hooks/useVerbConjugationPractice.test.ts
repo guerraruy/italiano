@@ -380,8 +380,16 @@ describe('useVerbConjugationPractice', () => {
   })
 
   describe('handleValidation', () => {
+    let consoleErrorSpy: jest.SpyInstance
+
     beforeEach(() => {
       mockUpdateConjugationStatistic.mockResolvedValue({})
+      // Spy on console.error but don't suppress it by default
+      consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation()
+    })
+
+    afterEach(() => {
+      consoleErrorSpy.mockRestore()
     })
 
     it('should set validation state to correct for correct answer', async () => {
@@ -701,6 +709,17 @@ describe('useVerbConjugationPractice', () => {
   })
 
   describe('Reset Dialog', () => {
+    let consoleErrorSpy: jest.SpyInstance
+
+    beforeEach(() => {
+      // Spy on console.error for error handling tests
+      consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation()
+    })
+
+    afterEach(() => {
+      consoleErrorSpy.mockRestore()
+    })
+
     it('should open reset dialog with correct verb info', () => {
       const { result } = renderHook(() => useVerbConjugationPractice())
 
@@ -1017,15 +1036,17 @@ describe('useVerbConjugationPractice', () => {
       })
     })
 
-    it('should load verbTypeFilter from localStorage on mount', () => {
+    it('should load verbTypeFilter from localStorage on mount', async () => {
       localStorageMock.setItem('verbTypeFilter_user123', 'irregular')
 
       // Rerender to trigger the initial load
       const { result } = renderHook(() => useVerbConjugationPractice())
 
-      // The filter might be loaded asynchronously via effect
-      // Initial state depends on what's in localStorage
-      expect(result.current.verbTypeFilter).toBeDefined()
+      // The filter is loaded asynchronously via effect using Promise.resolve()
+      // Wait for the async update to complete
+      await waitFor(() => {
+        expect(result.current.verbTypeFilter).toBe('irregular')
+      })
     })
   })
 

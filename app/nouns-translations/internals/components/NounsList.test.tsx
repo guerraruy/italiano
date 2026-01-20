@@ -1,9 +1,15 @@
-import React from 'react'
+import React, { ReactNode } from 'react'
 
 import { render, screen } from '@testing-library/react'
 
 import '@testing-library/jest-dom'
-import { SortOption, DisplayCount } from './NounItem/internals'
+import {
+  PracticeActionsProvider,
+  PracticeFiltersProvider,
+  PracticeActionsContextType,
+  PracticeFiltersContextType,
+} from '@/app/contexts'
+
 import { NounsList } from './NounsList'
 import { ValidationState, InputValues } from '../types'
 
@@ -31,24 +37,46 @@ jest.mock('./NounItem', () => ({
 }))
 
 jest.mock('./NounItem/internals', () => ({
-  FilterControls: ({
-    displayedCount,
-    totalCount,
-  }: {
-    displayedCount: number
-    totalCount: number
-  }) => (
-    <div data-testid="filter-controls">
-      FilterControls: {displayedCount}/{totalCount}
-    </div>
-  ),
-  SortOption: {
-    NONE: 'none',
-  },
-  DisplayCount: {
-    ALL: 'all',
-  },
+  FilterControls: () => <div data-testid="filter-controls">FilterControls</div>,
 }))
+
+// Test wrapper with context providers
+const mockActionsContext: PracticeActionsContextType = {
+  onInputChange: jest.fn(),
+  onValidation: jest.fn(),
+  onClearInput: jest.fn(),
+  onShowAnswer: jest.fn(),
+  onResetStatistics: jest.fn(),
+  onKeyDown: jest.fn(),
+  getStatistics: jest.fn().mockReturnValue({ correct: 0, wrong: 0 }),
+  getInputRef: jest.fn().mockReturnValue(jest.fn()),
+}
+
+const mockFiltersContext: PracticeFiltersContextType = {
+  sortOption: 'none',
+  displayCount: 'all',
+  excludeMastered: false,
+  masteryThreshold: 10,
+  masteredCount: 0,
+  shouldShowRefreshButton: false,
+  displayedCount: 1,
+  totalCount: 1,
+  onSortChange: jest.fn(),
+  onDisplayCountChange: jest.fn(),
+  onExcludeMasteredChange: jest.fn(),
+  onRefresh: jest.fn(),
+}
+
+const TestWrapper = ({ children }: { children: ReactNode }) => (
+  <PracticeFiltersProvider value={mockFiltersContext}>
+    <PracticeActionsProvider value={mockActionsContext}>
+      {children}
+    </PracticeActionsProvider>
+  </PracticeFiltersProvider>
+)
+
+const renderWithProviders = (ui: React.ReactElement) =>
+  render(ui, { wrapper: TestWrapper })
 
 describe('NounsList', () => {
   const mockNoun = {
@@ -74,24 +102,6 @@ describe('NounsList', () => {
         plural: null,
       },
     } as ValidationState,
-    sortOption: 'none' as SortOption,
-    displayCount: 'all' as DisplayCount,
-    excludeMastered: true,
-    masteryThreshold: 10,
-    shouldShowRefreshButton: true,
-    getStatistics: jest.fn().mockReturnValue({ correct: 0, wrong: 0 }),
-    onInputChange: jest.fn(),
-    onValidation: jest.fn(),
-    onClearInput: jest.fn(),
-    onShowAnswer: jest.fn(),
-    onResetStatistics: jest.fn(),
-    onKeyDown: jest.fn(),
-    onSortChange: jest.fn(),
-    onDisplayCountChange: jest.fn(),
-    onExcludeMasteredChange: jest.fn(),
-    onRefresh: jest.fn(),
-    inputRefSingular: jest.fn().mockReturnValue(jest.fn()),
-    inputRefPlural: jest.fn().mockReturnValue(jest.fn()),
   }
 
   beforeEach(() => {
@@ -99,7 +109,7 @@ describe('NounsList', () => {
   })
 
   it('renders "No nouns available" alert when nouns array is empty', () => {
-    render(
+    renderWithProviders(
       <NounsList {...defaultProps} nouns={[]} filteredAndSortedNouns={[]} />
     )
 
@@ -112,27 +122,21 @@ describe('NounsList', () => {
   })
 
   it('renders FilterControls and NounItem components when nouns are present', () => {
-    render(<NounsList {...defaultProps} />)
+    renderWithProviders(<NounsList {...defaultProps} />)
 
     expect(screen.getByTestId('filter-controls')).toBeInTheDocument()
     expect(screen.getByTestId('noun-item-noun1')).toBeInTheDocument()
     expect(screen.getByText('NounItem: house (Index: 0)')).toBeInTheDocument()
   })
 
-  it('passes correct props to FilterControls', () => {
-    const props = {
-      ...defaultProps,
-      nouns: [mockNoun, { ...mockNoun, id: 'noun2', translation: 'car' }],
-      filteredAndSortedNouns: [mockNoun],
-    }
+  it('renders FilterControls component', () => {
+    renderWithProviders(<NounsList {...defaultProps} />)
 
-    render(<NounsList {...props} />)
-
-    expect(screen.getByText('FilterControls: 1/2')).toBeInTheDocument()
+    expect(screen.getByTestId('filter-controls')).toBeInTheDocument()
   })
 
   it('provides default inputValues when missing', () => {
-    render(<NounsList {...defaultProps} inputValues={{}} />)
+    renderWithProviders(<NounsList {...defaultProps} inputValues={{}} />)
 
     const inputDiv = screen.getByTestId('input-noun1')
 
@@ -145,7 +149,7 @@ describe('NounsList', () => {
   })
 
   it('provides default validationState when missing', () => {
-    render(<NounsList {...defaultProps} validationState={{}} />)
+    renderWithProviders(<NounsList {...defaultProps} validationState={{}} />)
 
     const validationDiv = screen.getByTestId('validation-noun1')
 
@@ -160,7 +164,7 @@ describe('NounsList', () => {
   })
 
   it('provides default inputValues and validationState when both are missing', () => {
-    render(
+    renderWithProviders(
       <NounsList {...defaultProps} inputValues={{}} validationState={{}} />
     )
 
@@ -202,7 +206,7 @@ describe('NounsList', () => {
       },
     ]
 
-    render(
+    renderWithProviders(
       <NounsList
         {...defaultProps}
         nouns={nouns}
@@ -230,7 +234,7 @@ describe('NounsList', () => {
       },
     ]
 
-    render(
+    renderWithProviders(
       <NounsList
         {...defaultProps}
         nouns={nouns}
@@ -254,7 +258,7 @@ describe('NounsList', () => {
       },
     ]
 
-    render(
+    renderWithProviders(
       <NounsList
         {...defaultProps}
         nouns={nouns}
@@ -262,12 +266,12 @@ describe('NounsList', () => {
       />
     )
 
-    expect(defaultProps.getStatistics).toHaveBeenCalledWith('noun1')
-    expect(defaultProps.getStatistics).toHaveBeenCalledWith('noun2')
-    expect(defaultProps.getStatistics).toHaveBeenCalledTimes(2)
+    expect(mockActionsContext.getStatistics).toHaveBeenCalledWith('noun1')
+    expect(mockActionsContext.getStatistics).toHaveBeenCalledWith('noun2')
+    expect(mockActionsContext.getStatistics).toHaveBeenCalledTimes(2)
   })
 
-  it('calls inputRefSingular and inputRefPlural for each noun', () => {
+  it('calls getInputRef for each noun', () => {
     const nouns = [
       mockNoun,
       {
@@ -279,7 +283,7 @@ describe('NounsList', () => {
       },
     ]
 
-    render(
+    renderWithProviders(
       <NounsList
         {...defaultProps}
         nouns={nouns}
@@ -287,9 +291,21 @@ describe('NounsList', () => {
       />
     )
 
-    expect(defaultProps.inputRefSingular).toHaveBeenCalledWith('noun1')
-    expect(defaultProps.inputRefSingular).toHaveBeenCalledWith('noun2')
-    expect(defaultProps.inputRefPlural).toHaveBeenCalledWith('noun1')
-    expect(defaultProps.inputRefPlural).toHaveBeenCalledWith('noun2')
+    expect(mockActionsContext.getInputRef).toHaveBeenCalledWith(
+      'noun1',
+      'singular'
+    )
+    expect(mockActionsContext.getInputRef).toHaveBeenCalledWith(
+      'noun1',
+      'plural'
+    )
+    expect(mockActionsContext.getInputRef).toHaveBeenCalledWith(
+      'noun2',
+      'singular'
+    )
+    expect(mockActionsContext.getInputRef).toHaveBeenCalledWith(
+      'noun2',
+      'plural'
+    )
   })
 })

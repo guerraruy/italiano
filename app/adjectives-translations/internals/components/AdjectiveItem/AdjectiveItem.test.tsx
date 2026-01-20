@@ -1,9 +1,13 @@
-import React from 'react'
+import React, { ReactNode } from 'react'
 
 import { ThemeProvider, createTheme } from '@mui/material/styles'
 import { render, screen, fireEvent } from '@testing-library/react'
 
 import { Statistics } from '@/app/components/Statistics'
+import {
+  PracticeActionsProvider,
+  PracticeActionsContextType,
+} from '@/app/contexts'
 
 import AdjectiveItem from './AdjectiveItem'
 import { GenderInputColumn, AdjectiveActions } from './internals'
@@ -58,9 +62,28 @@ const MockedStatistics = jest.mocked(Statistics)
 
 const theme = createTheme()
 
-const renderWithTheme = (ui: React.ReactElement) => {
-  return render(<ThemeProvider theme={theme}>{ui}</ThemeProvider>)
+// Test wrapper with context providers
+const mockActionsContext: PracticeActionsContextType = {
+  onInputChange: jest.fn(),
+  onValidation: jest.fn(),
+  onClearInput: jest.fn(),
+  onShowAnswer: jest.fn(),
+  onResetStatistics: jest.fn(),
+  onKeyDown: jest.fn(),
+  getStatistics: jest.fn().mockReturnValue({ correct: 0, wrong: 0 }),
+  getInputRef: jest.fn().mockReturnValue(jest.fn()),
 }
+
+const TestWrapper = ({ children }: { children: ReactNode }) => (
+  <ThemeProvider theme={theme}>
+    <PracticeActionsProvider value={mockActionsContext}>
+      {children}
+    </PracticeActionsProvider>
+  </ThemeProvider>
+)
+
+const renderWithProviders = (ui: React.ReactElement) =>
+  render(ui, { wrapper: TestWrapper })
 
 describe('AdjectiveItem', () => {
   const mockAdjective = {
@@ -89,23 +112,16 @@ describe('AdjectiveItem', () => {
 
   const defaultStatistics = { correct: 0, wrong: 0 }
 
-  const mockHandlers = {
-    onInputChange: jest.fn(),
-    onValidation: jest.fn(),
-    onClearInput: jest.fn(),
-    onShowAnswer: jest.fn(),
-    onResetStatistics: jest.fn(),
-    onKeyDown: jest.fn(),
-    setInputRef: jest.fn(() => jest.fn()),
-  }
-
   const defaultProps = {
     adjective: mockAdjective,
     index: 0,
     inputValues: defaultInputValues,
     validationState: defaultValidationState,
     statistics: defaultStatistics,
-    ...mockHandlers,
+    inputRefMasculineSingular: jest.fn(),
+    inputRefMasculinePlural: jest.fn(),
+    inputRefFeminineSingular: jest.fn(),
+    inputRefFemininePlural: jest.fn(),
   }
 
   beforeEach(() => {
@@ -114,27 +130,27 @@ describe('AdjectiveItem', () => {
 
   describe('Rendering', () => {
     it('renders the adjective translation', () => {
-      renderWithTheme(<AdjectiveItem {...defaultProps} />)
+      renderWithProviders(<AdjectiveItem {...defaultProps} />)
 
       expect(screen.getByText('beautiful')).toBeInTheDocument()
     })
 
     it('renders both masculine and feminine gender input columns', () => {
-      renderWithTheme(<AdjectiveItem {...defaultProps} />)
+      renderWithProviders(<AdjectiveItem {...defaultProps} />)
 
       expect(screen.getByTestId('gender-column-masculine')).toBeInTheDocument()
       expect(screen.getByTestId('gender-column-feminine')).toBeInTheDocument()
     })
 
     it('renders correct input fields for masculine forms', () => {
-      renderWithTheme(<AdjectiveItem {...defaultProps} />)
+      renderWithProviders(<AdjectiveItem {...defaultProps} />)
 
       expect(screen.getByTestId('field-masculineSingular')).toBeInTheDocument()
       expect(screen.getByTestId('field-masculinePlural')).toBeInTheDocument()
     })
 
     it('renders correct input fields for feminine forms', () => {
-      renderWithTheme(<AdjectiveItem {...defaultProps} />)
+      renderWithProviders(<AdjectiveItem {...defaultProps} />)
 
       expect(screen.getByTestId('field-feminineSingular')).toBeInTheDocument()
       expect(screen.getByTestId('field-femininePlural')).toBeInTheDocument()
@@ -143,7 +159,7 @@ describe('AdjectiveItem', () => {
     it('renders statistics component with correct values', () => {
       const statisticsWithData = { correct: 5, wrong: 2 }
 
-      renderWithTheme(
+      renderWithProviders(
         <AdjectiveItem {...defaultProps} statistics={statisticsWithData} />
       )
 
@@ -156,7 +172,7 @@ describe('AdjectiveItem', () => {
     })
 
     it('renders action buttons in both mobile and desktop layouts', () => {
-      renderWithTheme(<AdjectiveItem {...defaultProps} />)
+      renderWithProviders(<AdjectiveItem {...defaultProps} />)
 
       // Mobile actions (with reset button)
       expect(
@@ -171,7 +187,7 @@ describe('AdjectiveItem', () => {
     it('renders desktop reset statistics button', () => {
       const statisticsWithData = { correct: 3, wrong: 1 }
 
-      renderWithTheme(
+      renderWithProviders(
         <AdjectiveItem {...defaultProps} statistics={statisticsWithData} />
       )
 
@@ -202,7 +218,7 @@ describe('AdjectiveItem', () => {
         femininePlural: 'correct' as const,
       }
 
-      renderWithTheme(
+      renderWithProviders(
         <AdjectiveItem
           {...defaultProps}
           inputValues={inputValues}
@@ -247,18 +263,27 @@ describe('AdjectiveItem', () => {
       )
     })
 
-    it('passes handlers to GenderInputColumn', () => {
+    it('passes input refs to GenderInputColumn', () => {
       MockedGenderInputColumn.mockClear()
 
-      renderWithTheme(<AdjectiveItem {...defaultProps} />)
+      renderWithProviders(<AdjectiveItem {...defaultProps} />)
 
+      // Check masculine column receives correct input refs
       expect(MockedGenderInputColumn).toHaveBeenCalledWith(
         expect.objectContaining({
-          onInputChange: mockHandlers.onInputChange,
-          onValidation: mockHandlers.onValidation,
-          onClearInput: mockHandlers.onClearInput,
-          onKeyDown: mockHandlers.onKeyDown,
-          setInputRef: mockHandlers.setInputRef,
+          gender: 'Masculine',
+          singularInputRef: defaultProps.inputRefMasculineSingular,
+          pluralInputRef: defaultProps.inputRefMasculinePlural,
+        }),
+        undefined
+      )
+
+      // Check feminine column receives correct input refs
+      expect(MockedGenderInputColumn).toHaveBeenCalledWith(
+        expect.objectContaining({
+          gender: 'Feminine',
+          singularInputRef: defaultProps.inputRefFeminineSingular,
+          pluralInputRef: defaultProps.inputRefFemininePlural,
         }),
         undefined
       )
@@ -269,16 +294,16 @@ describe('AdjectiveItem', () => {
     it('passes correct props to AdjectiveActions components', () => {
       MockedAdjectiveActions.mockClear()
 
-      renderWithTheme(<AdjectiveItem {...defaultProps} />)
+      renderWithProviders(<AdjectiveItem {...defaultProps} />)
 
       // Mobile actions (with reset button)
       expect(MockedAdjectiveActions).toHaveBeenCalledWith(
         expect.objectContaining({
           adjectiveId: 'adj-1',
           hasStatistics: false,
-          onShowAnswer: mockHandlers.onShowAnswer,
-          onClearInput: mockHandlers.onClearInput,
-          onResetStatistics: mockHandlers.onResetStatistics,
+          onShowAnswer: mockActionsContext.onShowAnswer,
+          onClearInput: mockActionsContext.onClearInput,
+          onResetStatistics: mockActionsContext.onResetStatistics,
         }),
         undefined
       )
@@ -297,7 +322,7 @@ describe('AdjectiveItem', () => {
     it('sets hasStatistics to true when statistics exist', () => {
       MockedAdjectiveActions.mockClear()
 
-      renderWithTheme(
+      renderWithProviders(
         <AdjectiveItem
           {...defaultProps}
           statistics={{ correct: 1, wrong: 0 }}
@@ -315,7 +340,7 @@ describe('AdjectiveItem', () => {
     it('sets hasStatistics to true when only wrong count exists', () => {
       MockedAdjectiveActions.mockClear()
 
-      renderWithTheme(
+      renderWithProviders(
         <AdjectiveItem
           {...defaultProps}
           statistics={{ correct: 0, wrong: 3 }}
@@ -336,7 +361,7 @@ describe('AdjectiveItem', () => {
       MockedStatistics.mockClear()
 
       const statistics = { correct: 10, wrong: 5 }
-      renderWithTheme(
+      renderWithProviders(
         <AdjectiveItem {...defaultProps} statistics={statistics} />
       )
 
@@ -352,27 +377,27 @@ describe('AdjectiveItem', () => {
 
   describe('Event Handlers', () => {
     it('calls onShowAnswer when show answer button is clicked', () => {
-      renderWithTheme(<AdjectiveItem {...defaultProps} />)
+      renderWithProviders(<AdjectiveItem {...defaultProps} />)
 
       const showAnswerButtons = screen.getAllByRole('button', {
         name: /show answer/i,
       })
       fireEvent.click(showAnswerButtons[0]!)
 
-      expect(mockHandlers.onShowAnswer).toHaveBeenCalledWith('adj-1')
+      expect(mockActionsContext.onShowAnswer).toHaveBeenCalledWith('adj-1')
     })
 
     it('calls onClearInput when clear button is clicked', () => {
-      renderWithTheme(<AdjectiveItem {...defaultProps} />)
+      renderWithProviders(<AdjectiveItem {...defaultProps} />)
 
       const clearButtons = screen.getAllByRole('button', { name: /clear/i })
       fireEvent.click(clearButtons[0]!)
 
-      expect(mockHandlers.onClearInput).toHaveBeenCalledWith('adj-1')
+      expect(mockActionsContext.onClearInput).toHaveBeenCalledWith('adj-1')
     })
 
     it('calls onResetStatistics when reset button is clicked', () => {
-      renderWithTheme(
+      renderWithProviders(
         <AdjectiveItem
           {...defaultProps}
           statistics={{ correct: 1, wrong: 1 }}
@@ -386,12 +411,14 @@ describe('AdjectiveItem', () => {
       )
       if (enabledResetButton) {
         fireEvent.click(enabledResetButton)
-        expect(mockHandlers.onResetStatistics).toHaveBeenCalledWith('adj-1')
+        expect(mockActionsContext.onResetStatistics).toHaveBeenCalledWith(
+          'adj-1'
+        )
       }
     })
 
     it('disables desktop reset button when no statistics exist', () => {
-      renderWithTheme(
+      renderWithProviders(
         <AdjectiveItem
           {...defaultProps}
           statistics={{ correct: 0, wrong: 0 }}
@@ -428,7 +455,7 @@ describe('AdjectiveItem', () => {
         translation: 'big/large',
       }
 
-      renderWithTheme(
+      renderWithProviders(
         <AdjectiveItem {...defaultProps} adjective={differentAdjective} />
       )
 
@@ -441,7 +468,7 @@ describe('AdjectiveItem', () => {
         translation: 'happy/pleased (feliz)',
       }
 
-      renderWithTheme(
+      renderWithProviders(
         <AdjectiveItem {...defaultProps} adjective={specialAdjective} />
       )
 
@@ -453,7 +480,7 @@ describe('AdjectiveItem', () => {
     it('passes correct index to GenderInputColumn', () => {
       MockedGenderInputColumn.mockClear()
 
-      renderWithTheme(<AdjectiveItem {...defaultProps} index={5} />)
+      renderWithProviders(<AdjectiveItem {...defaultProps} index={5} />)
 
       expect(MockedGenderInputColumn).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -482,7 +509,7 @@ describe('AdjectiveItem', () => {
         femininePlural: 'correct' as const,
       }
 
-      renderWithTheme(
+      renderWithProviders(
         <AdjectiveItem {...defaultProps} validationState={validationState} />
       )
 
@@ -519,7 +546,7 @@ describe('AdjectiveItem', () => {
         femininePlural: 'belle',
       }
 
-      renderWithTheme(
+      renderWithProviders(
         <AdjectiveItem {...defaultProps} inputValues={inputValues} />
       )
 
@@ -554,7 +581,7 @@ describe('AdjectiveItem', () => {
         femininePlural: '',
       }
 
-      renderWithTheme(
+      renderWithProviders(
         <AdjectiveItem {...defaultProps} inputValues={emptyInputValues} />
       )
 
@@ -582,7 +609,7 @@ describe('AdjectiveItem', () => {
         translation: 'tall',
       }
 
-      renderWithTheme(
+      renderWithProviders(
         <AdjectiveItem {...defaultProps} adjective={customAdjective} />
       )
 

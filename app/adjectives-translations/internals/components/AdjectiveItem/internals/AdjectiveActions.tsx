@@ -46,14 +46,17 @@ function AdjectiveActions({
 
       {showResetButton && (
         <Tooltip title="Reset statistics">
-          <IconButton
-            size="small"
-            onClick={() => onResetStatistics(adjectiveId)}
-            color="default"
-            disabled={!hasStatistics}
-          >
-            <DeleteSweepIcon fontSize="small" />
-          </IconButton>
+          <span>
+            <IconButton
+              size="small"
+              onClick={() => onResetStatistics(adjectiveId)}
+              color="default"
+              disabled={!hasStatistics}
+              aria-label="Reset statistics"
+            >
+              <DeleteSweepIcon fontSize="small" />
+            </IconButton>
+          </span>
         </Tooltip>
       )}
     </Box>

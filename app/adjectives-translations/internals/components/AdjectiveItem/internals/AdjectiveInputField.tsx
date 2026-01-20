@@ -3,6 +3,8 @@ import React from 'react'
 import ClearIcon from '@mui/icons-material/Clear'
 import { TextField, IconButton, Tooltip, InputAdornment } from '@mui/material'
 
+import { usePracticeActions } from '@/app/contexts'
+
 import { InputValues } from '../../../types'
 
 type FieldKey = keyof InputValues[string]
@@ -17,23 +19,7 @@ interface AdjectiveInputFieldProps {
   field: FieldKey
   index: number
   correctAnswer: string
-  onInputChange: (adjectiveId: string, field: FieldKey, value: string) => void
-  onValidation: (
-    adjectiveId: string,
-    field: FieldKey,
-    correctAnswer: string
-  ) => void
-  onClearInput: (adjectiveId: string, field?: FieldKey) => void
-  onKeyDown: (
-    e: React.KeyboardEvent,
-    adjectiveId: string,
-    field: FieldKey,
-    index: number
-  ) => void
-  setInputRef: (
-    adjectiveId: string,
-    field: FieldKey
-  ) => (el: HTMLInputElement | null) => void
+  inputRef: (el: HTMLInputElement | null) => void
 }
 
 const getInputStyle = (validationStatus: ValidationStatus) => {
@@ -65,12 +51,10 @@ function AdjectiveInputField({
   field,
   index,
   correctAnswer,
-  onInputChange,
-  onValidation,
-  onClearInput,
-  onKeyDown,
-  setInputRef,
+  inputRef,
 }: AdjectiveInputFieldProps) {
+  const { onInputChange, onValidation, onClearInput, onKeyDown } =
+    usePracticeActions()
   return (
     <TextField
       fullWidth
@@ -83,7 +67,7 @@ function AdjectiveInputField({
       onKeyDown={(e) => onKeyDown(e, adjectiveId, field, index)}
       sx={getInputStyle(validationStatus)}
       autoComplete="off"
-      inputRef={setInputRef(adjectiveId, field)}
+      inputRef={inputRef}
       slotProps={{
         input: {
           endAdornment: (

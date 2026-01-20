@@ -10,6 +10,16 @@ import AdjectivesTranslationsPage from './page'
 // Mock the hook
 jest.mock('./internals/hooks/useAdjectivesPractice')
 
+// Mock context providers
+jest.mock('../contexts', () => ({
+  PracticeActionsProvider: ({ children }: { children: React.ReactNode }) => (
+    <div>{children}</div>
+  ),
+  PracticeFiltersProvider: ({ children }: { children: React.ReactNode }) => (
+    <div>{children}</div>
+  ),
+}))
+
 // Mock child components
 jest.mock('./internals/components/AdjectivesList', () => ({
   AdjectivesList: jest.fn(() => (
@@ -39,8 +49,12 @@ describe('AdjectivesTranslationsPage', () => {
     validationState: {},
     sortOption: 'none',
     displayCount: 10,
+    excludeMastered: false,
+    masteryThreshold: 3,
+    masteredCount: 0,
     resetDialog: { open: false, adjectiveTranslation: null },
     isResetting: false,
+    statisticsError: null,
     inputRefs: { current: {} },
     handleInputChange: jest.fn(),
     handleValidation: jest.fn(),
@@ -53,6 +67,7 @@ describe('AdjectivesTranslationsPage', () => {
     handleRefresh: jest.fn(),
     handleSortChange: jest.fn(),
     setDisplayCount: jest.fn(),
+    setExcludeMastered: jest.fn(),
     getStatistics: jest.fn(),
     shouldShowRefreshButton: false,
   }
@@ -97,7 +112,7 @@ describe('AdjectivesTranslationsPage', () => {
     expect(screen.getByText(/Translate each adjective/i)).toBeInTheDocument()
     expect(screen.getByTestId('adjectives-list')).toBeInTheDocument()
 
-    // Check that AdjectivesList received correct props
+    // Check that AdjectivesList received correct props (handlers are now in context)
     expect(AdjectivesList).toHaveBeenCalledWith(
       expect.objectContaining({
         adjectives: defaultMockValues.adjectives,
@@ -105,31 +120,31 @@ describe('AdjectivesTranslationsPage', () => {
           defaultMockValues.filteredAndSortedAdjectives,
         inputValues: defaultMockValues.inputValues,
         validationState: defaultMockValues.validationState,
-        sortOption: defaultMockValues.sortOption,
-        displayCount: defaultMockValues.displayCount,
-        shouldShowRefreshButton: defaultMockValues.shouldShowRefreshButton,
       }),
       undefined
     )
   })
 
-  it('passes handlers to AdjectivesList', () => {
+  it('only passes data props to AdjectivesList (handlers via context)', () => {
     render(<AdjectivesTranslationsPage />)
 
+    // AdjectivesList should only receive data props, not handlers
     expect(AdjectivesList).toHaveBeenCalledWith(
-      expect.objectContaining({
-        onInputChange: defaultMockValues.handleInputChange,
-        onValidation: defaultMockValues.handleValidation,
-        onClearInput: defaultMockValues.handleClearInput,
-        onShowAnswer: defaultMockValues.handleShowAnswer,
-        onResetStatistics: defaultMockValues.handleOpenResetDialog,
-        onKeyDown: defaultMockValues.handleKeyDown,
-        onSortChange: defaultMockValues.handleSortChange,
-        onDisplayCountChange: defaultMockValues.setDisplayCount,
-        onRefresh: defaultMockValues.handleRefresh,
-      }),
+      {
+        adjectives: defaultMockValues.adjectives,
+        filteredAndSortedAdjectives:
+          defaultMockValues.filteredAndSortedAdjectives,
+        inputValues: defaultMockValues.inputValues,
+        validationState: defaultMockValues.validationState,
+      },
       undefined
     )
+
+    // Should not receive handler props (they're in context now)
+    const callArgs = (AdjectivesList as jest.Mock).mock.calls[0][0]
+    expect(callArgs).not.toHaveProperty('onInputChange')
+    expect(callArgs).not.toHaveProperty('onValidation')
+    expect(callArgs).not.toHaveProperty('onSortChange')
   })
 
   it('renders reset dialog when open', () => {

@@ -82,6 +82,7 @@ describe('SettingsModal', () => {
         'Indicativo.Passato Prossimo',
         'Indicativo.Futuro Semplice',
       ],
+      masteryThreshold: 10,
     },
   }
 
@@ -280,6 +281,7 @@ describe('SettingsModal', () => {
             'Indicativo.Passato Prossimo',
             'Indicativo.Futuro Semplice',
           ],
+          masteryThreshold: 10,
         })
       })
     })

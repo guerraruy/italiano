@@ -42,7 +42,9 @@ describe('AdjectiveActions', () => {
     it('should render reset statistics button with correct tooltip', () => {
       render(<AdjectiveActions {...defaultProps} />)
 
-      expect(screen.getByLabelText('Reset statistics')).toBeInTheDocument()
+      expect(
+        screen.getByRole('button', { name: 'Reset statistics' })
+      ).toBeInTheDocument()
     })
 
     it('should render show answer button with lightbulb icon', () => {
@@ -62,7 +64,7 @@ describe('AdjectiveActions', () => {
     it('should render reset statistics button with delete sweep icon', () => {
       render(<AdjectiveActions {...defaultProps} />)
 
-      const button = screen.getByLabelText('Reset statistics')
+      const button = screen.getByRole('button', { name: 'Reset statistics' })
       expect(button.querySelector('svg')).toBeInTheDocument()
     })
   })
@@ -89,7 +91,7 @@ describe('AdjectiveActions', () => {
     it('should call onResetStatistics with correct adjectiveId when reset is clicked', () => {
       render(<AdjectiveActions {...defaultProps} />)
 
-      fireEvent.click(screen.getByLabelText('Reset statistics'))
+      fireEvent.click(screen.getByRole('button', { name: 'Reset statistics' }))
 
       expect(mockOnResetStatistics).toHaveBeenCalledTimes(1)
       expect(mockOnResetStatistics).toHaveBeenCalledWith('test-adjective-123')
@@ -129,13 +131,17 @@ describe('AdjectiveActions', () => {
     it('should show reset button when showResetButton is true', () => {
       render(<AdjectiveActions {...defaultProps} showResetButton={true} />)
 
-      expect(screen.getByLabelText('Reset statistics')).toBeInTheDocument()
+      expect(
+        screen.getByRole('button', { name: 'Reset statistics' })
+      ).toBeInTheDocument()
     })
 
     it('should show reset button by default when showResetButton is not provided', () => {
       render(<AdjectiveActions {...defaultProps} />)
 
-      expect(screen.getByLabelText('Reset statistics')).toBeInTheDocument()
+      expect(
+        screen.getByRole('button', { name: 'Reset statistics' })
+      ).toBeInTheDocument()
     })
 
     it('should render only two buttons when showResetButton is false', () => {
@@ -150,21 +156,27 @@ describe('AdjectiveActions', () => {
     it('should disable reset button when hasStatistics is false', () => {
       render(<AdjectiveActions {...defaultProps} hasStatistics={false} />)
 
-      const resetButton = screen.getByLabelText('Reset statistics')
+      const resetButton = screen.getByRole('button', {
+        name: 'Reset statistics',
+      })
       expect(resetButton).toBeDisabled()
     })
 
     it('should enable reset button when hasStatistics is true', () => {
       render(<AdjectiveActions {...defaultProps} hasStatistics={true} />)
 
-      const resetButton = screen.getByLabelText('Reset statistics')
+      const resetButton = screen.getByRole('button', {
+        name: 'Reset statistics',
+      })
       expect(resetButton).not.toBeDisabled()
     })
 
     it('should not call onResetStatistics when disabled button is clicked', () => {
       render(<AdjectiveActions {...defaultProps} hasStatistics={false} />)
 
-      const resetButton = screen.getByLabelText('Reset statistics')
+      const resetButton = screen.getByRole('button', {
+        name: 'Reset statistics',
+      })
       fireEvent.click(resetButton)
 
       expect(mockOnResetStatistics).not.toHaveBeenCalled()
@@ -192,7 +204,7 @@ describe('AdjectiveActions', () => {
 
       fireEvent.click(screen.getByLabelText('Show all answers'))
       fireEvent.click(screen.getByLabelText('Clear all fields'))
-      fireEvent.click(screen.getByLabelText('Reset statistics'))
+      fireEvent.click(screen.getByRole('button', { name: 'Reset statistics' }))
 
       expect(mockOnShowAnswer).toHaveBeenCalledWith('custom-id-456')
       expect(mockOnClearInput).toHaveBeenCalledWith('custom-id-456')
@@ -229,7 +241,7 @@ describe('AdjectiveActions', () => {
     it('should render reset statistics button with default color', () => {
       render(<AdjectiveActions {...defaultProps} />)
 
-      const button = screen.getByLabelText('Reset statistics')
+      const button = screen.getByRole('button', { name: 'Reset statistics' })
       expect(button).not.toHaveClass('MuiIconButton-colorPrimary')
     })
   })
@@ -250,7 +262,9 @@ describe('AdjectiveActions', () => {
 
       expect(screen.getByLabelText('Show all answers')).toBeInTheDocument()
       expect(screen.getByLabelText('Clear all fields')).toBeInTheDocument()
-      expect(screen.getByLabelText('Reset statistics')).toBeInTheDocument()
+      expect(
+        screen.getByRole('button', { name: 'Reset statistics' })
+      ).toBeInTheDocument()
     })
 
     it('should maintain focus on buttons when clicked', () => {

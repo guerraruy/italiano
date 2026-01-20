@@ -1,11 +1,17 @@
 'use client'
-import React from 'react'
+import React, { useMemo } from 'react'
 
 import { Container, Typography, Paper, Alert } from '@mui/material'
 import { styled } from '@mui/material/styles'
 
 import { PageHeader } from '../components/PageHeader'
 import { SkeletonFilterBar, SkeletonPracticeList } from '../components/Skeleton'
+import {
+  PracticeActionsProvider,
+  PracticeFiltersProvider,
+  PracticeActionsContextType,
+  PracticeFiltersContextType,
+} from '../contexts'
 import { ResetStatisticsDialog } from './internals/components/AdjectiveItem/internals'
 import { AdjectivesList } from './internals/components/AdjectivesList'
 import { useAdjectivesPractice } from './internals/hooks/useAdjectivesPractice'
@@ -53,13 +59,62 @@ export default function AdjectivesTranslationsPage() {
     masteredCount,
   } = useAdjectivesPractice()
 
-  const setInputRef = React.useCallback(
-    (adjectiveId: string, field: string) => (el: HTMLInputElement | null) => {
-      inputRefs.current[`${adjectiveId}-${field}`] = el
-    },
-    // Refs are stable and don't need to be in dependency arrays
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
+  const actionsValue: PracticeActionsContextType = useMemo(
+    () => ({
+      onInputChange: handleInputChange,
+      onValidation: handleValidation,
+      onClearInput: handleClearInput,
+      onShowAnswer: handleShowAnswer,
+      onResetStatistics: handleOpenResetDialog,
+      onKeyDown: handleKeyDown,
+      getStatistics,
+      getInputRef:
+        (adjectiveId: string, field: string) =>
+        (el: HTMLInputElement | null) => {
+          inputRefs.current[`${adjectiveId}-${field}`] = el
+        },
+    }),
+    [
+      handleInputChange,
+      handleValidation,
+      handleClearInput,
+      handleShowAnswer,
+      handleOpenResetDialog,
+      handleKeyDown,
+      getStatistics,
+      inputRefs,
+    ]
+  )
+
+  const filtersValue: PracticeFiltersContextType = useMemo(
+    () => ({
+      sortOption,
+      displayCount,
+      excludeMastered,
+      masteryThreshold,
+      masteredCount,
+      shouldShowRefreshButton,
+      displayedCount: filteredAndSortedAdjectives.length,
+      totalCount: adjectives.length,
+      onSortChange: handleSortChange,
+      onDisplayCountChange: setDisplayCount,
+      onExcludeMasteredChange: setExcludeMastered,
+      onRefresh: handleRefresh,
+    }),
+    [
+      sortOption,
+      displayCount,
+      excludeMastered,
+      masteryThreshold,
+      masteredCount,
+      shouldShowRefreshButton,
+      filteredAndSortedAdjectives.length,
+      adjectives.length,
+      handleSortChange,
+      setDisplayCount,
+      setExcludeMastered,
+      handleRefresh,
+    ]
   )
 
   if (isLoading) {
@@ -117,30 +172,16 @@ export default function AdjectivesTranslationsPage() {
           forms: masculine/feminine, singular/plural)
         </Typography>
 
-        <AdjectivesList
-          adjectives={adjectives}
-          filteredAndSortedAdjectives={filteredAndSortedAdjectives}
-          inputValues={inputValues}
-          validationState={validationState}
-          sortOption={sortOption}
-          displayCount={displayCount}
-          excludeMastered={excludeMastered}
-          masteryThreshold={masteryThreshold}
-          masteredCount={masteredCount}
-          shouldShowRefreshButton={shouldShowRefreshButton}
-          getStatistics={getStatistics}
-          onInputChange={handleInputChange}
-          onValidation={handleValidation}
-          onClearInput={handleClearInput}
-          onShowAnswer={handleShowAnswer}
-          onResetStatistics={handleOpenResetDialog}
-          onKeyDown={handleKeyDown}
-          onSortChange={handleSortChange}
-          onDisplayCountChange={setDisplayCount}
-          onExcludeMasteredChange={setExcludeMastered}
-          onRefresh={handleRefresh}
-          setInputRef={setInputRef}
-        />
+        <PracticeFiltersProvider value={filtersValue}>
+          <PracticeActionsProvider value={actionsValue}>
+            <AdjectivesList
+              adjectives={adjectives}
+              filteredAndSortedAdjectives={filteredAndSortedAdjectives}
+              inputValues={inputValues}
+              validationState={validationState}
+            />
+          </PracticeActionsProvider>
+        </PracticeFiltersProvider>
       </ContentPaper>
 
       <ResetStatisticsDialog

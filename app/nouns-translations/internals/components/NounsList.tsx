@@ -2,12 +2,10 @@ import React from 'react'
 
 import { List, Alert } from '@mui/material'
 
+import { usePracticeActions } from '@/app/contexts'
+
 import { NounItem } from '../components/NounItem'
-import {
-  FilterControls,
-  SortOption,
-  DisplayCount,
-} from '../components/NounItem/internals'
+import { FilterControls } from '../components/NounItem/internals'
 import { InputValues, ValidationState } from '../types'
 
 interface Noun {
@@ -23,34 +21,6 @@ interface NounsListProps {
   filteredAndSortedNouns: Noun[]
   inputValues: InputValues
   validationState: ValidationState
-  sortOption: SortOption
-  displayCount: DisplayCount
-  excludeMastered: boolean
-  masteryThreshold: number
-  masteredCount: number
-  shouldShowRefreshButton: boolean
-  getStatistics: (nounId: string) => { correct: number; wrong: number }
-  onInputChange: (
-    nounId: string,
-    field: 'singular' | 'plural',
-    value: string
-  ) => void
-  onValidation: (nounId: string) => void
-  onClearInput: (nounId: string, field: 'singular' | 'plural') => void
-  onShowAnswer: (nounId: string) => void
-  onResetStatistics: (nounId: string) => void
-  onKeyDown: (
-    e: React.KeyboardEvent,
-    nounId: string,
-    field: 'singular' | 'plural',
-    currentIndex: number
-  ) => void
-  onSortChange: (newSort: SortOption) => void
-  onDisplayCountChange: (count: DisplayCount) => void
-  onExcludeMasteredChange: (value: boolean) => void
-  onRefresh: () => void
-  inputRefSingular: (nounId: string) => (el: HTMLInputElement | null) => void
-  inputRefPlural: (nounId: string) => (el: HTMLInputElement | null) => void
 }
 
 export const NounsList: React.FC<NounsListProps> = ({
@@ -58,26 +28,8 @@ export const NounsList: React.FC<NounsListProps> = ({
   filteredAndSortedNouns,
   inputValues,
   validationState,
-  sortOption,
-  displayCount,
-  excludeMastered,
-  masteryThreshold,
-  masteredCount,
-  shouldShowRefreshButton,
-  getStatistics,
-  onInputChange,
-  onValidation,
-  onClearInput,
-  onShowAnswer,
-  onResetStatistics,
-  onKeyDown,
-  onSortChange,
-  onDisplayCountChange,
-  onExcludeMasteredChange,
-  onRefresh,
-  inputRefSingular,
-  inputRefPlural,
 }) => {
+  const { getStatistics, getInputRef } = usePracticeActions()
   if (nouns.length === 0) {
     return (
       <Alert severity="info">
@@ -88,20 +40,7 @@ export const NounsList: React.FC<NounsListProps> = ({
 
   return (
     <>
-      <FilterControls
-        sortOption={sortOption}
-        displayCount={displayCount}
-        excludeMastered={excludeMastered}
-        masteryThreshold={masteryThreshold}
-        masteredCount={masteredCount}
-        onSortChange={onSortChange}
-        onDisplayCountChange={onDisplayCountChange}
-        onExcludeMasteredChange={onExcludeMasteredChange}
-        onRefresh={onRefresh}
-        showRefreshButton={shouldShowRefreshButton}
-        displayedCount={filteredAndSortedNouns.length}
-        totalCount={nouns.length}
-      />
+      <FilterControls />
 
       <List>
         {filteredAndSortedNouns.map((noun, index) => (
@@ -114,14 +53,8 @@ export const NounsList: React.FC<NounsListProps> = ({
               validationState[noun.id] || { singular: null, plural: null }
             }
             statistics={getStatistics(noun.id)}
-            onInputChange={onInputChange}
-            onValidation={onValidation}
-            onClearInput={onClearInput}
-            onShowAnswer={onShowAnswer}
-            onResetStatistics={onResetStatistics}
-            onKeyDown={onKeyDown}
-            inputRefSingular={inputRefSingular(noun.id)}
-            inputRefPlural={inputRefPlural(noun.id)}
+            inputRefSingular={getInputRef(noun.id, 'singular')}
+            inputRefPlural={getInputRef(noun.id, 'plural')}
           />
         ))}
       </List>

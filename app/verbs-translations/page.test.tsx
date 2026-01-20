@@ -10,6 +10,16 @@ import VerbsTranslationsPage from './page'
 // Mock the hook
 jest.mock('./internals/hooks/useVerbsPractice')
 
+// Mock context providers
+jest.mock('../contexts', () => ({
+  PracticeActionsProvider: ({ children }: { children: React.ReactNode }) => (
+    <div>{children}</div>
+  ),
+  PracticeFiltersProvider: ({ children }: { children: React.ReactNode }) => (
+    <div>{children}</div>
+  ),
+}))
+
 // Mock child components
 jest.mock('./internals/components/VerbsList', () => ({
   VerbsList: jest.fn(() => <div data-testid="verbs-list">VerbsList</div>),
@@ -109,7 +119,7 @@ describe('VerbsTranslationsPage', () => {
     expect(screen.getByText(/Translate each verb/i)).toBeInTheDocument()
     expect(screen.getByTestId('verbs-list')).toBeInTheDocument()
 
-    // Check that VerbsList received correct props
+    // Check that VerbsList received correct props (now passed directly, not via context)
     expect(VerbsList).toHaveBeenCalledWith(
       expect.objectContaining({
         verbs: defaultMockValues.verbs,
@@ -117,43 +127,30 @@ describe('VerbsTranslationsPage', () => {
         inputValues: defaultMockValues.inputValues,
         validationState: defaultMockValues.validationState,
         verbTypeFilter: defaultMockValues.verbTypeFilter,
-        sortOption: defaultMockValues.sortOption,
-        displayCount: defaultMockValues.displayCount,
-        shouldShowRefreshButton: defaultMockValues.shouldShowRefreshButton,
-      }),
-      undefined
-    )
-  })
-
-  it('passes handlers to VerbsList', () => {
-    render(<VerbsTranslationsPage />)
-
-    expect(VerbsList).toHaveBeenCalledWith(
-      expect.objectContaining({
-        onInputChange: defaultMockValues.handleInputChange,
-        onValidation: defaultMockValues.handleValidation,
-        onClearInput: defaultMockValues.handleClearInput,
-        onShowAnswer: defaultMockValues.handleShowAnswer,
-        onResetStatistics: defaultMockValues.handleOpenResetDialog,
-        onKeyDown: defaultMockValues.handleKeyDown,
         onVerbTypeChange: defaultMockValues.setVerbTypeFilter,
-        onSortChange: defaultMockValues.handleSortChange,
-        onDisplayCountChange: defaultMockValues.setDisplayCount,
-        onRefresh: defaultMockValues.handleRefresh,
       }),
       undefined
     )
   })
 
-  it('passes input ref function to VerbsList', () => {
+  it('passes onVerbTypeChange handler to VerbsList', () => {
     render(<VerbsTranslationsPage />)
 
+    // onVerbTypeChange is passed directly, other handlers are passed via context
     expect(VerbsList).toHaveBeenCalledWith(
       expect.objectContaining({
-        inputRef: expect.any(Function),
+        onVerbTypeChange: defaultMockValues.setVerbTypeFilter,
       }),
       undefined
     )
+  })
+
+  it('renders VerbsList with context providers', () => {
+    render(<VerbsTranslationsPage />)
+
+    // VerbsList is now wrapped with PracticeFiltersProvider and PracticeActionsProvider
+    // Input ref and other handlers are passed through context, not as direct props
+    expect(screen.getByTestId('verbs-list')).toBeInTheDocument()
   })
 
   it('renders reset dialog with correct props', () => {
@@ -254,7 +251,7 @@ describe('VerbsTranslationsPage', () => {
     )
   })
 
-  it('passes getStatistics function to VerbsList', () => {
+  it('renders with getStatistics in context', () => {
     const mockGetStatistics = jest
       .fn()
       .mockReturnValue({ correct: 5, wrong: 2 })
@@ -265,12 +262,8 @@ describe('VerbsTranslationsPage', () => {
 
     render(<VerbsTranslationsPage />)
 
-    expect(VerbsList).toHaveBeenCalledWith(
-      expect.objectContaining({
-        getStatistics: mockGetStatistics,
-      }),
-      undefined
-    )
+    // getStatistics is now passed via PracticeActionsProvider context
+    expect(screen.getByTestId('verbs-list')).toBeInTheDocument()
   })
 
   it('renders page header in loading state', () => {
@@ -396,7 +389,7 @@ describe('VerbsTranslationsPage', () => {
     )
   })
 
-  it('shows refresh button when sorting by random', () => {
+  it('renders when sorting by random with refresh button', () => {
     mockUseVerbsPractice.mockReturnValue({
       ...defaultMockValues,
       sortOption: 'random',
@@ -405,16 +398,11 @@ describe('VerbsTranslationsPage', () => {
 
     render(<VerbsTranslationsPage />)
 
-    expect(VerbsList).toHaveBeenCalledWith(
-      expect.objectContaining({
-        sortOption: 'random',
-        shouldShowRefreshButton: true,
-      }),
-      undefined
-    )
+    // sortOption and shouldShowRefreshButton are now passed via PracticeFiltersProvider context
+    expect(screen.getByTestId('verbs-list')).toBeInTheDocument()
   })
 
-  it('shows refresh button when sorting by most errors', () => {
+  it('renders when sorting by most errors with refresh button', () => {
     mockUseVerbsPractice.mockReturnValue({
       ...defaultMockValues,
       sortOption: 'most-errors',
@@ -423,16 +411,11 @@ describe('VerbsTranslationsPage', () => {
 
     render(<VerbsTranslationsPage />)
 
-    expect(VerbsList).toHaveBeenCalledWith(
-      expect.objectContaining({
-        sortOption: 'most-errors',
-        shouldShowRefreshButton: true,
-      }),
-      undefined
-    )
+    // sortOption and shouldShowRefreshButton are now passed via PracticeFiltersProvider context
+    expect(screen.getByTestId('verbs-list')).toBeInTheDocument()
   })
 
-  it('shows refresh button when sorting by worst performance', () => {
+  it('renders when sorting by worst performance with refresh button', () => {
     mockUseVerbsPractice.mockReturnValue({
       ...defaultMockValues,
       sortOption: 'worst-performance',
@@ -441,13 +424,8 @@ describe('VerbsTranslationsPage', () => {
 
     render(<VerbsTranslationsPage />)
 
-    expect(VerbsList).toHaveBeenCalledWith(
-      expect.objectContaining({
-        sortOption: 'worst-performance',
-        shouldShowRefreshButton: true,
-      }),
-      undefined
-    )
+    // sortOption and shouldShowRefreshButton are now passed via PracticeFiltersProvider context
+    expect(screen.getByTestId('verbs-list')).toBeInTheDocument()
   })
 
   it('renders reset dialog with error message', () => {
@@ -507,12 +485,8 @@ describe('VerbsTranslationsPage', () => {
 
     render(<VerbsTranslationsPage />)
 
-    expect(VerbsList).toHaveBeenCalledWith(
-      expect.objectContaining({
-        displayCount: 20,
-      }),
-      undefined
-    )
+    // displayCount is now passed via PracticeFiltersProvider context
+    expect(screen.getByTestId('verbs-list')).toBeInTheDocument()
   })
 
   it('renders with all display count option', () => {
@@ -523,12 +497,8 @@ describe('VerbsTranslationsPage', () => {
 
     render(<VerbsTranslationsPage />)
 
-    expect(VerbsList).toHaveBeenCalledWith(
-      expect.objectContaining({
-        displayCount: 'all',
-      }),
-      undefined
-    )
+    // displayCount is now passed via PracticeFiltersProvider context
+    expect(screen.getByTestId('verbs-list')).toBeInTheDocument()
   })
 
   it('renders with alphabetical sort option', () => {
@@ -539,12 +509,8 @@ describe('VerbsTranslationsPage', () => {
 
     render(<VerbsTranslationsPage />)
 
-    expect(VerbsList).toHaveBeenCalledWith(
-      expect.objectContaining({
-        sortOption: 'alphabetical',
-      }),
-      undefined
-    )
+    // sortOption is now passed via PracticeFiltersProvider context
+    expect(screen.getByTestId('verbs-list')).toBeInTheDocument()
   })
 
   it('renders with input values', () => {

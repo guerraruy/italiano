@@ -1,11 +1,17 @@
 'use client'
-import React from 'react'
+import React, { useMemo } from 'react'
 
 import { Container, Typography, Paper, Alert } from '@mui/material'
 import { styled } from '@mui/material/styles'
 
 import { PageHeader } from '../components/PageHeader'
 import { SkeletonFilterBar, SkeletonPracticeList } from '../components/Skeleton'
+import {
+  PracticeActionsProvider,
+  PracticeFiltersProvider,
+  PracticeActionsContextType,
+  PracticeFiltersContextType,
+} from '../contexts'
 import { ResetStatisticsDialog } from './internals/components/NounItem/internals'
 import { NounsList } from './internals/components/NounsList'
 import { useNounsPractice } from './internals/hooks/useNounsPractice'
@@ -53,6 +59,69 @@ export default function NounsTranslationsPage() {
     shouldShowRefreshButton,
     masteredCount,
   } = useNounsPractice()
+
+  const actionsValue: PracticeActionsContextType = useMemo(
+    () => ({
+      onInputChange: handleInputChange,
+      onValidation: handleValidation,
+      onClearInput: handleClearInput,
+      onShowAnswer: handleShowAnswer,
+      onResetStatistics: handleOpenResetDialog,
+      onKeyDown: handleKeyDown,
+      getStatistics,
+      getInputRef:
+        (nounId: string, field: 'singular' | 'plural') =>
+        (el: HTMLInputElement | null) => {
+          if (field === 'singular') {
+            inputRefsSingular.current[nounId] = el
+          } else {
+            inputRefsPlural.current[nounId] = el
+          }
+        },
+    }),
+    [
+      handleInputChange,
+      handleValidation,
+      handleClearInput,
+      handleShowAnswer,
+      handleOpenResetDialog,
+      handleKeyDown,
+      getStatistics,
+      inputRefsSingular,
+      inputRefsPlural,
+    ]
+  )
+
+  const filtersValue: PracticeFiltersContextType = useMemo(
+    () => ({
+      sortOption,
+      displayCount,
+      excludeMastered,
+      masteryThreshold,
+      masteredCount,
+      shouldShowRefreshButton,
+      displayedCount: filteredAndSortedNouns.length,
+      totalCount: nouns.length,
+      onSortChange: handleSortChange,
+      onDisplayCountChange: setDisplayCount,
+      onExcludeMasteredChange: setExcludeMastered,
+      onRefresh: handleRefresh,
+    }),
+    [
+      sortOption,
+      displayCount,
+      excludeMastered,
+      masteryThreshold,
+      masteredCount,
+      shouldShowRefreshButton,
+      filteredAndSortedNouns.length,
+      nouns.length,
+      handleSortChange,
+      setDisplayCount,
+      setExcludeMastered,
+      handleRefresh,
+    ]
+  )
 
   if (isLoading) {
     return (
@@ -107,35 +176,16 @@ export default function NounsTranslationsPage() {
           Translate each noun from your native language to Italian
         </Typography>
 
-        <NounsList
-          nouns={nouns}
-          filteredAndSortedNouns={filteredAndSortedNouns}
-          inputValues={inputValues}
-          validationState={validationState}
-          sortOption={sortOption}
-          displayCount={displayCount}
-          excludeMastered={excludeMastered}
-          masteryThreshold={masteryThreshold}
-          masteredCount={masteredCount}
-          shouldShowRefreshButton={shouldShowRefreshButton}
-          getStatistics={getStatistics}
-          onInputChange={handleInputChange}
-          onValidation={handleValidation}
-          onClearInput={handleClearInput}
-          onShowAnswer={handleShowAnswer}
-          onResetStatistics={handleOpenResetDialog}
-          onKeyDown={handleKeyDown}
-          onSortChange={handleSortChange}
-          onDisplayCountChange={setDisplayCount}
-          onExcludeMasteredChange={setExcludeMastered}
-          onRefresh={handleRefresh}
-          inputRefSingular={(nounId) => (el) =>
-            (inputRefsSingular.current[nounId] = el)
-          }
-          inputRefPlural={(nounId) => (el) =>
-            (inputRefsPlural.current[nounId] = el)
-          }
-        />
+        <PracticeFiltersProvider value={filtersValue}>
+          <PracticeActionsProvider value={actionsValue}>
+            <NounsList
+              nouns={nouns}
+              filteredAndSortedNouns={filteredAndSortedNouns}
+              inputValues={inputValues}
+              validationState={validationState}
+            />
+          </PracticeActionsProvider>
+        </PracticeFiltersProvider>
       </ContentPaper>
 
       <ResetStatisticsDialog

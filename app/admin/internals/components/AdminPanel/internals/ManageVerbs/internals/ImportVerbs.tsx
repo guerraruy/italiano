@@ -152,13 +152,16 @@ export default function ImportVerbs({ onError, onSuccess }: ImportVerbsProps) {
   return (
     <>
       <Tooltip title="Import Verbs from JSON">
-        <IconButton
-          color="primary"
-          onClick={() => setShowImportDialog(true)}
-          disabled={isLoading}
-        >
-          <CloudUpload />
-        </IconButton>
+        <span>
+          <IconButton
+            color="primary"
+            onClick={() => setShowImportDialog(true)}
+            disabled={isLoading}
+            aria-label="Import Verbs from JSON"
+          >
+            <CloudUpload />
+          </IconButton>
+        </span>
       </Tooltip>
 
       <ImportDialog

@@ -1,11 +1,17 @@
 'use client'
-import React from 'react'
+import React, { useMemo } from 'react'
 
 import { Container, Typography, Paper, Alert } from '@mui/material'
 import { styled } from '@mui/material/styles'
 
 import { PageHeader } from '../components/PageHeader'
 import { SkeletonFilterBar, SkeletonPracticeList } from '../components/Skeleton'
+import {
+  PracticeActionsProvider,
+  PracticeFiltersProvider,
+  PracticeActionsContextType,
+  PracticeFiltersContextType,
+} from '../contexts'
 import { ResetStatisticsDialog } from './internals/components/VerbItem/internals'
 import { VerbsList } from './internals/components/VerbsList'
 import { useVerbsPractice } from './internals/hooks/useVerbsPractice'
@@ -54,6 +60,62 @@ export default function VerbsTranslationsPage() {
     shouldShowRefreshButton,
     masteredCount,
   } = useVerbsPractice()
+
+  const actionsValue: PracticeActionsContextType = useMemo(
+    () => ({
+      onInputChange: handleInputChange,
+      onValidation: handleValidation,
+      onClearInput: handleClearInput,
+      onShowAnswer: handleShowAnswer,
+      onResetStatistics: handleOpenResetDialog,
+      onKeyDown: handleKeyDown,
+      getStatistics,
+      getInputRef: (verbId: string) => (el: HTMLInputElement | null) => {
+        inputRefs.current[verbId] = el
+      },
+    }),
+    [
+      handleInputChange,
+      handleValidation,
+      handleClearInput,
+      handleShowAnswer,
+      handleOpenResetDialog,
+      handleKeyDown,
+      getStatistics,
+      inputRefs,
+    ]
+  )
+
+  const filtersValue: PracticeFiltersContextType = useMemo(
+    () => ({
+      sortOption,
+      displayCount,
+      excludeMastered,
+      masteryThreshold,
+      masteredCount,
+      shouldShowRefreshButton,
+      displayedCount: filteredAndSortedVerbs.length,
+      totalCount: verbs.length,
+      onSortChange: handleSortChange,
+      onDisplayCountChange: setDisplayCount,
+      onExcludeMasteredChange: setExcludeMastered,
+      onRefresh: handleRefresh,
+    }),
+    [
+      sortOption,
+      displayCount,
+      excludeMastered,
+      masteryThreshold,
+      masteredCount,
+      shouldShowRefreshButton,
+      filteredAndSortedVerbs.length,
+      verbs.length,
+      handleSortChange,
+      setDisplayCount,
+      setExcludeMastered,
+      handleRefresh,
+    ]
+  )
 
   if (isLoading) {
     return (
@@ -108,32 +170,18 @@ export default function VerbsTranslationsPage() {
           Translate each verb from your native language to Italian
         </Typography>
 
-        <VerbsList
-          verbs={verbs}
-          filteredAndSortedVerbs={filteredAndSortedVerbs}
-          inputValues={inputValues}
-          validationState={validationState}
-          verbTypeFilter={verbTypeFilter}
-          sortOption={sortOption}
-          displayCount={displayCount}
-          excludeMastered={excludeMastered}
-          masteryThreshold={masteryThreshold}
-          masteredCount={masteredCount}
-          shouldShowRefreshButton={shouldShowRefreshButton}
-          getStatistics={getStatistics}
-          onInputChange={handleInputChange}
-          onValidation={handleValidation}
-          onClearInput={handleClearInput}
-          onShowAnswer={handleShowAnswer}
-          onResetStatistics={handleOpenResetDialog}
-          onKeyDown={handleKeyDown}
-          onVerbTypeChange={setVerbTypeFilter}
-          onSortChange={handleSortChange}
-          onDisplayCountChange={setDisplayCount}
-          onExcludeMasteredChange={setExcludeMastered}
-          onRefresh={handleRefresh}
-          inputRef={(verbId) => (el) => (inputRefs.current[verbId] = el)}
-        />
+        <PracticeFiltersProvider value={filtersValue}>
+          <PracticeActionsProvider value={actionsValue}>
+            <VerbsList
+              verbs={verbs}
+              filteredAndSortedVerbs={filteredAndSortedVerbs}
+              inputValues={inputValues}
+              validationState={validationState}
+              verbTypeFilter={verbTypeFilter}
+              onVerbTypeChange={setVerbTypeFilter}
+            />
+          </PracticeActionsProvider>
+        </PracticeFiltersProvider>
       </ContentPaper>
 
       <ResetStatisticsDialog

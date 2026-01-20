@@ -15,6 +15,12 @@ import {
 } from '@mui/material'
 import { styled } from '@mui/material/styles'
 
+import {
+  usePracticeFilters,
+  type SortOption,
+  type DisplayCount,
+} from '@/app/contexts'
+
 const FilterBox = styled(Box)(({ theme }) => ({
   display: 'flex',
   gap: theme.spacing(2),
@@ -23,44 +29,23 @@ const FilterBox = styled(Box)(({ theme }) => ({
   alignItems: 'center',
 }))
 
-export type SortOption =
-  | 'none'
-  | 'alphabetical'
-  | 'random'
-  | 'most-errors'
-  | 'worst-performance'
+export type { SortOption, DisplayCount }
 
-export type DisplayCount = 10 | 20 | 30 | 'all'
-
-interface FilterControlsProps {
-  sortOption: SortOption
-  displayCount: DisplayCount
-  excludeMastered: boolean
-  masteryThreshold: number
-  masteredCount: number
-  onSortChange: (value: SortOption) => void
-  onDisplayCountChange: (value: DisplayCount) => void
-  onExcludeMasteredChange: (value: boolean) => void
-  onRefresh: () => void
-  showRefreshButton: boolean
-  displayedCount: number
-  totalCount: number
-}
-
-export default function FilterControls({
-  sortOption,
-  displayCount,
-  excludeMastered,
-  masteryThreshold,
-  masteredCount,
-  onSortChange,
-  onDisplayCountChange,
-  onExcludeMasteredChange,
-  onRefresh,
-  showRefreshButton,
-  displayedCount,
-  totalCount,
-}: FilterControlsProps) {
+export default function FilterControls() {
+  const {
+    sortOption,
+    displayCount,
+    excludeMastered,
+    masteryThreshold,
+    masteredCount,
+    shouldShowRefreshButton,
+    displayedCount,
+    totalCount,
+    onSortChange,
+    onDisplayCountChange,
+    onExcludeMasteredChange,
+    onRefresh,
+  } = usePracticeFilters()
   return (
     <FilterBox>
       <FormControl size="small" sx={{ minWidth: 180 }}>
@@ -96,7 +81,7 @@ export default function FilterControls({
         </Select>
       </FormControl>
 
-      {showRefreshButton && (
+      {shouldShowRefreshButton && (
         <Tooltip title="Refresh list">
           <IconButton
             onClick={onRefresh}

@@ -3,23 +3,33 @@ import React from 'react'
 import { ThemeProvider, createTheme } from '@mui/material/styles'
 import { render, screen, fireEvent } from '@testing-library/react'
 
+import { PracticeActionsProvider } from '@/app/contexts'
+
 import AdjectiveInputField from './AdjectiveInputField'
 
 const theme = createTheme()
 
-const renderWithTheme = (ui: React.ReactElement) => {
-  return render(<ThemeProvider theme={theme}>{ui}</ThemeProvider>)
+const mockActions = {
+  onInputChange: jest.fn(),
+  onValidation: jest.fn(),
+  onClearInput: jest.fn(),
+  onShowAnswer: jest.fn(),
+  onResetStatistics: jest.fn(),
+  onKeyDown: jest.fn(),
+  getStatistics: jest.fn(() => ({ correct: 0, wrong: 0 })),
+}
+
+const renderWithProviders = (ui: React.ReactElement) => {
+  return render(
+    <ThemeProvider theme={theme}>
+      <PracticeActionsProvider value={mockActions}>
+        {ui}
+      </PracticeActionsProvider>
+    </ThemeProvider>
+  )
 }
 
 describe('AdjectiveInputField', () => {
-  const mockHandlers = {
-    onInputChange: jest.fn(),
-    onValidation: jest.fn(),
-    onClearInput: jest.fn(),
-    onKeyDown: jest.fn(),
-    setInputRef: jest.fn(() => jest.fn()),
-  }
-
   const defaultProps = {
     label: 'Masculine Singular',
     placeholder: 'Enter masculine singular',
@@ -29,7 +39,7 @@ describe('AdjectiveInputField', () => {
     field: 'masculineSingular' as const,
     index: 0,
     correctAnswer: 'bello',
-    ...mockHandlers,
+    inputRef: jest.fn(),
   }
 
   beforeEach(() => {
@@ -38,47 +48,49 @@ describe('AdjectiveInputField', () => {
 
   describe('Rendering', () => {
     it('renders with correct label', () => {
-      renderWithTheme(<AdjectiveInputField {...defaultProps} />)
+      renderWithProviders(<AdjectiveInputField {...defaultProps} />)
 
       expect(screen.getByLabelText('Masculine Singular')).toBeInTheDocument()
     })
 
     it('renders with correct placeholder', () => {
-      renderWithTheme(<AdjectiveInputField {...defaultProps} />)
+      renderWithProviders(<AdjectiveInputField {...defaultProps} />)
 
       const input = screen.getByPlaceholderText('Enter masculine singular')
       expect(input).toBeInTheDocument()
     })
 
     it('renders with empty value by default', () => {
-      renderWithTheme(<AdjectiveInputField {...defaultProps} />)
+      renderWithProviders(<AdjectiveInputField {...defaultProps} />)
 
       const input = screen.getByRole('textbox')
       expect(input).toHaveValue('')
     })
 
     it('renders with provided value', () => {
-      renderWithTheme(<AdjectiveInputField {...defaultProps} value="bello" />)
+      renderWithProviders(
+        <AdjectiveInputField {...defaultProps} value="bello" />
+      )
 
       const input = screen.getByRole('textbox')
       expect(input).toHaveValue('bello')
     })
 
     it('renders clear button', () => {
-      renderWithTheme(<AdjectiveInputField {...defaultProps} />)
+      renderWithProviders(<AdjectiveInputField {...defaultProps} />)
 
       const clearButton = screen.getByRole('button')
       expect(clearButton).toBeInTheDocument()
     })
 
     it('renders clear button with tooltip', () => {
-      renderWithTheme(<AdjectiveInputField {...defaultProps} />)
+      renderWithProviders(<AdjectiveInputField {...defaultProps} />)
 
       expect(screen.getByLabelText('Clear field')).toBeInTheDocument()
     })
 
     it('renders clear icon', () => {
-      renderWithTheme(<AdjectiveInputField {...defaultProps} />)
+      renderWithProviders(<AdjectiveInputField {...defaultProps} />)
 
       const clearButton = screen.getByRole('button')
       const svgIcon = clearButton.querySelector('svg')
@@ -86,7 +98,7 @@ describe('AdjectiveInputField', () => {
     })
 
     it('renders as a full width text field', () => {
-      renderWithTheme(<AdjectiveInputField {...defaultProps} />)
+      renderWithProviders(<AdjectiveInputField {...defaultProps} />)
 
       const textField = screen
         .getByRole('textbox')
@@ -95,7 +107,7 @@ describe('AdjectiveInputField', () => {
     })
 
     it('has autocomplete disabled', () => {
-      renderWithTheme(<AdjectiveInputField {...defaultProps} />)
+      renderWithProviders(<AdjectiveInputField {...defaultProps} />)
 
       const input = screen.getByRole('textbox')
       expect(input).toHaveAttribute('autocomplete', 'off')
@@ -104,7 +116,7 @@ describe('AdjectiveInputField', () => {
 
   describe('Validation Styles', () => {
     it('has no background color when validation is null', () => {
-      renderWithTheme(
+      renderWithProviders(
         <AdjectiveInputField {...defaultProps} validationStatus={null} />
       )
 
@@ -121,7 +133,7 @@ describe('AdjectiveInputField', () => {
     })
 
     it('has green background when validation is correct', () => {
-      renderWithTheme(
+      renderWithProviders(
         <AdjectiveInputField {...defaultProps} validationStatus="correct" />
       )
 
@@ -133,7 +145,7 @@ describe('AdjectiveInputField', () => {
     })
 
     it('has red background when validation is incorrect', () => {
-      renderWithTheme(
+      renderWithProviders(
         <AdjectiveInputField {...defaultProps} validationStatus="incorrect" />
       )
 
@@ -147,12 +159,12 @@ describe('AdjectiveInputField', () => {
 
   describe('Event Handlers', () => {
     it('calls onInputChange when typing in the field', () => {
-      renderWithTheme(<AdjectiveInputField {...defaultProps} />)
+      renderWithProviders(<AdjectiveInputField {...defaultProps} />)
 
       const input = screen.getByRole('textbox')
       fireEvent.change(input, { target: { value: 'bello' } })
 
-      expect(mockHandlers.onInputChange).toHaveBeenCalledWith(
+      expect(mockActions.onInputChange).toHaveBeenCalledWith(
         'adj-1',
         'masculineSingular',
         'bello'
@@ -160,12 +172,14 @@ describe('AdjectiveInputField', () => {
     })
 
     it('calls onInputChange with empty string when clearing input manually', () => {
-      renderWithTheme(<AdjectiveInputField {...defaultProps} value="test" />)
+      renderWithProviders(
+        <AdjectiveInputField {...defaultProps} value="test" />
+      )
 
       const input = screen.getByRole('textbox')
       fireEvent.change(input, { target: { value: '' } })
 
-      expect(mockHandlers.onInputChange).toHaveBeenCalledWith(
+      expect(mockActions.onInputChange).toHaveBeenCalledWith(
         'adj-1',
         'masculineSingular',
         ''
@@ -173,12 +187,12 @@ describe('AdjectiveInputField', () => {
     })
 
     it('calls onValidation when field loses focus', () => {
-      renderWithTheme(<AdjectiveInputField {...defaultProps} />)
+      renderWithProviders(<AdjectiveInputField {...defaultProps} />)
 
       const input = screen.getByRole('textbox')
       fireEvent.blur(input)
 
-      expect(mockHandlers.onValidation).toHaveBeenCalledWith(
+      expect(mockActions.onValidation).toHaveBeenCalledWith(
         'adj-1',
         'masculineSingular',
         'bello'
@@ -186,12 +200,12 @@ describe('AdjectiveInputField', () => {
     })
 
     it('calls onKeyDown when pressing a key', () => {
-      renderWithTheme(<AdjectiveInputField {...defaultProps} />)
+      renderWithProviders(<AdjectiveInputField {...defaultProps} />)
 
       const input = screen.getByRole('textbox')
       fireEvent.keyDown(input, { key: 'Enter', code: 'Enter' })
 
-      expect(mockHandlers.onKeyDown).toHaveBeenCalledWith(
+      expect(mockActions.onKeyDown).toHaveBeenCalledWith(
         expect.objectContaining({
           type: 'keydown',
         }),
@@ -202,24 +216,24 @@ describe('AdjectiveInputField', () => {
     })
 
     it('calls onClearInput when clear button is clicked', () => {
-      renderWithTheme(<AdjectiveInputField {...defaultProps} />)
+      renderWithProviders(<AdjectiveInputField {...defaultProps} />)
 
       const clearButton = screen.getByRole('button')
       fireEvent.click(clearButton)
 
-      expect(mockHandlers.onClearInput).toHaveBeenCalledWith(
+      expect(mockActions.onClearInput).toHaveBeenCalledWith(
         'adj-1',
         'masculineSingular'
       )
     })
 
     it('calls onKeyDown with correct index parameter', () => {
-      renderWithTheme(<AdjectiveInputField {...defaultProps} index={5} />)
+      renderWithProviders(<AdjectiveInputField {...defaultProps} index={5} />)
 
       const input = screen.getByRole('textbox')
       fireEvent.keyDown(input, { key: 'Tab', code: 'Tab' })
 
-      expect(mockHandlers.onKeyDown).toHaveBeenCalledWith(
+      expect(mockActions.onKeyDown).toHaveBeenCalledWith(
         expect.objectContaining({
           type: 'keydown',
         }),
@@ -231,48 +245,46 @@ describe('AdjectiveInputField', () => {
   })
 
   describe('Input Ref', () => {
-    it('calls setInputRef with adjectiveId and field', () => {
-      renderWithTheme(<AdjectiveInputField {...defaultProps} />)
-
-      expect(mockHandlers.setInputRef).toHaveBeenCalledWith(
-        'adj-1',
-        'masculineSingular'
+    it('calls inputRef with HTML input element', () => {
+      const mockInputRef = jest.fn()
+      renderWithProviders(
+        <AdjectiveInputField {...defaultProps} inputRef={mockInputRef} />
       )
+
+      expect(mockInputRef).toHaveBeenCalledWith(expect.any(HTMLInputElement))
     })
 
-    it('calls setInputRef for different fields', () => {
+    it('calls inputRef for different fields', () => {
+      const mockInputRef = jest.fn()
       const props = {
         ...defaultProps,
         field: 'femininePlural' as const,
         label: 'Feminine Plural',
+        inputRef: mockInputRef,
       }
 
-      renderWithTheme(<AdjectiveInputField {...props} />)
+      renderWithProviders(<AdjectiveInputField {...props} />)
 
-      expect(mockHandlers.setInputRef).toHaveBeenCalledWith(
-        'adj-1',
-        'femininePlural'
-      )
+      expect(mockInputRef).toHaveBeenCalledWith(expect.any(HTMLInputElement))
     })
 
-    it('calls setInputRef for different adjectives', () => {
+    it('calls inputRef for different adjectives', () => {
+      const mockInputRef = jest.fn()
       const props = {
         ...defaultProps,
         adjectiveId: 'adj-999',
+        inputRef: mockInputRef,
       }
 
-      renderWithTheme(<AdjectiveInputField {...props} />)
+      renderWithProviders(<AdjectiveInputField {...props} />)
 
-      expect(mockHandlers.setInputRef).toHaveBeenCalledWith(
-        'adj-999',
-        'masculineSingular'
-      )
+      expect(mockInputRef).toHaveBeenCalledWith(expect.any(HTMLInputElement))
     })
   })
 
   describe('Different Props', () => {
     it('renders with different label', () => {
-      renderWithTheme(
+      renderWithProviders(
         <AdjectiveInputField {...defaultProps} label="Feminine Singular" />
       )
 
@@ -280,7 +292,7 @@ describe('AdjectiveInputField', () => {
     })
 
     it('renders with different placeholder', () => {
-      renderWithTheme(
+      renderWithProviders(
         <AdjectiveInputField {...defaultProps} placeholder="Type your answer" />
       )
 
@@ -298,33 +310,33 @@ describe('AdjectiveInputField', () => {
       ] as const
 
       fields.forEach((field) => {
-        const { unmount } = renderWithTheme(
+        const { unmount } = renderWithProviders(
           <AdjectiveInputField {...defaultProps} field={field} />
         )
 
         const input = screen.getByRole('textbox')
         fireEvent.change(input, { target: { value: 'test' } })
 
-        expect(mockHandlers.onInputChange).toHaveBeenCalledWith(
+        expect(mockActions.onInputChange).toHaveBeenCalledWith(
           'adj-1',
           field,
           'test'
         )
 
-        mockHandlers.onInputChange.mockClear()
+        mockActions.onInputChange.mockClear()
         unmount()
       })
     })
 
     it('renders with different adjective IDs', () => {
-      renderWithTheme(
+      renderWithProviders(
         <AdjectiveInputField {...defaultProps} adjectiveId="adj-different" />
       )
 
       const input = screen.getByRole('textbox')
       fireEvent.change(input, { target: { value: 'test' } })
 
-      expect(mockHandlers.onInputChange).toHaveBeenCalledWith(
+      expect(mockActions.onInputChange).toHaveBeenCalledWith(
         'adj-different',
         'masculineSingular',
         'test'
@@ -332,14 +344,14 @@ describe('AdjectiveInputField', () => {
     })
 
     it('renders with different correct answers', () => {
-      renderWithTheme(
+      renderWithProviders(
         <AdjectiveInputField {...defaultProps} correctAnswer="grande" />
       )
 
       const input = screen.getByRole('textbox')
       fireEvent.blur(input)
 
-      expect(mockHandlers.onValidation).toHaveBeenCalledWith(
+      expect(mockActions.onValidation).toHaveBeenCalledWith(
         'adj-1',
         'masculineSingular',
         'grande'
@@ -349,21 +361,21 @@ describe('AdjectiveInputField', () => {
 
   describe('Clear Button', () => {
     it('has small size', () => {
-      renderWithTheme(<AdjectiveInputField {...defaultProps} />)
+      renderWithProviders(<AdjectiveInputField {...defaultProps} />)
 
       const clearButton = screen.getByRole('button')
       expect(clearButton).toHaveClass('MuiIconButton-sizeSmall')
     })
 
     it('has edge="end" positioning', () => {
-      renderWithTheme(<AdjectiveInputField {...defaultProps} />)
+      renderWithProviders(<AdjectiveInputField {...defaultProps} />)
 
       const clearButton = screen.getByRole('button')
       expect(clearButton).toHaveClass('MuiIconButton-edgeEnd')
     })
 
     it('is always rendered regardless of value', () => {
-      const { rerender } = renderWithTheme(
+      const { rerender } = renderWithProviders(
         <AdjectiveInputField {...defaultProps} value="" />
       )
 
@@ -371,7 +383,9 @@ describe('AdjectiveInputField', () => {
 
       rerender(
         <ThemeProvider theme={theme}>
-          <AdjectiveInputField {...defaultProps} value="some value" />
+          <PracticeActionsProvider value={mockActions}>
+            <AdjectiveInputField {...defaultProps} value="some value" />
+          </PracticeActionsProvider>
         </ThemeProvider>
       )
 
@@ -389,7 +403,7 @@ describe('AdjectiveInputField', () => {
 
   describe('Input Size', () => {
     it('renders with small size', () => {
-      renderWithTheme(<AdjectiveInputField {...defaultProps} />)
+      renderWithProviders(<AdjectiveInputField {...defaultProps} />)
 
       const input = screen.getByRole('textbox')
       const textField = input.closest('.MuiTextField-root')
@@ -401,7 +415,7 @@ describe('AdjectiveInputField', () => {
 
   describe('Multiple Event Calls', () => {
     it('calls onInputChange multiple times for consecutive typing', () => {
-      renderWithTheme(<AdjectiveInputField {...defaultProps} />)
+      renderWithProviders(<AdjectiveInputField {...defaultProps} />)
 
       const input = screen.getByRole('textbox')
 
@@ -411,8 +425,8 @@ describe('AdjectiveInputField', () => {
       fireEvent.change(input, { target: { value: 'bell' } })
       fireEvent.change(input, { target: { value: 'bello' } })
 
-      expect(mockHandlers.onInputChange).toHaveBeenCalledTimes(5)
-      expect(mockHandlers.onInputChange).toHaveBeenLastCalledWith(
+      expect(mockActions.onInputChange).toHaveBeenCalledTimes(5)
+      expect(mockActions.onInputChange).toHaveBeenLastCalledWith(
         'adj-1',
         'masculineSingular',
         'bello'
@@ -420,18 +434,18 @@ describe('AdjectiveInputField', () => {
     })
 
     it('handles multiple blur events', () => {
-      renderWithTheme(<AdjectiveInputField {...defaultProps} />)
+      renderWithProviders(<AdjectiveInputField {...defaultProps} />)
 
       const input = screen.getByRole('textbox')
 
       fireEvent.blur(input)
       fireEvent.blur(input)
 
-      expect(mockHandlers.onValidation).toHaveBeenCalledTimes(2)
+      expect(mockActions.onValidation).toHaveBeenCalledTimes(2)
     })
 
     it('handles clear button being clicked multiple times', () => {
-      renderWithTheme(<AdjectiveInputField {...defaultProps} />)
+      renderWithProviders(<AdjectiveInputField {...defaultProps} />)
 
       const clearButton = screen.getByRole('button')
 
@@ -439,20 +453,20 @@ describe('AdjectiveInputField', () => {
       fireEvent.click(clearButton)
       fireEvent.click(clearButton)
 
-      expect(mockHandlers.onClearInput).toHaveBeenCalledTimes(3)
+      expect(mockActions.onClearInput).toHaveBeenCalledTimes(3)
     })
   })
 
   describe('Integration', () => {
     it('handles typical user workflow: type, blur, clear', () => {
-      renderWithTheme(<AdjectiveInputField {...defaultProps} />)
+      renderWithProviders(<AdjectiveInputField {...defaultProps} />)
 
       const input = screen.getByRole('textbox')
       const clearButton = screen.getByRole('button')
 
       // Type in the input
       fireEvent.change(input, { target: { value: 'bello' } })
-      expect(mockHandlers.onInputChange).toHaveBeenCalledWith(
+      expect(mockActions.onInputChange).toHaveBeenCalledWith(
         'adj-1',
         'masculineSingular',
         'bello'
@@ -460,7 +474,7 @@ describe('AdjectiveInputField', () => {
 
       // Blur triggers validation
       fireEvent.blur(input)
-      expect(mockHandlers.onValidation).toHaveBeenCalledWith(
+      expect(mockActions.onValidation).toHaveBeenCalledWith(
         'adj-1',
         'masculineSingular',
         'bello'
@@ -468,31 +482,33 @@ describe('AdjectiveInputField', () => {
 
       // Clear the input
       fireEvent.click(clearButton)
-      expect(mockHandlers.onClearInput).toHaveBeenCalledWith(
+      expect(mockActions.onClearInput).toHaveBeenCalledWith(
         'adj-1',
         'masculineSingular'
       )
     })
 
     it('handles keyboard navigation', () => {
-      renderWithTheme(<AdjectiveInputField {...defaultProps} />)
+      renderWithProviders(<AdjectiveInputField {...defaultProps} />)
 
       const input = screen.getByRole('textbox')
 
       fireEvent.keyDown(input, { key: 'Tab', code: 'Tab' })
-      expect(mockHandlers.onKeyDown).toHaveBeenCalledTimes(1)
+      expect(mockActions.onKeyDown).toHaveBeenCalledTimes(1)
 
       fireEvent.keyDown(input, { key: 'Enter', code: 'Enter' })
-      expect(mockHandlers.onKeyDown).toHaveBeenCalledTimes(2)
+      expect(mockActions.onKeyDown).toHaveBeenCalledTimes(2)
 
       fireEvent.keyDown(input, { key: 'ArrowDown', code: 'ArrowDown' })
-      expect(mockHandlers.onKeyDown).toHaveBeenCalledTimes(3)
+      expect(mockActions.onKeyDown).toHaveBeenCalledTimes(3)
     })
   })
 
   describe('Edge Cases', () => {
     it('handles special characters in value', () => {
-      renderWithTheme(<AdjectiveInputField {...defaultProps} value="àèéìòù" />)
+      renderWithProviders(
+        <AdjectiveInputField {...defaultProps} value="àèéìòù" />
+      )
 
       const input = screen.getByRole('textbox')
       expect(input).toHaveValue('àèéìòù')
@@ -500,7 +516,7 @@ describe('AdjectiveInputField', () => {
 
     it('handles long values', () => {
       const longValue = 'a'.repeat(100)
-      renderWithTheme(
+      renderWithProviders(
         <AdjectiveInputField {...defaultProps} value={longValue} />
       )
 
@@ -509,14 +525,14 @@ describe('AdjectiveInputField', () => {
     })
 
     it('handles empty correct answer', () => {
-      renderWithTheme(
+      renderWithProviders(
         <AdjectiveInputField {...defaultProps} correctAnswer="" />
       )
 
       const input = screen.getByRole('textbox')
       fireEvent.blur(input)
 
-      expect(mockHandlers.onValidation).toHaveBeenCalledWith(
+      expect(mockActions.onValidation).toHaveBeenCalledWith(
         'adj-1',
         'masculineSingular',
         ''

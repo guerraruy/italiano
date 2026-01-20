@@ -5,6 +5,7 @@ import {
   useGetAdjectiveStatisticsQuery,
   useUpdateAdjectiveStatisticMutation,
   useResetAdjectiveStatisticMutation,
+  useGetProfileQuery,
 } from '@/app/store/api'
 
 import { useAdjectivesPractice } from './useAdjectivesPractice'
@@ -15,6 +16,7 @@ jest.mock('@/app/store/api', () => ({
   useGetAdjectiveStatisticsQuery: jest.fn(),
   useUpdateAdjectiveStatisticMutation: jest.fn(),
   useResetAdjectiveStatisticMutation: jest.fn(),
+  useGetProfileQuery: jest.fn(),
 }))
 
 describe('useAdjectivesPractice', () => {
@@ -67,6 +69,11 @@ describe('useAdjectivesPractice', () => {
       mockResetAdjectiveStatistic,
       { isLoading: false },
     ])
+
+    // Mock useGetProfileQuery
+    ;(useGetProfileQuery as jest.Mock).mockReturnValue({
+      data: { profile: { masteryThreshold: 10 } },
+    })
 
     // Mock Date.now for predictable timing
     jest.spyOn(Date, 'now').mockReturnValue(1000)

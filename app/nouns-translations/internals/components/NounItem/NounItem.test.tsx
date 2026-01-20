@@ -1,10 +1,16 @@
-import React from 'react'
+import React, { ReactNode } from 'react'
 
 import { ThemeProvider, createTheme } from '@mui/material/styles'
 import { render, screen, fireEvent } from '@testing-library/react'
 
 import '@testing-library/jest-dom'
 import { Statistics } from '@/app/components/Statistics'
+import {
+  PracticeActionsProvider,
+  PracticeFiltersProvider,
+  PracticeActionsContextType,
+  PracticeFiltersContextType,
+} from '@/app/contexts'
 
 import NounItem from './NounItem'
 
@@ -22,8 +28,44 @@ const MockedStatistics = jest.mocked(Statistics)
 
 const theme = createTheme()
 
+// Mock context values
+const mockActionsContext: PracticeActionsContextType = {
+  onInputChange: jest.fn(),
+  onValidation: jest.fn(),
+  onClearInput: jest.fn(),
+  onShowAnswer: jest.fn(),
+  onResetStatistics: jest.fn(),
+  onKeyDown: jest.fn(),
+  getStatistics: jest.fn().mockReturnValue({ correct: 0, wrong: 0 }),
+  getInputRef: jest.fn().mockReturnValue(jest.fn()),
+}
+
+const mockFiltersContext: PracticeFiltersContextType = {
+  sortOption: 'none',
+  displayCount: 'all',
+  excludeMastered: false,
+  masteryThreshold: 10,
+  masteredCount: 0,
+  shouldShowRefreshButton: false,
+  displayedCount: 1,
+  totalCount: 1,
+  onSortChange: jest.fn(),
+  onDisplayCountChange: jest.fn(),
+  onExcludeMasteredChange: jest.fn(),
+  onRefresh: jest.fn(),
+}
+
 const renderWithTheme = (ui: React.ReactElement) => {
-  return render(<ThemeProvider theme={theme}>{ui}</ThemeProvider>)
+  const Wrapper = ({ children }: { children: ReactNode }) => (
+    <ThemeProvider theme={theme}>
+      <PracticeFiltersProvider value={mockFiltersContext}>
+        <PracticeActionsProvider value={mockActionsContext}>
+          {children}
+        </PracticeActionsProvider>
+      </PracticeFiltersProvider>
+    </ThemeProvider>
+  )
+  return render(ui, { wrapper: Wrapper })
 }
 
 describe('NounItem', () => {
@@ -47,24 +89,14 @@ describe('NounItem', () => {
 
   const defaultStatistics = { correct: 0, wrong: 0 }
 
-  const mockHandlers = {
-    onInputChange: jest.fn(),
-    onValidation: jest.fn(),
-    onClearInput: jest.fn(),
-    onShowAnswer: jest.fn(),
-    onResetStatistics: jest.fn(),
-    onKeyDown: jest.fn(),
-    inputRefSingular: jest.fn(),
-    inputRefPlural: jest.fn(),
-  }
-
   const defaultProps = {
     noun: mockNoun,
     index: 0,
     inputValues: defaultInputValues,
     validationState: defaultValidationState,
     statistics: defaultStatistics,
-    ...mockHandlers,
+    inputRefSingular: jest.fn(),
+    inputRefPlural: jest.fn(),
   }
 
   beforeEach(() => {
@@ -297,7 +329,7 @@ describe('NounItem', () => {
         )
         fireEvent.change(singularInput, { target: { value: 'casa' } })
 
-        expect(mockHandlers.onInputChange).toHaveBeenCalledWith(
+        expect(mockActionsContext.onInputChange).toHaveBeenCalledWith(
           'noun-1',
           'singular',
           'casa'
@@ -312,7 +344,7 @@ describe('NounItem', () => {
         )
         fireEvent.change(pluralInput, { target: { value: 'case' } })
 
-        expect(mockHandlers.onInputChange).toHaveBeenCalledWith(
+        expect(mockActionsContext.onInputChange).toHaveBeenCalledWith(
           'noun-1',
           'plural',
           'case'
@@ -329,7 +361,10 @@ describe('NounItem', () => {
         )
         fireEvent.blur(singularInput)
 
-        expect(mockHandlers.onValidation).toHaveBeenCalledWith('noun-1', false)
+        expect(mockActionsContext.onValidation).toHaveBeenCalledWith(
+          'noun-1',
+          false
+        )
       })
 
       it('calls onValidation without saveStatistics flag when plural input loses focus', () => {
@@ -340,7 +375,7 @@ describe('NounItem', () => {
         )
         fireEvent.blur(pluralInput)
 
-        expect(mockHandlers.onValidation).toHaveBeenCalledWith('noun-1')
+        expect(mockActionsContext.onValidation).toHaveBeenCalledWith('noun-1')
       })
     })
 
@@ -353,7 +388,7 @@ describe('NounItem', () => {
         )
         fireEvent.keyDown(singularInput, { key: 'Enter' })
 
-        expect(mockHandlers.onKeyDown).toHaveBeenCalledWith(
+        expect(mockActionsContext.onKeyDown).toHaveBeenCalledWith(
           expect.objectContaining({ key: 'Enter' }),
           'noun-1',
           'singular',
@@ -369,7 +404,7 @@ describe('NounItem', () => {
         )
         fireEvent.keyDown(pluralInput, { key: 'Tab' })
 
-        expect(mockHandlers.onKeyDown).toHaveBeenCalledWith(
+        expect(mockActionsContext.onKeyDown).toHaveBeenCalledWith(
           expect.objectContaining({ key: 'Tab' }),
           'noun-1',
           'plural',
@@ -388,7 +423,7 @@ describe('NounItem', () => {
         // First clear button is for singular
         fireEvent.click(clearButtons[0]!)
 
-        expect(mockHandlers.onClearInput).toHaveBeenCalledWith(
+        expect(mockActionsContext.onClearInput).toHaveBeenCalledWith(
           'noun-1',
           'singular'
         )
@@ -403,7 +438,7 @@ describe('NounItem', () => {
         // Second clear button is for plural
         fireEvent.click(clearButtons[1]!)
 
-        expect(mockHandlers.onClearInput).toHaveBeenCalledWith(
+        expect(mockActionsContext.onClearInput).toHaveBeenCalledWith(
           'noun-1',
           'plural'
         )
@@ -419,7 +454,7 @@ describe('NounItem', () => {
         })
         fireEvent.click(showAnswerButton)
 
-        expect(mockHandlers.onShowAnswer).toHaveBeenCalledWith('noun-1')
+        expect(mockActionsContext.onShowAnswer).toHaveBeenCalledWith('noun-1')
       })
     })
 
@@ -434,24 +469,32 @@ describe('NounItem', () => {
         })
         fireEvent.click(resetButton)
 
-        expect(mockHandlers.onResetStatistics).toHaveBeenCalledWith('noun-1')
+        expect(mockActionsContext.onResetStatistics).toHaveBeenCalledWith(
+          'noun-1'
+        )
       })
     })
   })
 
   describe('Input Refs', () => {
     it('passes inputRefSingular to singular input', () => {
-      renderWithTheme(<NounItem {...defaultProps} />)
+      const singularRefMock = jest.fn()
+      renderWithTheme(
+        <NounItem {...defaultProps} inputRefSingular={singularRefMock} />
+      )
 
-      // The ref callback should be passed to the input
-      expect(mockHandlers.inputRefSingular).toBeDefined()
+      // The ref callback should be called with the input element
+      expect(singularRefMock).toHaveBeenCalledWith(expect.any(HTMLInputElement))
     })
 
     it('passes inputRefPlural to plural input', () => {
-      renderWithTheme(<NounItem {...defaultProps} />)
+      const pluralRefMock = jest.fn()
+      renderWithTheme(
+        <NounItem {...defaultProps} inputRefPlural={pluralRefMock} />
+      )
 
-      // The ref callback should be passed to the input
-      expect(mockHandlers.inputRefPlural).toBeDefined()
+      // The ref callback should be called with the input element
+      expect(pluralRefMock).toHaveBeenCalledWith(expect.any(HTMLInputElement))
     })
   })
 
@@ -572,7 +615,9 @@ describe('NounItem', () => {
       })
       fireEvent.click(showAnswerButton)
 
-      expect(mockHandlers.onShowAnswer).toHaveBeenCalledWith('custom-noun-id')
+      expect(mockActionsContext.onShowAnswer).toHaveBeenCalledWith(
+        'custom-noun-id'
+      )
     })
   })
 
@@ -585,7 +630,7 @@ describe('NounItem', () => {
       )
       fireEvent.keyDown(singularInput, { key: 'Enter' })
 
-      expect(mockHandlers.onKeyDown).toHaveBeenCalledWith(
+      expect(mockActionsContext.onKeyDown).toHaveBeenCalledWith(
         expect.any(Object),
         'noun-1',
         'singular',

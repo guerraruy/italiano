@@ -1,6 +1,18 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import '@testing-library/jest-dom'
+import { act } from 'react'
+
+import { cleanup } from '@testing-library/react'
+
+// Clean up after each test and wait for pending updates
+afterEach(async () => {
+  await act(async () => {
+    cleanup()
+    // Wait for any pending timers and state updates (including TouchRipple animations)
+    await new Promise((resolve) => setTimeout(resolve, 50))
+  })
+})
 
 // Mock localStorage
 const localStorageMock = {
@@ -100,3 +112,27 @@ global.Headers = class MockHeaders {
     this.headers.forEach((value, key) => callback(value, key))
   }
 } as any
+
+// Disable Material-UI transitions and animations in tests
+// This prevents act() warnings from TouchRipple and other animated components
+Object.defineProperty(window, 'matchMedia', {
+  writable: true,
+  value: jest.fn().mockImplementation((query) => ({
+    matches: false,
+    media: query,
+    onchange: null,
+    addListener: jest.fn(),
+    removeListener: jest.fn(),
+    addEventListener: jest.fn(),
+    removeEventListener: jest.fn(),
+    dispatchEvent: jest.fn(),
+  })),
+})
+
+// Mock TouchRipple to prevent act() warnings from ripple animations
+jest.mock('@mui/material/ButtonBase/TouchRipple', () => {
+  const React = jest.requireActual('react')
+  const MockTouchRipple = React.forwardRef(() => null)
+  MockTouchRipple.displayName = 'TouchRipple'
+  return MockTouchRipple
+})

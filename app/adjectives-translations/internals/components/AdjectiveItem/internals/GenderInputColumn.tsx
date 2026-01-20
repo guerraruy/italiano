@@ -20,23 +20,8 @@ interface GenderInputColumnProps {
   pluralValidation: ValidationStatus
   adjectiveId: string
   index: number
-  onInputChange: (adjectiveId: string, field: FieldKey, value: string) => void
-  onValidation: (
-    adjectiveId: string,
-    field: FieldKey,
-    correctAnswer: string
-  ) => void
-  onClearInput: (adjectiveId: string, field?: FieldKey) => void
-  onKeyDown: (
-    e: React.KeyboardEvent,
-    adjectiveId: string,
-    field: FieldKey,
-    index: number
-  ) => void
-  setInputRef: (
-    adjectiveId: string,
-    field: FieldKey
-  ) => (el: HTMLInputElement | null) => void
+  singularInputRef: (el: HTMLInputElement | null) => void
+  pluralInputRef: (el: HTMLInputElement | null) => void
 }
 
 function GenderInputColumn({
@@ -51,11 +36,8 @@ function GenderInputColumn({
   pluralValidation,
   adjectiveId,
   index,
-  onInputChange,
-  onValidation,
-  onClearInput,
-  onKeyDown,
-  setInputRef,
+  singularInputRef,
+  pluralInputRef,
 }: GenderInputColumnProps) {
   const genderLower = gender.toLowerCase()
 
@@ -73,11 +55,7 @@ function GenderInputColumn({
         field={singularField}
         index={index}
         correctAnswer={singularCorrectAnswer}
-        onInputChange={onInputChange}
-        onValidation={onValidation}
-        onClearInput={onClearInput}
-        onKeyDown={onKeyDown}
-        setInputRef={setInputRef}
+        inputRef={singularInputRef}
       />
       <AdjectiveInputField
         label="Plural"
@@ -88,11 +66,7 @@ function GenderInputColumn({
         field={pluralField}
         index={index}
         correctAnswer={pluralCorrectAnswer}
-        onInputChange={onInputChange}
-        onValidation={onValidation}
-        onClearInput={onClearInput}
-        onKeyDown={onKeyDown}
-        setInputRef={setInputRef}
+        inputRef={pluralInputRef}
       />
     </Box>
   )

@@ -241,13 +241,16 @@ export default function ImportAdjectives({
   return (
     <>
       <Tooltip title="Import Adjectives from JSON">
-        <IconButton
-          color="primary"
-          onClick={() => setShowImportDialog(true)}
-          disabled={isLoading}
-        >
-          <CloudUpload />
-        </IconButton>
+        <span>
+          <IconButton
+            color="primary"
+            onClick={() => setShowImportDialog(true)}
+            disabled={isLoading}
+            aria-label="Import Adjectives from JSON"
+          >
+            <CloudUpload />
+          </IconButton>
+        </span>
       </Tooltip>
 
       <ImportDialog

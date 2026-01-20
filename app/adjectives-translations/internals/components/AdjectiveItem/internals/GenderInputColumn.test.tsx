@@ -18,19 +18,6 @@ interface AdjectiveInputFieldProps {
   field: FieldKey
   index: number
   correctAnswer: string
-  onInputChange: (adjectiveId: string, field: FieldKey, value: string) => void
-  onValidation: (
-    adjectiveId: string,
-    field: FieldKey,
-    correctAnswer: string
-  ) => void
-  onClearInput: (adjectiveId: string, field?: FieldKey) => void
-  onKeyDown: (
-    e: React.KeyboardEvent,
-    adjectiveId: string,
-    field: FieldKey,
-    index: number
-  ) => void
   setInputRef: (
     adjectiveId: string,
     field: FieldKey
@@ -43,6 +30,16 @@ const renderWithTheme = (ui: React.ReactElement) => {
   return render(<ThemeProvider theme={theme}>{ui}</ThemeProvider>)
 }
 
+// Mock the PracticeActionsContext
+jest.mock('@/app/contexts', () => ({
+  usePracticeActions: () => ({
+    onInputChange: jest.fn(),
+    onValidation: jest.fn(),
+    onClearInput: jest.fn(),
+    onKeyDown: jest.fn(),
+  }),
+}))
+
 jest.mock('./AdjectiveInputField', () => {
   return function MockAdjectiveInputField(props: AdjectiveInputFieldProps) {
     return (
@@ -51,6 +48,7 @@ jest.mock('./AdjectiveInputField', () => {
         <input
           placeholder={props.placeholder}
           value={props.value}
+          onChange={() => {}}
           data-validation={props.validationStatus}
           data-adjective-id={props.adjectiveId}
           data-field={props.field}
@@ -63,14 +61,6 @@ jest.mock('./AdjectiveInputField', () => {
 })
 
 describe('GenderInputColumn', () => {
-  const mockHandlers = {
-    onInputChange: jest.fn(),
-    onValidation: jest.fn(),
-    onClearInput: jest.fn(),
-    onKeyDown: jest.fn(),
-    setInputRef: jest.fn(() => jest.fn()),
-  }
-
   const defaultProps = {
     gender: 'Masculine' as const,
     singularField: 'masculineSingular' as const,
@@ -83,7 +73,7 @@ describe('GenderInputColumn', () => {
     pluralValidation: null as 'correct' | 'incorrect' | null,
     adjectiveId: 'adj-1',
     index: 0,
-    ...mockHandlers,
+    setInputRef: jest.fn(() => jest.fn()),
   }
 
   beforeEach(() => {
