@@ -26,6 +26,45 @@ npx prisma migrate dev   # Create and apply migrations
 npx prisma studio        # Open Prisma Studio GUI
 ```
 
+## Gemini CLI for Large Codebase Analysis
+
+When analyzing large codebases or multiple files that might exceed context limits, use the Gemini CLI with its massive context window.
+
+### File and Directory Inclusion Syntax
+
+Use the `@` syntax to include files and directories in your Gemini prompts. Paths are relative to where you run the command:
+
+```bash
+# Single file analysis
+gemini -p "@src/main.py Explain this file's purpose and structure"
+
+# Multiple files
+gemini -p "@package.json @src/index.js Analyze the dependencies used in the code"
+
+# Entire directory
+gemini -p "@src/ Summarize the architecture of this codebase"
+
+# Multiple directories
+gemini -p "@src/ @tests/ Analyze test coverage for the source code"
+
+# Current directory and subdirectories
+gemini -p "@./ Give me an overview of this entire project"
+
+# Or use --all_files flag
+gemini --all_files -p "Analyze the project structure and dependencies"
+```
+
+### When to Use Gemini CLI
+
+Use `gemini -p` when:
+
+- Analyzing entire codebases or large directories
+- Comparing multiple large files
+- Need to understand project-wide patterns or architecture
+- Current context window is insufficient for the task
+- Working with files totaling more than 100KB
+- Verifying if specific features, patterns, or security measures are implemented
+
 ## Architecture Overview
 
 This is an Italian language learning app built with Next.js 16 App Router, React 19, TypeScript, and PostgreSQL (via Prisma).
