@@ -7,6 +7,7 @@ import {
   useUpdateNounStatisticMutation,
   useGetProfileQuery,
 } from '@/app/store/api'
+import { usePracticeFiltersStore } from '@/app/store/practiceFiltersStore'
 import { TIMING } from '@/lib/constants'
 import {
   useStatisticsError,
@@ -31,7 +32,16 @@ export const useNounsPractice = () => {
 
   const [inputValues, setInputValues] = useState<InputValues>({})
   const [validationState, setValidationState] = useState<ValidationState>({})
-  const [excludeMastered, setExcludeMastered] = useState<boolean>(true)
+
+  // Use persisted filter preferences from Zustand store
+  const {
+    excludeMastered,
+    setExcludeMastered,
+    sortOption: storedSortOption,
+    setSortOption,
+    displayCount: storedDisplayCount,
+    setDisplayCount: setStoredDisplayCount,
+  } = usePracticeFiltersStore()
 
   const inputRefsSingular = useRef<{ [key: string]: HTMLInputElement | null }>(
     {}
@@ -112,7 +122,7 @@ export const useNounsPractice = () => {
     [excludeMastered, masteryThreshold, getStatistics]
   )
 
-  // Use shared sorting and filtering hook
+  // Use shared sorting and filtering hook with persisted values
   const {
     sortOption,
     displayCount,
@@ -126,6 +136,10 @@ export const useNounsPractice = () => {
     getStatistics,
     filterFn,
     refetchStatistics,
+    initialSortOption: storedSortOption,
+    initialDisplayCount: storedDisplayCount,
+    onSortOptionChange: setSortOption,
+    onDisplayCountChange: setStoredDisplayCount,
   })
 
   // Wrap refresh handler to also clear input/validation state

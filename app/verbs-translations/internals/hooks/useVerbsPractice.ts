@@ -7,6 +7,7 @@ import {
   useUpdateVerbStatisticMutation,
   useGetProfileQuery,
 } from '@/app/store/api'
+import { usePracticeFiltersStore } from '@/app/store/practiceFiltersStore'
 import { TIMING } from '@/lib/constants'
 import {
   useStatisticsError,
@@ -15,7 +16,6 @@ import {
 } from '@/lib/hooks'
 import { PracticeVerb } from '@/lib/types'
 
-import { VerbTypeFilter } from '../components/VerbItem/internals'
 import { InputValues, ValidationState } from '../types'
 import { validateAnswer } from '../utils'
 
@@ -32,8 +32,18 @@ export const useVerbsPractice = () => {
 
   const [inputValues, setInputValues] = useState<InputValues>({})
   const [validationState, setValidationState] = useState<ValidationState>({})
-  const [verbTypeFilter, setVerbTypeFilter] = useState<VerbTypeFilter>('all')
-  const [excludeMastered, setExcludeMastered] = useState<boolean>(true)
+
+  // Use persisted filter preferences from Zustand store
+  const {
+    excludeMastered,
+    setExcludeMastered,
+    verbTypeFilter,
+    setVerbTypeFilter,
+    sortOption: storedSortOption,
+    setSortOption,
+    displayCount: storedDisplayCount,
+    setDisplayCount: setStoredDisplayCount,
+  } = usePracticeFiltersStore()
 
   const inputRefs = useRef<{ [key: string]: HTMLInputElement | null }>({})
   const lastValidatedRef = useRef<{ [key: string]: number }>({})
@@ -120,7 +130,7 @@ export const useVerbsPractice = () => {
     [verbTypeFilter, excludeMastered, masteryThreshold, getStatistics]
   )
 
-  // Use shared sorting and filtering hook
+  // Use shared sorting and filtering hook with persisted values
   const {
     sortOption,
     displayCount,
@@ -134,6 +144,10 @@ export const useVerbsPractice = () => {
     getStatistics,
     filterFn,
     refetchStatistics,
+    initialSortOption: storedSortOption,
+    initialDisplayCount: storedDisplayCount,
+    onSortOptionChange: setSortOption,
+    onDisplayCountChange: setStoredDisplayCount,
   })
 
   // Wrap refresh handler to also clear input/validation state

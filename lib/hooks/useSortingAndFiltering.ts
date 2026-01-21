@@ -11,6 +11,14 @@ interface UseSortingAndFilteringOptions<TItem extends PracticeItem> {
   filterFn?: (item: TItem) => boolean
   /** Optional function to refetch statistics (called on refresh for error-based sorts) */
   refetchStatistics?: () => void
+  /** Initial sort option (for persistence) */
+  initialSortOption?: SortOption
+  /** Initial display count (for persistence) */
+  initialDisplayCount?: DisplayCount
+  /** Callback when sort option changes (for persistence) */
+  onSortOptionChange?: (value: SortOption) => void
+  /** Callback when display count changes (for persistence) */
+  onDisplayCountChange?: (value: DisplayCount) => void
 }
 
 /**
@@ -50,9 +58,14 @@ export function useSortingAndFiltering<TItem extends PracticeItem>({
   getStatistics,
   filterFn,
   refetchStatistics,
+  initialSortOption = 'none',
+  initialDisplayCount = 10,
+  onSortOptionChange,
+  onDisplayCountChange,
 }: UseSortingAndFilteringOptions<TItem>) {
-  const [sortOption, setSortOption] = useState<SortOption>('none')
-  const [displayCount, setDisplayCount] = useState<DisplayCount>(10)
+  const [sortOption, setSortOption] = useState<SortOption>(initialSortOption)
+  const [displayCount, setDisplayCountState] =
+    useState<DisplayCount>(initialDisplayCount)
   const [randomSeed, setRandomSeed] = useState(0)
 
   // Pre-calculate all statistics once to avoid repeated calls during sorting
@@ -193,6 +206,7 @@ export function useSortingAndFiltering<TItem extends PracticeItem>({
   const handleSortChange = useCallback(
     (newSort: SortOption) => {
       setSortOption(newSort)
+      onSortOptionChange?.(newSort)
       // Always capture snapshot when changing sort to update filter
       captureSnapshot()
 
@@ -200,13 +214,21 @@ export function useSortingAndFiltering<TItem extends PracticeItem>({
         setRandomSeed(Date.now())
       }
     },
-    [captureSnapshot]
+    [captureSnapshot, onSortOptionChange]
   )
 
   const shouldShowRefreshButton =
     sortOption === 'random' ||
     sortOption === 'most-errors' ||
     sortOption === 'worst-performance'
+
+  const setDisplayCount = useCallback(
+    (value: DisplayCount) => {
+      setDisplayCountState(value)
+      onDisplayCountChange?.(value)
+    },
+    [onDisplayCountChange]
+  )
 
   return {
     sortOption,

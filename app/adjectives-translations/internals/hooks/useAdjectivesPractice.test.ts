@@ -7,6 +7,7 @@ import {
   useResetAdjectiveStatisticMutation,
   useGetProfileQuery,
 } from '@/app/store/api'
+import { usePracticeFiltersStore } from '@/app/store/practiceFiltersStore'
 
 import { useAdjectivesPractice } from './useAdjectivesPractice'
 
@@ -51,6 +52,8 @@ describe('useAdjectivesPractice', () => {
 
   beforeEach(() => {
     jest.clearAllMocks()
+    // Reset Zustand store to defaults
+    usePracticeFiltersStore.getState().resetAll()
 
     // Default mock implementations
     ;(useGetAdjectivesForPracticeQuery as jest.Mock).mockReturnValue({

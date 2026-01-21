@@ -3,6 +3,7 @@ import React from 'react'
 import { act, renderHook, waitFor } from '@testing-library/react'
 
 import * as api from '@/app/store/api'
+import { usePracticeFiltersStore } from '@/app/store/practiceFiltersStore'
 
 import { useVerbsPractice } from './useVerbsPractice'
 
@@ -79,6 +80,8 @@ describe('useVerbsPractice', () => {
 
   beforeEach(() => {
     jest.clearAllMocks()
+    // Reset Zustand store to defaults
+    usePracticeFiltersStore.getState().resetAll()
 
     // Default mock implementations
     ;(api.useGetVerbsForPracticeQuery as jest.Mock).mockReturnValue({

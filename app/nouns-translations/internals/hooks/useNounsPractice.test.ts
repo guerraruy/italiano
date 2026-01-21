@@ -7,6 +7,7 @@ import {
   useResetNounStatisticMutation,
   useGetProfileQuery,
 } from '@/app/store/api'
+import { usePracticeFiltersStore } from '@/app/store/practiceFiltersStore'
 
 import { useNounsPractice } from './useNounsPractice'
 
@@ -58,6 +59,8 @@ describe('useNounsPractice', () => {
 
   beforeEach(() => {
     jest.clearAllMocks()
+    // Reset Zustand store to defaults
+    usePracticeFiltersStore.getState().resetAll()
 
     // Default mock implementations
     ;(useGetNounsForPracticeQuery as jest.Mock).mockReturnValue({
